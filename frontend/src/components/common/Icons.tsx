@@ -38,21 +38,21 @@ import {
   FiChevronDown,
   FiDollarSign,
 } from 'react-icons/fi';
-import { IconBaseProps } from 'react-icons';
+import { IconType } from 'react-icons';
 
-// Create a wrapper component for icons that works with React 19
+// Create a wrapper component for icons that works with IconType
 interface IconProps {
-  icon: React.ComponentType<IconBaseProps>;
+  icon: IconType;
   className?: string;
   onClick?: () => void;
   size?: number;
 }
 
 export const Icon: React.FC<IconProps> = ({ icon: IconComponent, className, onClick, size }) => {
-  return React.createElement(IconComponent, { className, onClick, size });
+  return React.createElement(IconComponent as React.ComponentType<any>, { className, onClick, size });
 };
 
-// Export icons directly from react-icons/fi - no need to wrap them
+// Export icons directly from react-icons/fi
 export {
   FiUser,
   FiMail,
