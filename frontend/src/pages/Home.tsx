@@ -310,32 +310,54 @@ const Home: React.FC = () => {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {[
-              {
-                icon: Icons.FiUsers,
-                title: 'Expert Local Guides',
-                description: 'Our experienced local guides provide authentic insights and unforgettable experiences that you won\'t find anywhere else.',
-                color: 'blue'
-              },
-              {
-                icon: Icons.FiCheck,
-                title: 'Carefully Curated',
-                description: 'Every tour is meticulously planned and tested to ensure the highest quality experience for our travelers.',
-                color: 'green'
-              },
-              {
-                icon: Icons.FiStar,
-                title: '24/7 Support',
-                description: 'Our dedicated support team is available around the clock to assist you before, during, and after your trip.',
-                color: 'purple'
-              }
-            ].map((feature, index) => (
+            {whyChooseUs.map((feature, index) => (
               <div key={index} className="text-center group">
-                <div className={`w-16 h-16 mx-auto mb-6 rounded-full flex items-center justify-center bg-${feature.color}-100 dark:bg-${feature.color}-900/20 group-hover:scale-110 transition-transform duration-200`}>
-                  <Icon icon={feature.icon} className={`w-8 h-8 text-${feature.color}-600 dark:text-${feature.color}-400`} />
+                <div className={`w-16 h-16 mx-auto mb-6 rounded-full flex items-center justify-center bg-blue-100 dark:bg-blue-900/20 group-hover:scale-110 transition-transform duration-200`}>
+                  <Icon icon={feature.icon} className={`w-8 h-8 text-blue-600 dark:text-blue-400`} />
                 </div>
                 <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-4">{feature.title}</h3>
                 <p className="text-gray-600 dark:text-gray-300 leading-relaxed">{feature.description}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Testimonials Section */}
+      <section className="py-20 bg-gray-50 dark:bg-dark-900 transition-colors duration-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">What Our Travelers Say</h2>
+            <p className="text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
+              Hear from thousands of satisfied travelers who have experienced amazing adventures with us
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {testimonials.map((testimonial, index) => (
+              <div key={index} className="bg-white dark:bg-dark-700 rounded-xl shadow-lg p-6 border dark:border-dark-600">
+                <div className="flex items-center mb-4">
+                  <div className="w-12 h-12 bg-gray-200 dark:bg-dark-600 rounded-full overflow-hidden mr-4">
+                    <img
+                      src={testimonial.avatar}
+                      alt={testimonial.name}
+                      className="w-full h-full object-cover"
+                      onError={(e) => {
+                        e.currentTarget.src = `https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&q=80`;
+                      }}
+                    />
+                  </div>
+                  <div>
+                    <h4 className="font-semibold text-gray-900 dark:text-white">{testimonial.name}</h4>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">{testimonial.location}</p>
+                  </div>
+                </div>
+                <div className="flex items-center mb-3">
+                  {[...Array(testimonial.rating)].map((_, starIndex) => (
+                    <Icon key={starIndex} icon={Icons.FiStar} className="w-4 h-4 text-yellow-400 fill-current" />
+                  ))}
+                </div>
+                <p className="text-gray-600 dark:text-gray-300 italic">"{testimonial.text}"</p>
               </div>
             ))}
           </div>
