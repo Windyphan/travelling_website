@@ -42,20 +42,20 @@ const Header: React.FC = () => {
     : 'bg-transparent';
 
   const logoTextClasses = isScrolled
-    ? `text-gray-900 dark:text-white ${isDarkMode ? 'text-white' : 'text-gray-900'}`
-    : 'text-white drop-shadow-lg';
+    ? `transition-colors duration-300 ${isDarkMode ? 'text-white' : 'text-gray-900'}`
+    : `transition-colors duration-300 ${isDarkMode ? 'text-white drop-shadow-lg' : 'text-gray-900 drop-shadow-lg'}`;
 
   const navLinkClasses = isScrolled
-    ? `transition-all duration-300 hover:scale-105 ${isDarkMode ? 'text-gray-300 hover:text-primary-400' : 'text-gray-700 hover:text-primary-600'}`
-    : 'text-white hover:text-primary-200 drop-shadow-md transition-all duration-300 hover:scale-105';
+    ? `px-3 py-2 text-sm font-medium transition-all duration-300 hover:scale-105 ${isDarkMode ? 'text-gray-300 hover:text-primary-400' : 'text-gray-700 hover:text-primary-600'}`
+    : `px-3 py-2 text-sm font-medium transition-all duration-300 hover:scale-105 ${isDarkMode ? 'text-white hover:text-primary-200 drop-shadow-md' : 'text-gray-900 hover:text-primary-600 drop-shadow-md'}`;
 
   const buttonClasses = isScrolled
-    ? `transition-all duration-300 hover:scale-105 ${isDarkMode ? 'bg-dark-700 text-gray-300 hover:bg-dark-600' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`
-    : 'bg-white/20 text-white hover:bg-white/30 backdrop-blur-sm transition-all duration-300 hover:scale-105';
+    ? `p-2 rounded-lg transition-all duration-300 hover:scale-105 ${isDarkMode ? 'bg-dark-700 text-gray-300 hover:bg-dark-600' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`
+    : `p-2 rounded-lg transition-all duration-300 hover:scale-105 ${isDarkMode ? 'bg-white/20 text-white hover:bg-white/30 backdrop-blur-sm' : 'bg-black/20 text-gray-900 hover:bg-black/30 backdrop-blur-sm'}`;
 
   const userTextClasses = isScrolled
     ? `font-medium transition-colors duration-300 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`
-    : 'text-white drop-shadow-md font-medium transition-colors duration-300';
+    : `font-medium transition-colors duration-300 ${isDarkMode ? 'text-white drop-shadow-md' : 'text-gray-900 drop-shadow-md'}`;
 
   return (
     <header className={`sticky top-0 z-50 transition-all duration-300 ${headerClasses}`}>
