@@ -52,6 +52,16 @@
   .hero-gradient {
     background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(20, 184, 166, 0.1) 100%);
   }
+
+  .header-transparent {
+    background: none !important;
+    background-color: transparent !important;
+    backdrop-filter: none !important;
+  }
+
+  .header-scrolled {
+    backdrop-filter: blur(12px) !important;
+  }
 }
 
 body {

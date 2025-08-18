@@ -55,13 +55,14 @@ const Header: React.FC = () => {
 
   return (
     <header
-      className={`sticky top-0 z-50 transition-all duration-300`}
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+        isScrolled ? 'header-scrolled' : 'header-transparent'
+      }`}
       style={{
-        backgroundColor: isScrolled
-          ? isDarkMode
-            ? 'rgba(31, 41, 55, 0.95)'
-            : 'rgba(255, 255, 255, 0.95)'
-          : 'transparent',
+        background: isScrolled
+          ? (isDarkMode ? 'rgba(31, 41, 55, 0.95)' : 'rgba(255, 255, 255, 0.95)')
+          : 'none',
+        boxShadow: isScrolled ? '0 10px 15px -3px rgba(0, 0, 0, 0.1)' : 'none'
       }}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
