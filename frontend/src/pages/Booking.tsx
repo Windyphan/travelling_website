@@ -59,7 +59,6 @@ const Booking: React.FC = () => {
     handleSubmit,
     watch,
     control,
-    setValue,
     formState: { errors, isSubmitting },
   } = useForm<BookingForm>({
     resolver: yupResolver(schema) as any,
