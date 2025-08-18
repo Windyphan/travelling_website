@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { toursAPI } from '../utils/api';
-import { FiStar, FiMapPin, FiClock, FiUsers, FiCheck, FiPlay, FiArrowRight } from '../components/common/Icons';
+import { Icon, Icons } from '../components/common/Icons';
 import { Tour } from '../types';
 
 const Home: React.FC = () => {
@@ -46,22 +46,22 @@ const Home: React.FC = () => {
 
   const whyChooseUs = [
     {
-      icon: FiUsers,
+      icon: Icons.FiUsers,
       title: 'Local Experts',
       description: 'Our experienced local guides provide authentic insights and unforgettable experiences.',
     },
     {
-      icon: FiCheck,
+      icon: Icons.FiCheck,
       title: 'Bespoke Journeys',
       description: 'Customized travel experiences tailored to your preferences and interests.',
     },
     {
-      icon: FiStar,
+      icon: Icons.FiStar,
       title: 'Safety First',
       description: '24/7 support and comprehensive safety measures for worry-free travel.',
     },
     {
-      icon: FiMapPin,
+      icon: Icons.FiMapPin,
       title: 'Unique Destinations',
       description: 'Access to exclusive locations and hidden gems off the beaten path.',
     },
@@ -136,7 +136,7 @@ const Home: React.FC = () => {
                   Explore Tours
                 </Link>
                 <button className="btn-secondary text-lg px-8 py-4 hover:scale-105 transform transition-all duration-200 flex items-center justify-center">
-                  <FiPlay className="w-5 h-5 mr-2" />
+                  <Icon icon={Icons.FiPlay} className="w-5 h-5 mr-2" />
                   Watch Video
                 </button>
               </div>
@@ -197,7 +197,7 @@ const Home: React.FC = () => {
                   </div>
                   <div className="p-6">
                     <div className="flex items-center text-sm text-gray-500 dark:text-gray-400 mb-2">
-                      <FiMapPin className="w-4 h-4 mr-1" />
+                      <Icon icon={Icons.FiMapPin} className="w-4 h-4 mr-1" />
                       {tour.destination}
                     </div>
                     <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors duration-200">
@@ -208,11 +208,11 @@ const Home: React.FC = () => {
                     </p>
                     <div className="flex items-center justify-between">
                       <div className="flex items-center text-sm text-gray-500 dark:text-gray-400">
-                        <FiClock className="w-4 h-4 mr-1" />
+                        <Icon icon={Icons.FiClock} className="w-4 h-4 mr-1" />
                         {tour.duration} days
                       </div>
                       <div className="flex items-center text-sm text-yellow-500">
-                        <FiStar className="w-4 h-4 mr-1 fill-current" />
+                        <Icon icon={Icons.FiStar} className="w-4 h-4 mr-1 fill-current" />
                         {tour.rating || '4.8'}
                       </div>
                     </div>
@@ -234,7 +234,7 @@ const Home: React.FC = () => {
               className="inline-flex items-center bg-primary-600 hover:bg-primary-700 text-white px-8 py-3 rounded-lg font-medium transition-colors duration-200"
             >
               View All Tours
-              <FiArrowRight className="w-5 h-5 ml-2" />
+              <Icon icon={Icons.FiArrowRight} className="w-5 h-5 ml-2" />
             </Link>
           </div>
         </div>
@@ -312,19 +312,19 @@ const Home: React.FC = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {[
               {
-                icon: FiUsers,
+                icon: Icons.FiUsers,
                 title: 'Expert Local Guides',
                 description: 'Our experienced local guides provide authentic insights and unforgettable experiences that you won\'t find anywhere else.',
                 color: 'blue'
               },
               {
-                icon: FiCheck,
+                icon: Icons.FiCheck,
                 title: 'Carefully Curated',
                 description: 'Every tour is meticulously planned and tested to ensure the highest quality experience for our travelers.',
                 color: 'green'
               },
               {
-                icon: FiStar,
+                icon: Icons.FiStar,
                 title: '24/7 Support',
                 description: 'Our dedicated support team is available around the clock to assist you before, during, and after your trip.',
                 color: 'purple'
@@ -332,7 +332,7 @@ const Home: React.FC = () => {
             ].map((feature, index) => (
               <div key={index} className="text-center group">
                 <div className={`w-16 h-16 mx-auto mb-6 rounded-full flex items-center justify-center bg-${feature.color}-100 dark:bg-${feature.color}-900/20 group-hover:scale-110 transition-transform duration-200`}>
-                  <feature.icon className={`w-8 h-8 text-${feature.color}-600 dark:text-${feature.color}-400`} />
+                  <Icon icon={feature.icon} className={`w-8 h-8 text-${feature.color}-600 dark:text-${feature.color}-400`} />
                 </div>
                 <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-4">{feature.title}</h3>
                 <p className="text-gray-600 dark:text-gray-300 leading-relaxed">{feature.description}</p>

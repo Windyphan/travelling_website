@@ -6,7 +6,7 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import { toursAPI, bookingsAPI } from '../utils/api';
 import { BookingForm } from '../types';
-import { FiCalendar, FiCreditCard } from '../components/common/Icons';
+import { Icon, Icons } from '../components/common/Icons';
 import toast from 'react-hot-toast';
 
 const schema = yup.object({
@@ -217,7 +217,7 @@ const Booking: React.FC = () => {
                       Start Date
                     </label>
                     <div className="relative">
-                      <FiCalendar className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                      <Icon icon={Icons.FiCalendar} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
                       <input
                         {...register('startDate')}
                         type="date"
@@ -430,7 +430,7 @@ const Booking: React.FC = () => {
                     <div className="space-y-3">
                       <label className="flex items-center p-4 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50">
                         <input type="radio" name="paymentMethod" value="credit_card" className="mr-3" defaultChecked />
-                        <FiCreditCard className="w-5 h-5 mr-2" />
+                        <Icon icon={Icons.FiCreditCard} className="w-5 h-5 mr-2" />
                         <span>Credit Card (Stripe)</span>
                       </label>
                       <label className="flex items-center p-4 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50">

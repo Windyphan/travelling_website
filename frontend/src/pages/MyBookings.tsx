@@ -3,10 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
 import { bookingsAPI } from '../utils/api';
 import { Booking } from '../types';
-import {
-  FiFilter, FiCalendar, FiMapPin, FiClock, FiUsers,
-  FiCreditCard, FiEye, FiX, FiDownload
-} from '../components/common/Icons';
+import { Icon, Icons } from '../components/common/Icons';
 import { format } from 'date-fns';
 
 const MyBookings: React.FC = () => {
@@ -93,7 +90,7 @@ const MyBookings: React.FC = () => {
         <div className="bg-white rounded-lg shadow-lg p-6 mb-8">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <div className="flex items-center gap-4">
-              <FiFilter className="w-5 h-5 text-gray-400" />
+              <Icon icon={Icons.FiFilter} className="w-5 h-5 text-gray-400" />
               <select
                 value={statusFilter}
                 onChange={(e) => {
@@ -125,7 +122,7 @@ const MyBookings: React.FC = () => {
           </div>
         ) : !bookings.length ? (
           <div className="bg-white rounded-lg shadow-lg p-12 text-center">
-            <FiCalendar className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+            <Icon icon={Icons.FiCalendar} className="w-16 h-16 text-gray-300 mx-auto mb-4" />
             <h3 className="text-xl font-semibold text-gray-900 mb-2">No bookings found</h3>
             <p className="text-gray-600 mb-6">
               {statusFilter
@@ -212,7 +209,7 @@ const BookingCard: React.FC<BookingCardProps> = ({ booking, getStatusColor, getP
                 />
               ) : (
                 <div className="w-full h-full bg-gray-300 flex items-center justify-center">
-                  <FiMapPin className="w-6 h-6 text-gray-500" />
+                  <Icons name="mapPin" className="w-6 h-6 text-gray-500" />
                 </div>
               )}
             </div>
@@ -221,7 +218,7 @@ const BookingCard: React.FC<BookingCardProps> = ({ booking, getStatusColor, getP
                 {booking.tour.title}
               </h3>
               <p className="text-sm text-gray-600 flex items-center">
-                <FiMapPin className="w-4 h-4 mr-1" />
+                <Icons name="mapPin" className="w-4 h-4 mr-1" />
                 {booking.tour.destination}
               </p>
               <p className="text-sm text-gray-500">
@@ -252,7 +249,7 @@ const BookingCard: React.FC<BookingCardProps> = ({ booking, getStatusColor, getP
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
           <div className="flex items-center text-sm text-gray-600">
-            <FiCalendar className="w-4 h-4 mr-2" />
+            <Icons name="calendar" className="w-4 h-4 mr-2" />
             <div>
               <div className="font-medium">Start Date</div>
               <div>{format(new Date(booking.bookingDetails.startDate), 'MMM dd, yyyy')}</div>
@@ -260,7 +257,7 @@ const BookingCard: React.FC<BookingCardProps> = ({ booking, getStatusColor, getP
           </div>
 
           <div className="flex items-center text-sm text-gray-600">
-            <FiClock className="w-4 h-4 mr-2" />
+            <Icons name="clock" className="w-4 h-4 mr-2" />
             <div>
               <div className="font-medium">Duration</div>
               <div>{booking.tour.duration.days}D/{booking.tour.duration.nights}N</div>
@@ -268,7 +265,7 @@ const BookingCard: React.FC<BookingCardProps> = ({ booking, getStatusColor, getP
           </div>
 
           <div className="flex items-center text-sm text-gray-600">
-            <FiUsers className="w-4 h-4 mr-2" />
+            <Icons name="users" className="w-4 h-4 mr-2" />
             <div>
               <div className="font-medium">Travelers</div>
               <div>{booking.bookingDetails.totalTravelers} people</div>
@@ -276,7 +273,7 @@ const BookingCard: React.FC<BookingCardProps> = ({ booking, getStatusColor, getP
           </div>
 
           <div className="flex items-center text-sm text-gray-600">
-            <FiCreditCard className="w-4 h-4 mr-2" />
+            <Icons name="creditCard" className="w-4 h-4 mr-2" />
             <div>
               <div className="font-medium">Payment</div>
               <div>{booking.payment.method || 'Not specified'}</div>
@@ -289,19 +286,19 @@ const BookingCard: React.FC<BookingCardProps> = ({ booking, getStatusColor, getP
             onClick={() => setShowDetails(!showDetails)}
             className="btn-secondary text-sm flex items-center"
           >
-            <FiEye className="w-4 h-4 mr-1" />
+            <Icons name={showDetails ? "eyeOff" : "eye"} className="w-4 h-4 mr-1" />
             {showDetails ? 'Hide Details' : 'View Details'}
           </button>
 
           {booking.status !== 'cancelled' && booking.status !== 'completed' && (
             <button className="text-sm px-4 py-2 text-red-600 border border-red-600 rounded-lg hover:bg-red-50 flex items-center">
-              <FiX className="w-4 h-4 mr-1" />
+              <Icons name="x" className="w-4 h-4 mr-1" />
               Cancel Booking
             </button>
           )}
 
           <button className="text-sm px-4 py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 flex items-center">
-            <FiDownload className="w-4 h-4 mr-1" />
+            <Icons name="download" className="w-4 h-4 mr-1" />
             Download Invoice
           </button>
         </div>

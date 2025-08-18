@@ -39,7 +39,6 @@ import {
   FiDollarSign,
 } from 'react-icons/fi';
 import { IconType } from 'react-icons';
-
 // Create a wrapper component for icons that works with IconType
 interface IconProps {
   icon: IconType;
@@ -47,11 +46,9 @@ interface IconProps {
   onClick?: () => void;
   size?: number;
 }
-
 export const Icon: React.FC<IconProps> = ({ icon: IconComponent, className, onClick, size }) => {
   return React.createElement(IconComponent as React.ComponentType<any>, { className, onClick, size });
 };
-
 // Export icons directly from react-icons/fi
 export {
   FiUser,
@@ -92,7 +89,6 @@ export {
   FiChevronDown,
   FiDollarSign,
 };
-
 // Export an object with all icons for easier imports
 export const Icons = {
   FiUser,
@@ -133,3 +129,6 @@ export const Icons = {
   FiChevronDown,
   FiDollarSign,
 };
+
+
+
