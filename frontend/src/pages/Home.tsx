@@ -47,53 +47,6 @@ const Home: React.FC = () => {
     return () => clearInterval(timer);
   }, [heroSlides.length]);
 
-  const whyChooseUs = [
-    {
-      icon: Icons.FiUsers,
-      title: 'Local Experts',
-      description: 'Our experienced local guides provide authentic insights and unforgettable experiences.',
-    },
-    {
-      icon: Icons.FiCheck,
-      title: 'Bespoke Journeys',
-      description: 'Customized travel experiences tailored to your preferences and interests.',
-    },
-    {
-      icon: Icons.FiStar,
-      title: 'Safety First',
-      description: '24/7 support and comprehensive safety measures for worry-free travel.',
-    },
-    {
-      icon: Icons.FiMapPin,
-      title: 'Unique Destinations',
-      description: 'Access to exclusive locations and hidden gems off the beaten path.',
-    },
-  ];
-
-  const testimonials = [
-    {
-      name: 'Sarah Johnson',
-      location: 'United States',
-      rating: 5,
-      text: 'Absolutely incredible experience! The tour was perfectly organized and our guide was amazing.',
-      avatar: '/images/avatar-1.jpg',
-    },
-    {
-      name: 'Michael Chen',
-      location: 'Canada',
-      rating: 5,
-      text: 'Best vacation ever! Every detail was taken care of. Highly recommend TravelCo.',
-      avatar: '/images/avatar-2.jpg',
-    },
-    {
-      name: 'Emma Wilson',
-      location: 'Australia',
-      rating: 5,
-      text: 'Professional service, beautiful destinations, and unforgettable memories.',
-      avatar: '/images/avatar-3.jpg',
-    },
-  ];
-
   return (
     <div className="bg-gray-50 dark:bg-dark-900 transition-colors duration-200">
       {/* Hero Section */}
