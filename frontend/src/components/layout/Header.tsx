@@ -38,7 +38,7 @@ const Header: React.FC = () => {
   ];
 
   const headerClasses = isScrolled
-    ? 'bg-white/95 dark:bg-dark-800/95 backdrop-blur-md shadow-lg'
+    ? `${isDarkMode ? 'bg-dark-800/95' : 'bg-white/95'} backdrop-blur-md shadow-lg`
     : 'bg-transparent';
 
   const logoTextClasses = isScrolled
