@@ -156,25 +156,25 @@ tourSchema.pre('save', function(next) {
 // Calculate current price based on season and group size
 tourSchema.methods.calculatePrice = function(date, groupSize = 1) {
   let price = this.pricing.basePrice;
-
+  
   // Apply seasonal pricing
   const seasonalPrice = this.pricing.seasonalPricing.find(season => {
     return date >= season.startDate && date <= season.endDate;
   });
-
+  
   if (seasonalPrice) {
     price *= seasonalPrice.multiplier;
   }
-
+  
   // Apply group discounts
   const groupDiscount = this.pricing.groupDiscounts
     .filter(discount => groupSize >= discount.minPeople)
     .sort((a, b) => b.minPeople - a.minPeople)[0];
-
+    
   if (groupDiscount) {
     price *= (1 - groupDiscount.discount / 100);
   }
-
+  
   return Math.round(price * 100) / 100;
 };
 
@@ -183,9 +183,9 @@ tourSchema.methods.checkAvailability = function(startDate, groupSize) {
   const availability = this.availability.find(slot => {
     return startDate >= slot.startDate && startDate <= slot.endDate;
   });
-
+  
   if (!availability) return false;
-
+  
   return (availability.availableSpots - availability.bookedSpots) >= groupSize;
 };
 

@@ -14,22 +14,25 @@ const Home: React.FC = () => {
     queryFn: () => toursAPI.getFeaturedTours(),
   });
 
-  // Hero slides data
+  // Hero slides data with video support
   const heroSlides = [
     {
       image: '/images/hero-1.jpg',
+      video: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
       title: 'Discover Amazing Vietnam',
       subtitle: 'Unforgettable Adventures Await',
       description: 'Experience the beauty of Vietnam with our expert-guided tours and personalized travel experiences.',
     },
     {
       image: '/images/hero-2.jpg',
+      video: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4',
       title: 'Luxury Travel Redefined',
       subtitle: 'Premium Experiences',
       description: 'Indulge in world-class accommodations and exclusive access to hidden gems.',
     },
     {
       image: '/images/hero-3.jpg',
+      video: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
       title: 'Cultural Immersion',
       subtitle: 'Authentic Local Experiences',
       description: 'Connect with local cultures and traditions through our immersive travel programs.',
@@ -103,14 +106,27 @@ const Home: React.FC = () => {
                 index === currentSlide ? 'opacity-100' : 'opacity-0'
               }`}
             >
-              <img
-                src={slide.image}
-                alt={slide.title}
-                className="w-full h-full object-cover"
-                onError={(e) => {
-                  e.currentTarget.src = `https://images.unsplash.com/photo-1469474968028-56623f02e42e?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80`;
-                }}
-              />
+              {slide.video ? (
+                <video
+                  src={slide.video}
+                  autoPlay
+                  loop
+                  muted
+                  className="w-full h-full object-cover"
+                  onError={(e) => {
+                    e.currentTarget.src = `https://images.unsplash.com/photo-1469474968028-56623f02e42e?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80`;
+                  }}
+                />
+              ) : (
+                <img
+                  src={slide.image}
+                  alt={slide.title}
+                  className="w-full h-full object-cover"
+                  onError={(e) => {
+                    e.currentTarget.src = `https://images.unsplash.com/photo-1469474968028-56623f02e42e?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80`;
+                  }}
+                />
+              )}
               <div className="absolute inset-0 hero-gradient"></div>
             </div>
           ))}
