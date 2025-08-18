@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { toursAPI, contentAPI } from '../utils/api';
+import { toursAPI } from '../utils/api';
 import { FiStar, FiMapPin, FiClock, FiUsers, FiCheck, FiPlay, FiArrowRight } from '../components/common/Icons';
 import { Tour } from '../types';
 

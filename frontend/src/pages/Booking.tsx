@@ -5,8 +5,8 @@ import { useForm, useFieldArray } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import { toursAPI, bookingsAPI } from '../utils/api';
-import { BookingForm, Traveler } from '../types';
-import { FiCalendar, FiUsers, FiPlus, FiTrash2, FiCreditCard } from '../components/common/Icons';
+import { BookingForm } from '../types';
+import { FiCalendar, FiCreditCard } from '../components/common/Icons';
 import toast from 'react-hot-toast';
 
 const schema = yup.object({
@@ -530,4 +530,3 @@ const Booking: React.FC = () => {
 };
 
 export default Booking;
-

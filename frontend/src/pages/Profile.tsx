@@ -5,7 +5,6 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import { useAuth } from '../contexts/AuthContext';
 import { authAPI } from '../utils/api';
-import { User } from '../types';
 import { FiUser, FiMail, FiPhone, FiMapPin, FiSettings, FiLock, FiSave, FiEdit3 } from '../components/common/Icons';
 import toast from 'react-hot-toast';
 
@@ -436,4 +435,3 @@ const Profile: React.FC = () => {
 };
 
 export default Profile;
-

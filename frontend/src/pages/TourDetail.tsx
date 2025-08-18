@@ -7,7 +7,6 @@ import { FiStar, FiMapPin, FiClock, FiUsers, FiCheck, FiX, FiCalendar, FiCamera 
 const TourDetail: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
   const [selectedImage, setSelectedImage] = useState(0);
-  const [showBookingWidget, setShowBookingWidget] = useState(false);
 
   const { data: tourData, isLoading, error } = useQuery({
     queryKey: ['tour', slug],

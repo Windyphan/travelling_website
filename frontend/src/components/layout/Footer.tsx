@@ -123,15 +123,15 @@ const Footer: React.FC = () => {
         {/* Social Links & Copyright */}
         <div className="border-t border-gray-800 mt-8 pt-8 flex flex-col lg:flex-row justify-between items-center">
           <div className="flex space-x-4 mb-4 lg:mb-0">
-            <a href="#" className="text-gray-300 hover:text-white transition-colors">
+            <button type="button" className="text-gray-300 hover:text-white transition-colors">
               <Icon icon={Icons.FiFacebook} className="w-5 h-5" />
-            </a>
-            <a href="#" className="text-gray-300 hover:text-white transition-colors">
+            </button>
+            <button type="button" className="text-gray-300 hover:text-white transition-colors">
               <Icon icon={Icons.FiInstagram} className="w-5 h-5" />
-            </a>
-            <a href="#" className="text-gray-300 hover:text-white transition-colors">
+            </button>
+            <button type="button" className="text-gray-300 hover:text-white transition-colors">
               <Icon icon={Icons.FiTwitter} className="w-5 h-5" />
-            </a>
+            </button>
           </div>
           <div className="text-gray-300 text-sm">
             <p>&copy; 2025 TravelCo. All rights reserved.</p>

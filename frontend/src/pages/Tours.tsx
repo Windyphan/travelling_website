@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
 import { toursAPI } from '../utils/api';
-import { Tour, TourFilters, ToursResponse } from '../types';
+import { Tour, TourFilters } from '../types';
 import { Icon, Icons } from '../components/common/Icons';
 
 const Tours: React.FC = () => {
