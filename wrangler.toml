@@ -12,11 +12,11 @@ command = "cd frontend && npm ci && npm run build"
 REACT_APP_API_URL = "https://your-backend.vercel.app/api"
 REACT_APP_STRIPE_PUBLIC_KEY = ""
 
-# Custom domain routes for phongphan.me
+# Custom domain routes for phongphan.me (without wildcards)
 [[routes]]
-pattern = "phongphan.me/*"
+pattern = "phongphan.me"
 custom_domain = true
 
 [[routes]]
-pattern = "www.phongphan.me/*"
+pattern = "www.phongphan.me"
 custom_domain = true
