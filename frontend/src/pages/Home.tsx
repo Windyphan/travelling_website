@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { toursAPI } from '../utils/api';
@@ -7,6 +7,21 @@ import { Tour } from '../types';
 
 const Home: React.FC = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
+  const carRentalsRef = useRef<HTMLDivElement>(null);
+  const galleryRef = useRef<HTMLDivElement>(null);
+
+  // Scroll functions
+  const scrollLeft = (ref: React.RefObject<HTMLDivElement>) => {
+    if (ref.current) {
+      ref.current.scrollBy({ left: -320, behavior: 'smooth' });
+    }
+  };
+
+  const scrollRight = (ref: React.RefObject<HTMLDivElement>) => {
+    if (ref.current) {
+      ref.current.scrollBy({ left: 320, behavior: 'smooth' });
+    }
+  };
 
   // Fetch featured tours
   const { data: featuredTours, isLoading: toursLoading } = useQuery({
@@ -331,7 +346,7 @@ const Home: React.FC = () => {
           </div>
 
           <div className="relative">
-            <div className="overflow-x-auto scrollbar-hide">
+            <div className="overflow-x-auto scrollbar-hide" ref={carRentalsRef}>
               <div className="flex space-x-6 pb-4">
                 {[
                   {
@@ -401,10 +416,16 @@ const Home: React.FC = () => {
             </div>
 
             {/* Scroll buttons */}
-            <button className="absolute left-0 top-1/2 -translate-y-1/2 bg-white dark:bg-dark-700 shadow-lg rounded-full p-3 hover:bg-gray-50 dark:hover:bg-dark-600 transition-colors duration-200">
+            <button
+              onClick={() => scrollLeft(carRentalsRef)}
+              className="absolute left-0 top-1/2 -translate-y-1/2 bg-white dark:bg-dark-700 shadow-lg rounded-full p-3 hover:bg-gray-50 dark:hover:bg-dark-600 transition-colors duration-200"
+            >
               <Icon icon={Icons.FiChevronLeft} className="w-6 h-6 text-gray-600 dark:text-gray-300" />
             </button>
-            <button className="absolute right-0 top-1/2 -translate-y-1/2 bg-white dark:bg-dark-700 shadow-lg rounded-full p-3 hover:bg-gray-50 dark:hover:bg-dark-600 transition-colors duration-200">
+            <button
+              onClick={() => scrollRight(carRentalsRef)}
+              className="absolute right-0 top-1/2 -translate-y-1/2 bg-white dark:bg-dark-700 shadow-lg rounded-full p-3 hover:bg-gray-50 dark:hover:bg-dark-600 transition-colors duration-200"
+            >
               <Icon icon={Icons.FiChevronRight} className="w-6 h-6 text-gray-600 dark:text-gray-300" />
             </button>
           </div>
@@ -422,7 +443,7 @@ const Home: React.FC = () => {
           </div>
 
           <div className="relative">
-            <div className="overflow-x-auto scrollbar-hide">
+            <div className="overflow-x-auto scrollbar-hide" ref={galleryRef}>
               <div className="flex space-x-6 pb-4">
                 {[
                   {
@@ -483,10 +504,16 @@ const Home: React.FC = () => {
             </div>
 
             {/* Scroll buttons */}
-            <button className="absolute left-0 top-1/2 -translate-y-1/2 bg-white dark:bg-dark-700 shadow-lg rounded-full p-3 hover:bg-gray-50 dark:hover:bg-dark-600 transition-colors duration-200 z-10">
+            <button
+              onClick={() => scrollLeft(galleryRef)}
+              className="absolute left-0 top-1/2 -translate-y-1/2 bg-white dark:bg-dark-700 shadow-lg rounded-full p-3 hover:bg-gray-50 dark:hover:bg-dark-600 transition-colors duration-200 z-10"
+            >
               <Icon icon={Icons.FiChevronLeft} className="w-6 h-6 text-gray-600 dark:text-gray-300" />
             </button>
-            <button className="absolute right-0 top-1/2 -translate-y-1/2 bg-white dark:bg-dark-700 shadow-lg rounded-full p-3 hover:bg-gray-50 dark:hover:bg-dark-600 transition-colors duration-200 z-10">
+            <button
+              onClick={() => scrollRight(galleryRef)}
+              className="absolute right-0 top-1/2 -translate-y-1/2 bg-white dark:bg-dark-700 shadow-lg rounded-full p-3 hover:bg-gray-50 dark:hover:bg-dark-600 transition-colors duration-200 z-10"
+            >
               <Icon icon={Icons.FiChevronRight} className="w-6 h-6 text-gray-600 dark:text-gray-300" />
             </button>
           </div>
