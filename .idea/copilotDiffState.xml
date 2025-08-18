@@ -192,8 +192,8 @@
           <value>
             <PendingDiffInfo>
               <option name="filePath" value="$PROJECT_DIR$/frontend/postcss.config.js" />
-              <option name="originalContent" value="    autoprefixer: {},&#10;  plugins: {&#10;    tailwindcss: {},&#10;    autoprefixer: {},&#10;  },&#10;" />
-              <option name="updatedContent" value="const tailwindcss = require('tailwindcss');&#10;const autoprefixer = require('autoprefixer');&#10;&#10;module.exports = {&#10;  plugins: [&#10;    tailwindcss,&#10;    autoprefixer,&#10;  ],&#10;}" />
+              <option name="originalContent" value="    autoprefixer: {},&#10;  plugins: {&#10;    tailwindcss: {},&#10;    autoprefixer: {},&#10;  },&#10;&#10;" />
+              <option name="updatedContent" value="module.exports = {&#13;&#10;  plugins: {&#13;&#10;    tailwindcss: {},&#13;&#10;    autoprefixer: {},&#13;&#10;  },&#13;&#10;}" />
             </PendingDiffInfo>
           </value>
         </entry>
