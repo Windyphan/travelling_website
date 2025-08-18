@@ -1,0 +1,27 @@
+{
+  "name": "travelling-website",
+  "version": "1.0.0",
+  "description": "A comprehensive travel booking website",
+  "scripts": {
+    "dev": "concurrently \"npm run server\" \"npm run client\"",
+    "server": "cd backend && npm start",
+    "client": "cd frontend && npm start",
+    "build": "cd frontend && npm run build",
+    "install-all": "cd backend && npm install && cd ../frontend && npm install",
+    "deploy:backend": "cd backend && vercel --prod",
+    "deploy:frontend": "cd frontend && npm run build && cd .. && wrangler pages deploy frontend/build --project-name=travelling-website-frontend",
+    "deploy:all": "npm run deploy:backend && npm run deploy:frontend"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.0"
+  },
+  "keywords": [
+    "travel",
+    "booking",
+    "tourism",
+    "react",
+    "nodejs"
+  ],
+  "author": "Travel Company",
+  "license": "MIT"
+}
