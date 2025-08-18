@@ -5,7 +5,7 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import { useAuth } from '../contexts/AuthContext';
 import { authAPI } from '../utils/api';
-import { FiUser, FiMail, FiPhone, FiMapPin, FiSettings, FiLock, FiSave, FiEdit3 } from '../components/common/Icons';
+import { Icon, Icons } from '../components/common/Icons';
 import toast from 'react-hot-toast';
 
 const profileSchema = yup.object({
@@ -128,9 +128,9 @@ const Profile: React.FC = () => {
   }
 
   const tabs = [
-    { id: 'profile', name: 'Profile Information', icon: FiUser },
-    { id: 'security', name: 'Security', icon: FiLock },
-    { id: 'preferences', name: 'Preferences', icon: FiSettings },
+    { id: 'profile', name: 'Profile Information', icon: Icons.FiUser },
+    { id: 'security', name: 'Security', icon: Icons.FiLock },
+    { id: 'preferences', name: 'Preferences', icon: Icons.FiSettings },
   ];
 
   return (
@@ -147,7 +147,7 @@ const Profile: React.FC = () => {
                   className="w-20 h-20 rounded-full object-cover"
                 />
               ) : (
-                <FiUser className="w-10 h-10 text-primary-600" />
+                <Icon icon={Icons.FiUser} className="w-10 h-10 text-primary-600" />
               )}
             </div>
             <div>
@@ -186,7 +186,7 @@ const Profile: React.FC = () => {
                         : 'text-gray-600 hover:bg-gray-50'
                     }`}
                   >
-                    <tab.icon className="w-5 h-5 mr-3" />
+                    <Icon icon={tab.icon} className="w-5 h-5 mr-3" />
                     {tab.name}
                   </button>
                 ))}
@@ -205,7 +205,7 @@ const Profile: React.FC = () => {
                     onClick={() => setIsEditing(!isEditing)}
                     className="btn-secondary flex items-center"
                   >
-                    <FiEdit3 className="w-4 h-4 mr-2" />
+                    <Icon icon={Icons.FiEdit3} className="w-4 h-4 mr-2" />
                     {isEditing ? 'Cancel' : 'Edit'}
                   </button>
                 </div>
@@ -217,7 +217,7 @@ const Profile: React.FC = () => {
                         Full Name
                       </label>
                       <div className="relative">
-                        <FiUser className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                        <Icon icon={Icons.FiUser} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
                         <input
                           {...registerProfile('name')}
                           type="text"
@@ -237,7 +237,7 @@ const Profile: React.FC = () => {
                         Email Address
                       </label>
                       <div className="relative">
-                        <FiMail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                        <Icon icon={Icons.FiMail} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
                         <input
                           {...registerProfile('email')}
                           type="email"
@@ -257,7 +257,7 @@ const Profile: React.FC = () => {
                         Phone Number
                       </label>
                       <div className="relative">
-                        <FiPhone className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                        <Icon icon={Icons.FiPhone} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
                         <input
                           {...registerProfile('phone')}
                           type="tel"
@@ -273,7 +273,7 @@ const Profile: React.FC = () => {
                         Country
                       </label>
                       <div className="relative">
-                        <FiMapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                        <Icon icon={Icons.FiMapPin} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
                         <select
                           {...registerProfile('country')}
                           disabled={!isEditing}
@@ -303,7 +303,7 @@ const Profile: React.FC = () => {
                         disabled={isUpdatingProfile}
                         className="btn-primary disabled:opacity-50 flex items-center"
                       >
-                        <FiSave className="w-4 h-4 mr-2" />
+                        <Icon icon={Icons.FiSave} className="w-4 h-4 mr-2" />
                         {isUpdatingProfile ? 'Saving...' : 'Save Changes'}
                       </button>
                     </div>
@@ -370,7 +370,7 @@ const Profile: React.FC = () => {
                         disabled={isChangingPassword}
                         className="btn-primary disabled:opacity-50 flex items-center"
                       >
-                        <FiLock className="w-4 h-4 mr-2" />
+                        <Icon icon={Icons.FiLock} className="w-4 h-4 mr-2" />
                         {isChangingPassword ? 'Changing...' : 'Change Password'}
                       </button>
                     </div>

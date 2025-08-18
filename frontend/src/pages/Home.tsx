@@ -198,7 +198,7 @@ const Home: React.FC = () => {
                   <div className="p-6">
                     <div className="flex items-center text-sm text-gray-500 dark:text-gray-400 mb-2">
                       <Icon icon={Icons.FiMapPin} className="w-4 h-4 mr-1" />
-                      {tour.destination}
+                      <span>{tour.destination}</span>
                     </div>
                     <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors duration-200">
                       {tour.title}
@@ -209,11 +209,11 @@ const Home: React.FC = () => {
                     <div className="flex items-center justify-between">
                       <div className="flex items-center text-sm text-gray-500 dark:text-gray-400">
                         <Icon icon={Icons.FiClock} className="w-4 h-4 mr-1" />
-                        {tour.duration} days
+                        <span>{tour.duration.days}D/{tour.duration.nights}N</span>
                       </div>
                       <div className="flex items-center text-sm text-yellow-500">
                         <Icon icon={Icons.FiStar} className="w-4 h-4 mr-1 fill-current" />
-                        {tour.rating || '4.8'}
+                        <span>{tour.ratings.average.toFixed(1)} ({tour.ratings.count})</span>
                       </div>
                     </div>
                     <Link

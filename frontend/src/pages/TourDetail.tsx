@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { toursAPI } from '../utils/api';
-import { FiStar, FiMapPin, FiClock, FiUsers, FiCheck, FiX, FiCalendar, FiCamera } from '../components/common/Icons';
+import { Icon, Icons } from '../components/common/Icons';
 
 const TourDetail: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -79,7 +79,7 @@ const TourDetail: React.FC = () => {
             ))}
             {tour.images.length > 5 && (
               <button className="text-white text-sm bg-black/50 px-2 py-1 rounded">
-                <FiCamera className="w-4 h-4 inline mr-1" />
+                <Icon icon={Icons.FiCamera} className="w-4 h-4 inline mr-1" />
                 +{tour.images.length - 5}
               </button>
             )}
@@ -94,7 +94,7 @@ const TourDetail: React.FC = () => {
             {/* Tour Header */}
             <div className="bg-white rounded-lg shadow-lg p-6 mb-6">
               <div className="flex items-center text-sm text-gray-500 mb-2">
-                <FiMapPin className="w-4 h-4 mr-1" />
+                <Icon icon={Icons.FiMapPin} className="w-4 h-4 mr-1" />
                 {tour.destination}
               </div>
               <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
@@ -103,15 +103,15 @@ const TourDetail: React.FC = () => {
 
               <div className="flex flex-wrap items-center gap-6 text-sm text-gray-600">
                 <div className="flex items-center">
-                  <FiClock className="w-4 h-4 mr-1" />
+                  <Icon icon={Icons.FiClock} className="w-4 h-4 mr-1" />
                   {tour.duration.days} Days / {tour.duration.nights} Nights
                 </div>
                 <div className="flex items-center">
-                  <FiUsers className="w-4 h-4 mr-1" />
+                  <Icon icon={Icons.FiUsers} className="w-4 h-4 mr-1" />
                   Max {tour.maxGroupSize} People
                 </div>
                 <div className="flex items-center">
-                  <FiStar className="w-4 h-4 text-yellow-400 mr-1" />
+                  <Icon icon={Icons.FiStar} className="w-4 h-4 text-yellow-400 mr-1" />
                   {tour.ratings.average.toFixed(1)} ({tour.ratings.count} reviews)
                 </div>
                 <span className={`px-3 py-1 rounded-full text-xs font-medium ${
@@ -138,7 +138,7 @@ const TourDetail: React.FC = () => {
                 <ul className="grid grid-cols-1 md:grid-cols-2 gap-3">
                   {tour.highlights.map((highlight, index) => (
                     <li key={index} className="flex items-start">
-                      <FiCheck className="w-5 h-5 text-green-500 mr-2 mt-0.5 flex-shrink-0" />
+                      <Icon icon={Icons.FiCheck} className="w-5 h-5 text-green-500 mr-2 mt-0.5 flex-shrink-0" />
                       <span className="text-gray-600">{highlight}</span>
                     </li>
                   ))}
@@ -188,13 +188,13 @@ const TourDetail: React.FC = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <div>
                   <h3 className="text-lg font-semibold text-green-600 mb-4 flex items-center">
-                    <FiCheck className="w-5 h-5 mr-2" />
+                    <Icon icon={Icons.FiCheck} className="w-5 h-5 mr-2" />
                     Included
                   </h3>
                   <ul className="space-y-2">
                     {tour.inclusions.map((inclusion, index) => (
                       <li key={index} className="flex items-start">
-                        <FiCheck className="w-4 h-4 text-green-500 mr-2 mt-0.5 flex-shrink-0" />
+                        <Icon icon={Icons.FiCheck} className="w-4 h-4 text-green-500 mr-2 mt-0.5 flex-shrink-0" />
                         <span className="text-gray-600 text-sm">{inclusion}</span>
                       </li>
                     ))}
@@ -202,13 +202,13 @@ const TourDetail: React.FC = () => {
                 </div>
                 <div>
                   <h3 className="text-lg font-semibold text-red-600 mb-4 flex items-center">
-                    <FiX className="w-5 h-5 mr-2" />
+                    <Icon icon={Icons.FiX} className="w-5 h-5 mr-2" />
                     Not Included
                   </h3>
                   <ul className="space-y-2">
                     {tour.exclusions.map((exclusion, index) => (
                       <li key={index} className="flex items-start">
-                        <FiX className="w-4 h-4 text-red-500 mr-2 mt-0.5 flex-shrink-0" />
+                        <Icon icon={Icons.FiX} className="w-4 h-4 text-red-500 mr-2 mt-0.5 flex-shrink-0" />
                         <span className="text-gray-600 text-sm">{exclusion}</span>
                       </li>
                     ))}
@@ -226,7 +226,7 @@ const TourDetail: React.FC = () => {
                   {/* In a real implementation, you would embed Google Maps or another map service */}
                 </div>
                 <div className="mt-4 text-sm text-gray-600">
-                  <FiMapPin className="w-4 h-4 inline mr-1" />
+                  <Icon icon={Icons.FiMapPin} className="w-4 h-4 inline mr-1" />
                   {tour.location.address}, {tour.location.city}, {tour.location.country}
                 </div>
               </div>
@@ -265,7 +265,7 @@ const TourDetail: React.FC = () => {
                   to={`/booking/${tour._id}`}
                   className="w-full btn-primary mb-4 flex items-center justify-center"
                 >
-                  <FiCalendar className="w-4 h-4 mr-2" />
+                  <Icon icon={Icons.FiCalendar} className="w-4 h-4 mr-2" />
                   Book Now
                 </Link>
 
@@ -275,7 +275,7 @@ const TourDetail: React.FC = () => {
 
                 <div className="mt-6 pt-6 border-t border-gray-200">
                   <div className="flex items-center justify-center text-sm text-gray-500">
-                    <FiCheck className="w-4 h-4 mr-1 text-green-500" />
+                    <Icon icon={Icons.FiCheck} className="w-4 h-4 mr-1 text-green-500" />
                     Free cancellation up to 24 hours before
                   </div>
                 </div>
