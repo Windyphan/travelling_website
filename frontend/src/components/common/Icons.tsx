@@ -33,6 +33,10 @@ import {
   FiTwitter as FiTwitterOriginal,
   FiPlus as FiPlusOriginal,
   FiTrash2 as FiTrash2Original,
+  FiSun as FiSunOriginal,
+  FiMoon as FiMoonOriginal,
+  FiChevronDown as FiChevronDownOriginal,
+  FiDollarSign as FiDollarSignOriginal,
 } from 'react-icons/fi';
 import { IconBaseProps } from 'react-icons';
 
@@ -49,50 +53,45 @@ export const Icon: React.FC<IconProps> = ({ icon: IconComponent, className, onCl
 };
 
 // Create functional components that properly wrap the original icons
-const createIconComponent = (OriginalIcon: any) => {
-  const IconComponent: React.FC<IconBaseProps> = (props) => {
-    return React.createElement(OriginalIcon, props);
-  };
-  IconComponent.displayName = OriginalIcon.displayName || OriginalIcon.name;
-  return IconComponent;
-};
+export const FiUser: React.FC<IconBaseProps> = (props) => <FiUserOriginal {...props} />;
+export const FiMail: React.FC<IconBaseProps> = (props) => <FiMailOriginal {...props} />;
+export const FiLock: React.FC<IconBaseProps> = (props) => <FiLockOriginal {...props} />;
+export const FiEye: React.FC<IconBaseProps> = (props) => <FiEyeOriginal {...props} />;
+export const FiEyeOff: React.FC<IconBaseProps> = (props) => <FiEyeOffOriginal {...props} />;
+export const FiPhone: React.FC<IconBaseProps> = (props) => <FiPhoneOriginal {...props} />;
+export const FiMapPin: React.FC<IconBaseProps> = (props) => <FiMapPinOriginal {...props} />;
+export const FiCalendar: React.FC<IconBaseProps> = (props) => <FiCalendarOriginal {...props} />;
+export const FiClock: React.FC<IconBaseProps> = (props) => <FiClockOriginal {...props} />;
+export const FiUsers: React.FC<IconBaseProps> = (props) => <FiUsersOriginal {...props} />;
+export const FiStar: React.FC<IconBaseProps> = (props) => <FiStarOriginal {...props} />;
+export const FiFilter: React.FC<IconBaseProps> = (props) => <FiFilterOriginal {...props} />;
+export const FiSearch: React.FC<IconBaseProps> = (props) => <FiSearchOriginal {...props} />;
+export const FiGrid: React.FC<IconBaseProps> = (props) => <FiGridOriginal {...props} />;
+export const FiList: React.FC<IconBaseProps> = (props) => <FiListOriginal {...props} />;
+export const FiMenu: React.FC<IconBaseProps> = (props) => <FiMenuOriginal {...props} />;
+export const FiX: React.FC<IconBaseProps> = (props) => <FiXOriginal {...props} />;
+export const FiLogOut: React.FC<IconBaseProps> = (props) => <FiLogOutOriginal {...props} />;
+export const FiSettings: React.FC<IconBaseProps> = (props) => <FiSettingsOriginal {...props} />;
+export const FiEdit3: React.FC<IconBaseProps> = (props) => <FiEdit3Original {...props} />;
+export const FiSave: React.FC<IconBaseProps> = (props) => <FiSaveOriginal {...props} />;
+export const FiCheck: React.FC<IconBaseProps> = (props) => <FiCheckOriginal {...props} />;
+export const FiCamera: React.FC<IconBaseProps> = (props) => <FiCameraOriginal {...props} />;
+export const FiPlay: React.FC<IconBaseProps> = (props) => <FiPlayOriginal {...props} />;
+export const FiArrowRight: React.FC<IconBaseProps> = (props) => <FiArrowRightOriginal {...props} />;
+export const FiCreditCard: React.FC<IconBaseProps> = (props) => <FiCreditCardOriginal {...props} />;
+export const FiDownload: React.FC<IconBaseProps> = (props) => <FiDownloadOriginal {...props} />;
+export const FiBarChart: React.FC<IconBaseProps> = (props) => <FiBarChartOriginal {...props} />;
+export const FiFacebook: React.FC<IconBaseProps> = (props) => <FiFacebookOriginal {...props} />;
+export const FiInstagram: React.FC<IconBaseProps> = (props) => <FiInstagramOriginal {...props} />;
+export const FiTwitter: React.FC<IconBaseProps> = (props) => <FiTwitterOriginal {...props} />;
+export const FiPlus: React.FC<IconBaseProps> = (props) => <FiPlusOriginal {...props} />;
+export const FiTrash2: React.FC<IconBaseProps> = (props) => <FiTrash2Original {...props} />;
+export const FiSun: React.FC<IconBaseProps> = (props) => <FiSunOriginal {...props} />;
+export const FiMoon: React.FC<IconBaseProps> = (props) => <FiMoonOriginal {...props} />;
+export const FiChevronDown: React.FC<IconBaseProps> = (props) => <FiChevronDownOriginal {...props} />;
+export const FiDollarSign: React.FC<IconBaseProps> = (props) => <FiDollarSignOriginal {...props} />;
 
-// Export individual icon components
-export const FiUser = createIconComponent(FiUserOriginal);
-export const FiMail = createIconComponent(FiMailOriginal);
-export const FiLock = createIconComponent(FiLockOriginal);
-export const FiEye = createIconComponent(FiEyeOriginal);
-export const FiEyeOff = createIconComponent(FiEyeOffOriginal);
-export const FiPhone = createIconComponent(FiPhoneOriginal);
-export const FiMapPin = createIconComponent(FiMapPinOriginal);
-export const FiCalendar = createIconComponent(FiCalendarOriginal);
-export const FiClock = createIconComponent(FiClockOriginal);
-export const FiUsers = createIconComponent(FiUsersOriginal);
-export const FiStar = createIconComponent(FiStarOriginal);
-export const FiFilter = createIconComponent(FiFilterOriginal);
-export const FiSearch = createIconComponent(FiSearchOriginal);
-export const FiGrid = createIconComponent(FiGridOriginal);
-export const FiList = createIconComponent(FiListOriginal);
-export const FiMenu = createIconComponent(FiMenuOriginal);
-export const FiX = createIconComponent(FiXOriginal);
-export const FiLogOut = createIconComponent(FiLogOutOriginal);
-export const FiSettings = createIconComponent(FiSettingsOriginal);
-export const FiEdit3 = createIconComponent(FiEdit3Original);
-export const FiSave = createIconComponent(FiSaveOriginal);
-export const FiCheck = createIconComponent(FiCheckOriginal);
-export const FiCamera = createIconComponent(FiCameraOriginal);
-export const FiPlay = createIconComponent(FiPlayOriginal);
-export const FiArrowRight = createIconComponent(FiArrowRightOriginal);
-export const FiCreditCard = createIconComponent(FiCreditCardOriginal);
-export const FiDownload = createIconComponent(FiDownloadOriginal);
-export const FiBarChart = createIconComponent(FiBarChartOriginal);
-export const FiFacebook = createIconComponent(FiFacebookOriginal);
-export const FiInstagram = createIconComponent(FiInstagramOriginal);
-export const FiTwitter = createIconComponent(FiTwitterOriginal);
-export const FiPlus = createIconComponent(FiPlusOriginal);
-export const FiTrash2 = createIconComponent(FiTrash2Original);
-
-// Export commonly used icons in an object for backward compatibility
+// Export an object with all icons for easier imports
 export const Icons = {
   FiUser,
   FiMail,
@@ -127,4 +126,8 @@ export const Icons = {
   FiTwitter,
   FiPlus,
   FiTrash2,
-} as const;
+  FiSun,
+  FiMoon,
+  FiChevronDown,
+  FiDollarSign,
+};

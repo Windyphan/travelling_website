@@ -92,7 +92,7 @@ const Home: React.FC = () => {
   ];
 
   return (
-    <div className="min-h-screen">
+    <div className="bg-gray-50 dark:bg-dark-900 transition-colors duration-200">
       {/* Hero Section */}
       <section className="relative h-screen overflow-hidden">
         <div className="absolute inset-0">
@@ -158,71 +158,67 @@ const Home: React.FC = () => {
         </div>
       </section>
 
-      {/* Featured Experiences */}
-      <section className="py-20 bg-white">
+      {/* Featured Tours Section */}
+      <section className="py-20 bg-white dark:bg-dark-800 transition-colors duration-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">Featured Experiences</h2>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+            <h2 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">Featured Tours</h2>
+            <p className="text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
               Discover our handpicked collection of extraordinary tours and experiences
             </p>
           </div>
 
           {toursLoading ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-              {[...Array(4)].map((_, index) => (
-                <div key={index} className="card animate-pulse">
-                  <div className="h-48 bg-gray-300 rounded-t-xl"></div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {[...Array(3)].map((_, index) => (
+                <div key={index} className="bg-white dark:bg-dark-700 rounded-xl shadow-lg animate-pulse">
+                  <div className="h-48 bg-gray-300 dark:bg-dark-600 rounded-t-xl"></div>
                   <div className="p-6">
-                    <div className="h-4 bg-gray-300 rounded mb-2"></div>
-                    <div className="h-6 bg-gray-300 rounded mb-4"></div>
-                    <div className="h-4 bg-gray-300 rounded"></div>
+                    <div className="h-4 bg-gray-300 dark:bg-dark-600 rounded mb-2"></div>
+                    <div className="h-6 bg-gray-300 dark:bg-dark-600 rounded mb-4"></div>
+                    <div className="h-4 bg-gray-300 dark:bg-dark-600 rounded"></div>
                   </div>
                 </div>
               ))}
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-              {featuredTours?.data.tours.map((tour: Tour) => (
-                <div key={tour._id} className="card overflow-hidden group">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {featuredTours?.data?.tours?.slice(0, 3).map((tour: Tour) => (
+                <div key={tour._id} className="bg-white dark:bg-dark-700 rounded-xl shadow-lg overflow-hidden group hover:shadow-2xl transition-all duration-300 border dark:border-dark-600">
                   <div className="relative h-48 overflow-hidden">
                     <img
-                      src={tour.images[0]?.url || `https://images.unsplash.com/photo-1469474968028-56623f02e42e?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80`}
+                      src={tour.images?.[0]?.url || `https://images.unsplash.com/photo-1469474968028-56623f02e42e?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80`}
                       alt={tour.title}
                       className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
                     />
-                    <div className="absolute top-4 right-4 bg-white rounded-full px-3 py-1 text-sm font-medium text-primary-600">
-                      ${tour.pricing.basePrice}
+                    <div className="absolute top-4 right-4 bg-white dark:bg-dark-800 rounded-full px-3 py-1 text-sm font-medium text-primary-600 dark:text-primary-400">
+                      ${tour.pricing?.basePrice || 'N/A'}
                     </div>
                   </div>
                   <div className="p-6">
-                    <div className="flex items-center text-sm text-gray-500 mb-2">
+                    <div className="flex items-center text-sm text-gray-500 dark:text-gray-400 mb-2">
                       <FiMapPin className="w-4 h-4 mr-1" />
                       {tour.destination}
                     </div>
-                    <h3 className="text-lg font-semibold text-gray-900 mb-2 line-clamp-2">
+                    <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors duration-200">
                       {tour.title}
                     </h3>
-                    <p className="text-gray-600 text-sm mb-4 line-clamp-2">
-                      {tour.shortDescription}
+                    <p className="text-gray-600 dark:text-gray-300 text-sm mb-4 line-clamp-2">
+                      {tour.description}
                     </p>
                     <div className="flex items-center justify-between">
-                      <div className="flex items-center">
-                        <FiClock className="w-4 h-4 mr-1 text-gray-400" />
-                        <span className="text-sm text-gray-500">
-                          {tour.duration.days}D/{tour.duration.nights}N
-                        </span>
+                      <div className="flex items-center text-sm text-gray-500 dark:text-gray-400">
+                        <FiClock className="w-4 h-4 mr-1" />
+                        {tour.duration} days
                       </div>
-                      <div className="flex items-center">
-                        <FiStar className="w-4 h-4 text-yellow-400 mr-1" />
-                        <span className="text-sm text-gray-500">
-                          {tour.ratings.average.toFixed(1)} ({tour.ratings.count})
-                        </span>
+                      <div className="flex items-center text-sm text-yellow-500">
+                        <FiStar className="w-4 h-4 mr-1 fill-current" />
+                        {tour.rating || '4.8'}
                       </div>
                     </div>
                     <Link
                       to={`/tours/${tour.slug}`}
-                      className="block w-full mt-4 text-center btn-primary"
+                      className="mt-4 block w-full bg-primary-600 hover:bg-primary-700 text-white text-center py-2 rounded-lg font-medium transition-colors duration-200"
                     >
                       View Details
                     </Link>
@@ -235,7 +231,7 @@ const Home: React.FC = () => {
           <div className="text-center mt-12">
             <Link
               to="/tours"
-              className="inline-flex items-center btn-secondary text-lg px-8 py-4"
+              className="inline-flex items-center bg-primary-600 hover:bg-primary-700 text-white px-8 py-3 rounded-lg font-medium transition-colors duration-200"
             >
               View All Tours
               <FiArrowRight className="w-5 h-5 ml-2" />
@@ -244,61 +240,57 @@ const Home: React.FC = () => {
         </div>
       </section>
 
-      {/* Why Choose Us */}
-      <section className="py-20 bg-gray-50">
+      {/* Featured Destinations Section */}
+      <section className="py-20 bg-gray-50 dark:bg-dark-900 transition-colors duration-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">Why Choose Us</h2>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              We're committed to creating extraordinary travel experiences that exceed your expectations
+            <h2 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">Popular Destinations</h2>
+            <p className="text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
+              Explore the most sought-after destinations around the world
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {whyChooseUs.map((item, index) => (
-              <div key={index} className="text-center group">
-                <div className="w-16 h-16 bg-primary-100 rounded-full flex items-center justify-center mx-auto mb-6 group-hover:bg-primary-600 transition-colors duration-300">
-                  <item.icon className="w-8 h-8 text-primary-600 group-hover:text-white transition-colors duration-300" />
-                </div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-4">{item.title}</h3>
-                <p className="text-gray-600">{item.description}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Testimonials */}
-      <section className="py-20 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">What Our Travelers Say</h2>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              Read reviews from our satisfied customers who have experienced unforgettable journeys
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {testimonials.map((testimonial, index) => (
-              <div key={index} className="card p-8">
-                <div className="flex items-center mb-4">
-                  {[...Array(testimonial.rating)].map((_, i) => (
-                    <FiStar key={i} className="w-5 h-5 text-yellow-400 fill-current" />
-                  ))}
-                </div>
-                <p className="text-gray-600 mb-6 italic">"{testimonial.text}"</p>
-                <div className="flex items-center">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {[
+              {
+                name: 'Bali, Indonesia',
+                image: 'https://images.unsplash.com/photo-1537953773345-d172ccf13cf1?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80',
+                tours: '12 Tours',
+                price: 'From $899'
+              },
+              {
+                name: 'Tokyo, Japan',
+                image: 'https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80',
+                tours: '8 Tours',
+                price: 'From $1,299'
+              },
+              {
+                name: 'Paris, France',
+                image: 'https://images.unsplash.com/photo-1502602898536-47ad22581b52?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80',
+                tours: '15 Tours',
+                price: 'From $1,099'
+              },
+              {
+                name: 'Santorini, Greece',
+                image: 'https://images.unsplash.com/photo-1570077188670-e3a8d69ac5ff?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80',
+                tours: '6 Tours',
+                price: 'From $1,499'
+              }
+            ].map((destination, index) => (
+              <div key={index} className="relative bg-white dark:bg-dark-700 rounded-xl overflow-hidden shadow-lg group hover:shadow-2xl transition-all duration-300 border dark:border-dark-600">
+                <div className="relative h-64 overflow-hidden">
                   <img
-                    src={testimonial.avatar}
-                    alt={testimonial.name}
-                    className="w-12 h-12 rounded-full mr-4"
-                    onError={(e) => {
-                      e.currentTarget.src = `https://ui-avatars.com/api/?name=${testimonial.name}&background=3b82f6&color=fff`;
-                    }}
+                    src={destination.image}
+                    alt={destination.name}
+                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
                   />
-                  <div>
-                    <h4 className="font-semibold text-gray-900">{testimonial.name}</h4>
-                    <p className="text-gray-500 text-sm">{testimonial.location}</p>
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+                  <div className="absolute bottom-4 left-4 text-white">
+                    <h3 className="text-xl font-bold mb-1">{destination.name}</h3>
+                    <p className="text-sm opacity-90">{destination.tours}</p>
+                  </div>
+                  <div className="absolute top-4 right-4 bg-white dark:bg-dark-800 text-gray-900 dark:text-white px-3 py-1 rounded-full text-sm font-medium">
+                    {destination.price}
                   </div>
                 </div>
               </div>
@@ -307,22 +299,69 @@ const Home: React.FC = () => {
         </div>
       </section>
 
-      {/* Newsletter Subscription */}
-      <section className="py-20 bg-primary-600">
+      {/* Recommendations Section */}
+      <section className="py-20 bg-white dark:bg-dark-800 transition-colors duration-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">Why Choose Us</h2>
+            <p className="text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
+              Our recommendations are based on years of experience and thousands of satisfied travelers
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {[
+              {
+                icon: FiUsers,
+                title: 'Expert Local Guides',
+                description: 'Our experienced local guides provide authentic insights and unforgettable experiences that you won\'t find anywhere else.',
+                color: 'blue'
+              },
+              {
+                icon: FiCheck,
+                title: 'Carefully Curated',
+                description: 'Every tour is meticulously planned and tested to ensure the highest quality experience for our travelers.',
+                color: 'green'
+              },
+              {
+                icon: FiStar,
+                title: '24/7 Support',
+                description: 'Our dedicated support team is available around the clock to assist you before, during, and after your trip.',
+                color: 'purple'
+              }
+            ].map((feature, index) => (
+              <div key={index} className="text-center group">
+                <div className={`w-16 h-16 mx-auto mb-6 rounded-full flex items-center justify-center bg-${feature.color}-100 dark:bg-${feature.color}-900/20 group-hover:scale-110 transition-transform duration-200`}>
+                  <feature.icon className={`w-8 h-8 text-${feature.color}-600 dark:text-${feature.color}-400`} />
+                </div>
+                <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-4">{feature.title}</h3>
+                <p className="text-gray-600 dark:text-gray-300 leading-relaxed">{feature.description}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* CTA Section */}
+      <section className="py-20 bg-primary-600 dark:bg-primary-800 transition-colors duration-200">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-4xl font-bold text-white mb-4">Stay in the Loop</h2>
-          <p className="text-xl text-blue-100 mb-8">
-            Subscribe to our newsletter for exclusive travel tips, deals, and destination guides
+          <h2 className="text-4xl font-bold text-white mb-6">Ready for Your Next Adventure?</h2>
+          <p className="text-xl text-primary-100 mb-8 max-w-2xl mx-auto">
+            Join thousands of travelers who have discovered amazing destinations with us. Start planning your perfect trip today.
           </p>
-          <div className="flex flex-col sm:flex-row max-w-md mx-auto">
-            <input
-              type="email"
-              placeholder="Enter your email address"
-              className="flex-1 px-6 py-3 rounded-l-lg sm:rounded-r-none rounded-r-lg border-0 focus:ring-2 focus:ring-blue-300 focus:outline-none"
-            />
-            <button className="px-8 py-3 bg-white text-primary-600 font-semibold rounded-r-lg sm:rounded-l-none rounded-l-lg hover:bg-gray-100 transition-colors duration-200">
-              Subscribe
-            </button>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Link
+              to="/tours"
+              className="bg-white text-primary-600 px-8 py-4 rounded-lg font-medium hover:bg-gray-100 transition-colors duration-200"
+            >
+              Browse Tours
+            </Link>
+            <Link
+              to="/contact"
+              className="border-2 border-white text-white px-8 py-4 rounded-lg font-medium hover:bg-white hover:text-primary-600 transition-colors duration-200"
+            >
+              Contact Us
+            </Link>
           </div>
         </div>
       </section>
