@@ -32,9 +32,9 @@ function App() {
       <ThemeProvider>
         <AuthProvider>
           <Router>
-            <div className="min-h-screen bg-gray-50 dark:bg-dark-900 flex flex-col transition-colors duration-200">
+            <div className="min-h-screen flex flex-col transition-colors duration-200">
               <Header />
-              <main className="flex-1">
+              <main className="flex-1 bg-gray-50 dark:bg-dark-900">
                 <Routes>
                   {/* Public Routes */}
                   <Route path="/" element={<Home />} />
