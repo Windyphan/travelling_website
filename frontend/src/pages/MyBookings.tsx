@@ -186,6 +186,7 @@ const MyBookings: React.FC = () => {
   );
 };
 
+
 interface BookingCardProps {
   booking: Booking;
   getStatusColor: (status: string) => string;
