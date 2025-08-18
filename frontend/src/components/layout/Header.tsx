@@ -37,10 +37,6 @@ const Header: React.FC = () => {
     { name: 'Contact', href: '/contact' },
   ];
 
-  const headerClasses = isScrolled
-    ? `${isDarkMode ? 'bg-dark-800/95' : 'bg-white/95'} backdrop-blur-md shadow-lg`
-    : 'bg-transparent';
-
   const logoTextClasses = isScrolled
     ? `transition-colors duration-300 ${isDarkMode ? 'text-white' : 'text-gray-900'}`
     : `transition-colors duration-300 ${isDarkMode ? 'text-white drop-shadow-lg' : 'text-gray-900 drop-shadow-lg'}`;
@@ -58,7 +54,16 @@ const Header: React.FC = () => {
     : `font-medium transition-colors duration-300 ${isDarkMode ? 'text-white drop-shadow-md' : 'text-gray-900 drop-shadow-md'}`;
 
   return (
-    <header className={`sticky top-0 z-50 transition-all duration-300 ${headerClasses}`}>
+    <header
+      className={`sticky top-0 z-50 transition-all duration-300`}
+      style={{
+        backgroundColor: isScrolled
+          ? isDarkMode
+            ? 'rgba(31, 41, 55, 0.95)'
+            : 'rgba(255, 255, 255, 0.95)'
+          : 'transparent',
+      }}
+    >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-center items-center h-16 relative">
           {/* Centered Logo */}
@@ -67,7 +72,9 @@ const Header: React.FC = () => {
               <div className="w-12 h-12 bg-primary-600 rounded-lg flex items-center justify-center shadow-lg">
                 <span className="text-white font-bold text-2xl">T</span>
               </div>
-              <span className={`ml-3 text-2xl font-bold transition-colors duration-300 ${logoTextClasses}`}>
+              <span
+                className={`ml-3 text-2xl font-bold transition-colors duration-300 ${logoTextClasses}`}
+              >
                 TravelCo
               </span>
             </Link>
@@ -125,7 +132,9 @@ const Header: React.FC = () => {
                       {state.user.name.charAt(0).toUpperCase()}
                     </span>
                   </div>
-                  <span className={`font-medium transition-colors duration-300 ${userTextClasses}`}>
+                  <span
+                    className={`font-medium transition-colors duration-300 ${userTextClasses}`}
+                  >
                     {state.user.name}
                   </span>
                   <Icon
