@@ -37,6 +37,8 @@ import {
   FiMoon,
   FiChevronDown,
   FiDollarSign,
+    FiChevronLeft,
+    FiChevronRight
 } from 'react-icons/fi';
 import { IconType } from 'react-icons';
 
@@ -91,6 +93,8 @@ export {
   FiMoon,
   FiChevronDown,
   FiDollarSign,
+    FiChevronLeft,
+    FiChevronRight,
 };
 
 // Export an object with all icons for easier imports
@@ -132,4 +136,6 @@ export const Icons = {
   FiMoon,
   FiChevronDown,
   FiDollarSign,
+    FiChevronLeft,
+    FiChevronRight,
 };

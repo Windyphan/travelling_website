@@ -315,67 +315,227 @@ const Home: React.FC = () => {
         </div>
       </section>
 
-      {/* Recommendations Section */}
+      {/* Services Section */}
       <section className="py-20 bg-white dark:bg-dark-800 transition-colors duration-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">Why Choose Us</h2>
+            <h2 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">Our Services</h2>
             <p className="text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
-              Our recommendations are based on years of experience and thousands of satisfied travelers
+              Complete travel solutions for your perfect getaway
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {whyChooseUs.map((feature, index) => (
-              <div key={index} className="text-center group">
-                <div className={`w-16 h-16 mx-auto mb-6 rounded-full flex items-center justify-center bg-blue-100 dark:bg-blue-900/20 group-hover:scale-110 transition-transform duration-200`}>
-                  <Icon icon={feature.icon} className={`w-8 h-8 text-blue-600 dark:text-blue-400`} />
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {[
+              {
+                title: 'Luxury Hotels',
+                image: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80',
+                description: 'Premium accommodations'
+              },
+              {
+                title: 'Flight Booking',
+                image: 'https://images.unsplash.com/photo-1436491865332-7a61a109cc05?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80',
+                description: 'Best flight deals'
+              },
+              {
+                title: 'Travel Insurance',
+                image: 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80',
+                description: 'Comprehensive coverage'
+              },
+              {
+                title: 'Tour Guides',
+                image: 'https://images.unsplash.com/photo-1488646953014-85cb44e25828?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80',
+                description: 'Expert local guides'
+              }
+            ].map((service, index) => (
+              <div key={index} className="bg-white dark:bg-dark-700 rounded-xl overflow-hidden shadow-lg group hover:shadow-2xl transition-all duration-300 border dark:border-dark-600">
+                <div className="relative h-48 overflow-hidden">
+                  <img
+                    src={service.image}
+                    alt={service.title}
+                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+                  <div className="absolute bottom-4 left-4 text-white">
+                    <h3 className="text-lg font-bold mb-1">{service.title}</h3>
+                    <p className="text-sm opacity-90">{service.description}</p>
+                  </div>
                 </div>
-                <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-4">{feature.title}</h3>
-                <p className="text-gray-600 dark:text-gray-300 leading-relaxed">{feature.description}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Testimonials Section */}
+      {/* Car Rentals Section */}
       <section className="py-20 bg-gray-50 dark:bg-dark-900 transition-colors duration-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">What Our Travelers Say</h2>
+            <h2 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">Car Rentals</h2>
             <p className="text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
-              Hear from thousands of satisfied travelers who have experienced amazing adventures with us
+              Choose from our premium fleet
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {testimonials.map((testimonial, index) => (
-              <div key={index} className="bg-white dark:bg-dark-700 rounded-xl shadow-lg p-6 border dark:border-dark-600">
-                <div className="flex items-center mb-4">
-                  <div className="w-12 h-12 bg-gray-200 dark:bg-dark-600 rounded-full overflow-hidden mr-4">
-                    <img
-                      src={testimonial.avatar}
-                      alt={testimonial.name}
-                      className="w-full h-full object-cover"
-                      onError={(e) => {
-                        e.currentTarget.src = `https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&q=80`;
-                      }}
-                    />
+          <div className="relative">
+            <div className="overflow-x-auto scrollbar-hide">
+              <div className="flex space-x-6 pb-4">
+                {[
+                  {
+                    name: 'Luxury Sedan',
+                    image: 'https://images.unsplash.com/photo-1549924231-f129b911e442?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80',
+                    price: '$89/day',
+                    features: ['GPS', 'AC', 'Bluetooth']
+                  },
+                  {
+                    name: 'SUV Premium',
+                    image: 'https://images.unsplash.com/photo-1519641471654-76ce0107ad1b?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80',
+                    price: '$129/day',
+                    features: ['4WD', 'GPS', 'Premium Audio']
+                  },
+                  {
+                    name: 'Convertible',
+                    image: 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80',
+                    price: '$159/day',
+                    features: ['Convertible', 'Sport Mode', 'Premium']
+                  },
+                  {
+                    name: 'Electric Car',
+                    image: 'https://images.unsplash.com/photo-1560958089-b8a1929cea89?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80',
+                    price: '$99/day',
+                    features: ['Electric', 'Eco-Friendly', 'Silent']
+                  },
+                  {
+                    name: 'Sports Car',
+                    image: 'https://images.unsplash.com/photo-1541443131876-44b03de101c5?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80',
+                    price: '$299/day',
+                    features: ['High Performance', 'Luxury', 'Manual']
+                  },
+                  {
+                    name: 'Family Van',
+                    image: 'https://images.unsplash.com/photo-1449965408869-eaa3f722e40d?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80',
+                    price: '$109/day',
+                    features: ['8 Seats', 'Family Friendly', 'Spacious']
+                  }
+                ].map((car, index) => (
+                  <div key={index} className="flex-none w-80 bg-white dark:bg-dark-700 rounded-xl shadow-lg overflow-hidden border dark:border-dark-600">
+                    <div className="relative h-48 overflow-hidden">
+                      <img
+                        src={car.image}
+                        alt={car.name}
+                        className="w-full h-full object-cover hover:scale-110 transition-transform duration-300"
+                      />
+                      <div className="absolute top-4 right-4 bg-white dark:bg-dark-800 text-gray-900 dark:text-white px-3 py-1 rounded-full text-sm font-medium">
+                        {car.price}
+                      </div>
+                    </div>
+                    <div className="p-6">
+                      <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">{car.name}</h3>
+                      <div className="flex flex-wrap gap-2 mb-4">
+                        {car.features.map((feature, featureIndex) => (
+                          <span key={featureIndex} className="bg-blue-100 dark:bg-blue-900/20 text-blue-800 dark:text-blue-300 px-2 py-1 rounded-full text-xs">
+                            {feature}
+                          </span>
+                        ))}
+                      </div>
+                      <button className="w-full bg-primary-600 hover:bg-primary-700 text-white py-2 rounded-lg font-medium transition-colors duration-200">
+                        Book Now
+                      </button>
+                    </div>
                   </div>
-                  <div>
-                    <h4 className="font-semibold text-gray-900 dark:text-white">{testimonial.name}</h4>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">{testimonial.location}</p>
-                  </div>
-                </div>
-                <div className="flex items-center mb-3">
-                  {[...Array(testimonial.rating)].map((_, starIndex) => (
-                    <Icon key={starIndex} icon={Icons.FiStar} className="w-4 h-4 text-yellow-400 fill-current" />
-                  ))}
-                </div>
-                <p className="text-gray-600 dark:text-gray-300 italic">"{testimonial.text}"</p>
+                ))}
               </div>
-            ))}
+            </div>
+
+            {/* Scroll buttons */}
+            <button className="absolute left-0 top-1/2 -translate-y-1/2 bg-white dark:bg-dark-700 shadow-lg rounded-full p-3 hover:bg-gray-50 dark:hover:bg-dark-600 transition-colors duration-200">
+              <Icon icon={Icons.FiChevronLeft} className="w-6 h-6 text-gray-600 dark:text-gray-300" />
+            </button>
+            <button className="absolute right-0 top-1/2 -translate-y-1/2 bg-white dark:bg-dark-700 shadow-lg rounded-full p-3 hover:bg-gray-50 dark:hover:bg-dark-600 transition-colors duration-200">
+              <Icon icon={Icons.FiChevronRight} className="w-6 h-6 text-gray-600 dark:text-gray-300" />
+            </button>
+          </div>
+        </div>
+      </section>
+
+      {/* Photo Gallery Section */}
+      <section className="py-20 bg-white dark:bg-dark-800 transition-colors duration-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">Explore Destinations</h2>
+            <p className="text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
+              Discover amazing places around the world
+            </p>
+          </div>
+
+          <div className="relative">
+            <div className="overflow-x-auto scrollbar-hide">
+              <div className="flex space-x-6 pb-4">
+                {[
+                  {
+                    name: 'Tropical Paradise',
+                    image: 'https://images.unsplash.com/photo-1559827260-dc66d52bef19?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80',
+                    location: 'Maldives'
+                  },
+                  {
+                    name: 'Mountain Adventure',
+                    image: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80',
+                    location: 'Swiss Alps'
+                  },
+                  {
+                    name: 'City Lights',
+                    image: 'https://images.unsplash.com/photo-1518391846015-55a9cc003b25?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80',
+                    location: 'New York'
+                  },
+                  {
+                    name: 'Desert Safari',
+                    image: 'https://images.unsplash.com/photo-1451337516015-6b6e9a44a8a3?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80',
+                    location: 'Dubai'
+                  },
+                  {
+                    name: 'Ancient Wonders',
+                    image: 'https://images.unsplash.com/photo-1539650116574-75c0c6d3b86f?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80',
+                    location: 'Egypt'
+                  },
+                  {
+                    name: 'Forest Retreat',
+                    image: 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80',
+                    location: 'Amazon'
+                  },
+                  {
+                    name: 'Coastal Beauty',
+                    image: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80',
+                    location: 'Greece'
+                  }
+                ].map((destination, index) => (
+                  <div key={index} className="flex-none w-72 group cursor-pointer">
+                    <div className="relative h-80 overflow-hidden rounded-xl shadow-lg">
+                      <img
+                        src={destination.image}
+                        alt={destination.name}
+                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent"></div>
+                      <div className="absolute bottom-6 left-6 text-white">
+                        <h3 className="text-2xl font-bold mb-2">{destination.name}</h3>
+                        <p className="text-lg opacity-90 flex items-center">
+                          <Icon icon={Icons.FiMapPin} className="w-4 h-4 mr-2" />
+                          {destination.location}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Scroll buttons */}
+            <button className="absolute left-0 top-1/2 -translate-y-1/2 bg-white dark:bg-dark-700 shadow-lg rounded-full p-3 hover:bg-gray-50 dark:hover:bg-dark-600 transition-colors duration-200 z-10">
+              <Icon icon={Icons.FiChevronLeft} className="w-6 h-6 text-gray-600 dark:text-gray-300" />
+            </button>
+            <button className="absolute right-0 top-1/2 -translate-y-1/2 bg-white dark:bg-dark-700 shadow-lg rounded-full p-3 hover:bg-gray-50 dark:hover:bg-dark-600 transition-colors duration-200 z-10">
+              <Icon icon={Icons.FiChevronRight} className="w-6 h-6 text-gray-600 dark:text-gray-300" />
+            </button>
           </div>
         </div>
       </section>
