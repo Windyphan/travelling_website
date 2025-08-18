@@ -57,7 +57,7 @@ const confirmPayment = async (req, res) => {
 
     // Verify payment with Stripe
     const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
-
+    
     if (paymentIntent.status === 'succeeded') {
       booking.payment.status = 'paid';
       booking.payment.method = paymentMethod;

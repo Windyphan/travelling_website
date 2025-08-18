@@ -33,7 +33,7 @@ const getTours = async (req, res) => {
 
     // Build filter object
     const filter = { status: 'published' };
-
+    
     if (destination) filter.destination = new RegExp(destination, 'i');
     if (category) filter.category = category;
     if (minPrice || maxPrice) {
@@ -83,9 +83,9 @@ const getTours = async (req, res) => {
 // Get featured tours
 const getFeaturedTours = async (req, res) => {
   try {
-    const tours = await Tour.find({
-      status: 'published',
-      featured: true
+    const tours = await Tour.find({ 
+      status: 'published', 
+      featured: true 
     })
     .sort({ 'ratings.average': -1 })
     .limit(4)
@@ -102,9 +102,9 @@ const getFeaturedTours = async (req, res) => {
 const getTourBySlug = async (req, res) => {
   try {
     const { slug } = req.params;
-
+    
     const tour = await Tour.findOne({ slug, status: 'published' });
-
+    
     if (!tour) {
       return res.status(404).json({ message: 'Tour not found' });
     }
@@ -149,7 +149,7 @@ const createTour = async (req, res) => {
 const updateTour = async (req, res) => {
   try {
     const { id } = req.params;
-
+    
     const tour = await Tour.findByIdAndUpdate(
       id,
       { $set: req.body },
@@ -174,9 +174,9 @@ const updateTour = async (req, res) => {
 const deleteTour = async (req, res) => {
   try {
     const { id } = req.params;
-
+    
     const tour = await Tour.findByIdAndDelete(id);
-
+    
     if (!tour) {
       return res.status(404).json({ message: 'Tour not found' });
     }
@@ -195,7 +195,7 @@ const checkAvailability = async (req, res) => {
     const { startDate, groupSize = 1 } = req.query;
 
     const tour = await Tour.findById(tourId);
-
+    
     if (!tour) {
       return res.status(404).json({ message: 'Tour not found' });
     }

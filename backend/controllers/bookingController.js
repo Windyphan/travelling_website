@@ -20,7 +20,7 @@ const createEmailTransporter = () => {
 const sendConfirmationEmail = async (booking, customer, tour) => {
   try {
     const transporter = createEmailTransporter();
-
+    
     const emailTemplate = `
       <h2>Booking Confirmation - ${tour.title}</h2>
       <p>Dear ${customer.name},</p>
@@ -70,7 +70,7 @@ const createBooking = async (req, res) => {
     }
 
     const totalTravelers = numberOfTravelers.adults + numberOfTravelers.children + numberOfTravelers.infants;
-
+    
     // Check availability
     if (!tour.checkAvailability(new Date(startDate), totalTravelers)) {
       return res.status(400).json({ message: 'Tour not available for selected date and group size' });
@@ -115,7 +115,7 @@ const createBooking = async (req, res) => {
       const bookingDate = new Date(startDate);
       return bookingDate >= slot.startDate && bookingDate <= slot.endDate;
     });
-
+    
     if (availability) {
       availability.bookedSpots += totalTravelers;
       await tour.save();
@@ -147,7 +147,7 @@ const createBooking = async (req, res) => {
 const getUserBookings = async (req, res) => {
   try {
     const { page = 1, limit = 10, status } = req.query;
-
+    
     const filter = { customer: req.user.id };
     if (status) filter.status = status;
 
@@ -177,7 +177,7 @@ const getUserBookings = async (req, res) => {
 const getBooking = async (req, res) => {
   try {
     const { id } = req.params;
-
+    
     const booking = await Booking.findOne({
       _id: id,
       customer: req.user.id
@@ -219,8 +219,8 @@ const cancelBooking = async (req, res) => {
     const hoursDifference = (startDate - now) / (1000 * 60 * 60);
 
     if (hoursDifference < 24) {
-      return res.status(400).json({
-        message: 'Cancellation not allowed less than 24 hours before start date'
+      return res.status(400).json({ 
+        message: 'Cancellation not allowed less than 24 hours before start date' 
       });
     }
 
@@ -238,7 +238,7 @@ const cancelBooking = async (req, res) => {
       const bookingDate = booking.bookingDetails.startDate;
       return bookingDate >= slot.startDate && bookingDate <= slot.endDate;
     });
-
+    
     if (availability) {
       availability.bookedSpots -= booking.bookingDetails.totalTravelers;
       await tour.save();

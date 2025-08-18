@@ -114,7 +114,7 @@ const bookingSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User'
   },
-  notes: [{
+  notes: [{ 
     content: String,
     author: {
       type: mongoose.Schema.Types.ObjectId,

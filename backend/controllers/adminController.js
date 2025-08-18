@@ -21,15 +21,15 @@ const getDashboardStats = async (req, res) => {
     ]);
 
     // Recent stats
-    const weeklyBookings = await Booking.countDocuments({
-      createdAt: { $gte: lastWeek }
+    const weeklyBookings = await Booking.countDocuments({ 
+      createdAt: { $gte: lastWeek } 
     });
     const monthlyRevenue = await Booking.aggregate([
-      {
-        $match: {
+      { 
+        $match: { 
           'payment.status': 'paid',
           'payment.paymentDate': { $gte: lastMonth }
-        }
+        } 
       },
       { $group: { _id: null, total: { $sum: '$pricing.totalAmount' } } }
     ]);
