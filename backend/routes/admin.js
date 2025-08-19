@@ -3,47 +3,48 @@ const router = express.Router();
 const { adminAuth, editorAuth } = require('../middleware/auth');
 const {
   getDashboardStats,
-  getAllBookings,
-  updateBookingStatus,
   getAllUsers,
-  getAllToursAdmin,
-  getAllReviews,
-  updateReviewStatus
+  updateUserRole,
+  uploadImage,
+  deleteImage,
+  createContent,
+  updateContent,
+  deleteContent,
+  getAllContent
 } = require('../controllers/adminController');
 
-// @route   GET /api/admin/dashboard
-// @desc    Get dashboard statistics
-// @access  Private (Admin only)
+const {
+  getTours,
+  getTour,
+  createTour,
+  updateTour,
+  deleteTour,
+  getTourStats
+} = require('../controllers/tourController');
+
+// Dashboard routes
 router.get('/dashboard', adminAuth, getDashboardStats);
 
-// @route   GET /api/admin/bookings
-// @desc    Get all bookings
-// @access  Private (Admin only)
-router.get('/bookings', adminAuth, getAllBookings);
-
-// @route   PUT /api/admin/bookings/:id/status
-// @desc    Update booking status
-// @access  Private (Admin only)
-router.put('/bookings/:id/status', adminAuth, updateBookingStatus);
-
-// @route   GET /api/admin/users
-// @desc    Get all users
-// @access  Private (Admin only)
+// User management routes
 router.get('/users', adminAuth, getAllUsers);
+router.put('/users/:userId/role', adminAuth, updateUserRole);
 
-// @route   GET /api/admin/tours
-// @desc    Get all tours for admin
-// @access  Private (Editor or Admin)
-router.get('/tours', editorAuth, getAllToursAdmin);
+// Image management routes
+router.post('/upload-image', adminAuth, uploadImage);
+router.delete('/delete-image', adminAuth, deleteImage);
 
-// @route   GET /api/admin/reviews
-// @desc    Get all reviews
-// @access  Private (Editor or Admin)
-router.get('/reviews', editorAuth, getAllReviews);
+// Content management routes
+router.get('/content', editorAuth, getAllContent);
+router.post('/content', editorAuth, createContent);
+router.put('/content/:contentId', editorAuth, updateContent);
+router.delete('/content/:contentId', editorAuth, deleteContent);
 
-// @route   PUT /api/admin/reviews/:id
-// @desc    Update review status
-// @access  Private (Editor or Admin)
-router.put('/reviews/:id', editorAuth, updateReviewStatus);
+// Tour management routes
+router.get('/tours', editorAuth, getTours);
+router.get('/tours/stats', adminAuth, getTourStats);
+router.get('/tours/:id', editorAuth, getTour);
+router.post('/tours', editorAuth, createTour);
+router.put('/tours/:id', editorAuth, updateTour);
+router.delete('/tours/:id', adminAuth, deleteTour);
 
 module.exports = router;

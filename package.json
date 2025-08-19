@@ -24,5 +24,8 @@
     "nodejs"
   ],
   "author": "Travel Company",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "react-feather": "^2.0.10"
+  }
 }

@@ -240,6 +240,49 @@ export interface Content {
   updatedAt: string;
 }
 
+// Blog-specific types extending Content
+export interface Blog extends Omit<Content, 'type'> {
+  type: 'blog';
+  readingTime: number;
+  publishedAt?: string;
+  authorProfile?: {
+    name: string;
+    avatar?: string;
+    bio?: string;
+  };
+}
+
+export interface BlogFilters {
+  category?: string;
+  tag?: string;
+  status?: 'draft' | 'published' | 'archived';
+  author?: string;
+  search?: string;
+  page?: number;
+  limit?: number;
+  sortBy?: 'createdAt' | 'publishedAt' | 'views' | 'title';
+  sortOrder?: 'asc' | 'desc';
+}
+
+export interface BlogForm {
+  title: string;
+  slug: string;
+  content: string;
+  excerpt: string;
+  featuredImage?: string;
+  gallery: string[];
+  categories: string[];
+  tags: string[];
+  status: 'draft' | 'published' | 'archived';
+  featured: boolean;
+  language: 'en' | 'vi';
+  seoData: {
+    metaTitle?: string;
+    metaDescription?: string;
+    keywords: string[];
+  };
+}
+
 // API Response types
 export interface ApiResponse<T> {
   data?: T;
@@ -324,4 +367,88 @@ export interface TourFilters {
   search?: string;
   page?: number;
   limit?: number;
+}
+
+// Service types for comprehensive booking system
+export interface Service {
+  _id: string;
+  title: string;
+  subtitle: string;
+  description: string;
+  images: string[];
+  videos?: string[];
+  price: number;
+  duration?: string;
+  included: string[];
+  excluded?: string[];
+  category: 'tours' | 'car-rental' | 'hotel' | 'cruise' | 'flights' | 'train' | 'visa';
+  serviceType: 'tours' | 'car-rental' | 'other-services';
+  featured?: boolean;
+  status: 'active' | 'inactive';
+  itinerary?: string[];
+  location?: {
+    coordinates?: [number, number];
+    address?: string;
+    city?: string;
+    country?: string;
+  };
+}
+
+// Enhanced booking form types for different services
+export interface BaseContactInfo {
+  name: string;
+  email: string;
+  gender: 'male' | 'female' | 'other';
+  dateOfBirth?: string;
+  phone: string;
+  address?: string;
+}
+
+export interface PassengerInfo {
+  adults: number;
+  children: number;
+}
+
+export interface TourBookingForm extends BaseContactInfo {
+  serviceId: string;
+  serviceType: 'tours';
+  passengers: PassengerInfo;
+  departureDate: string;
+}
+
+export interface CarRentalBookingForm extends BaseContactInfo {
+  serviceId: string;
+  serviceType: 'car-rental';
+  passengers: PassengerInfo;
+  departureDate: string;
+  from: string;
+  to: string;
+  returnTrip: boolean;
+  returnDate?: string;
+  tripDetails: string;
+}
+
+export interface OtherServiceBookingForm extends BaseContactInfo {
+  serviceId: string;
+  serviceType: 'other-services';
+  passengers: PassengerInfo;
+  departureDate?: string;
+  requestDetails: string;
+}
+
+export type ServiceBookingForm = TourBookingForm | CarRentalBookingForm | OtherServiceBookingForm;
+
+// Enhanced booking type
+export interface ServiceBooking {
+  _id: string;
+  bookingNumber: string;
+  service: Service;
+  customer: User;
+  bookingForm: ServiceBookingForm;
+  status: 'pending' | 'confirmed' | 'contacted' | 'completed' | 'cancelled';
+  contactedAt?: string;
+  confirmedAt?: string;
+  notes: BookingNote[];
+  createdAt: string;
+  updatedAt: string;
 }

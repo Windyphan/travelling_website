@@ -58,6 +58,29 @@ const getTours = async (req, res) => {
   }
 };
 
+// Get featured tours
+const getFeaturedTours = async (req, res) => {
+  try {
+    const { limit = 6 } = req.query;
+    const tours = await Tour.findAll(req.db, { 
+      limit: parseInt(limit), 
+      offset: 0, 
+      featured: true 
+    });
+
+    res.json({
+      success: true,
+      data: tours.map(tour => tour.toJSON())
+    });
+  } catch (error) {
+    console.error('Get featured tours error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error fetching featured tours'
+    });
+  }
+};
+
 // Get single tour by ID
 const getTour = async (req, res) => {
   try {
@@ -76,6 +99,33 @@ const getTour = async (req, res) => {
     });
   } catch (error) {
     console.error('Get tour error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error fetching tour'
+    });
+  }
+};
+
+// Get tour by slug
+const getTourBySlug = async (req, res) => {
+  try {
+    const { slug } = req.params;
+    // For now, we'll use ID since we don't have slug in our model yet
+    const tour = await Tour.findById(req.db, slug);
+
+    if (!tour) {
+      return res.status(404).json({
+        success: false,
+        message: 'Tour not found'
+      });
+    }
+
+    res.json({
+      success: true,
+      data: tour.toJSON()
+    });
+  } catch (error) {
+    console.error('Get tour by slug error:', error);
     res.status(500).json({
       success: false,
       message: 'Error fetching tour'
@@ -180,6 +230,42 @@ const deleteTour = async (req, res) => {
   }
 };
 
+// Check tour availability
+const checkAvailability = async (req, res) => {
+  try {
+    const { tourId } = req.params;
+    const { date, participants } = req.query;
+
+    const tour = await Tour.findById(req.db, tourId);
+    if (!tour) {
+      return res.status(404).json({
+        success: false,
+        message: 'Tour not found'
+      });
+    }
+
+    // Simple availability check - in real app, this would check bookings
+    const available = tour.max_participants >= parseInt(participants || 1);
+    const totalPrice = tour.price * parseInt(participants || 1);
+
+    res.json({
+      success: true,
+      data: {
+        available,
+        price: tour.price,
+        totalPrice,
+        maxParticipants: tour.max_participants
+      }
+    });
+  } catch (error) {
+    console.error('Check availability error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error checking availability'
+    });
+  }
+};
+
 // Get tour statistics (admin only)
 const getTourStats = async (req, res) => {
   try {
@@ -200,9 +286,12 @@ const getTourStats = async (req, res) => {
 
 module.exports = {
   getTours,
+  getFeaturedTours,
+  getTourBySlug,
   getTour,
   createTour,
   updateTour,
   deleteTour,
-  getTourStats
+  getTourStats,
+  checkAvailability
 };

@@ -53,11 +53,8 @@ const corsOptions = {
       callback(new Error('Not allowed by CORS'));
     }
   },
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
-  allowedHeaders: ['Content-Type', 'Authorization']
+  credentials: true
 };
-
 app.use(cors(corsOptions));
 
 // Body parsing middleware
@@ -67,27 +64,54 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 // Routes
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/tours', require('./routes/tours'));
+app.use('/api/services', require('./routes/services'));
+app.use('/api/blogs', require('./routes/blogs'));
 app.use('/api/bookings', require('./routes/bookings'));
+app.use('/api/reviews', require('./routes/reviews'));
 app.use('/api/admin', require('./routes/admin'));
 app.use('/api/payments', require('./routes/payments'));
-app.use('/api/content', require('./routes/content'));
-app.use('/api/reviews', require('./routes/reviews'));
 
-// Error handling middleware
-app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(500).json({ message: 'Something went wrong!' });
+// Health check endpoint
+app.get('/api/health', (req, res) => {
+  res.json({
+    success: true,
+    message: 'Server is running',
+    timestamp: new Date().toISOString()
+  });
 });
 
 // 404 handler
-app.use('*', (req, res) => {
-  res.status(404).json({ message: 'Route not found' });
+app.use('/api/*', (req, res) => {
+  res.status(404).json({
+    success: false,
+    message: 'API endpoint not found'
+  });
 });
 
-const PORT = process.env.PORT || 5000;
+// Global error handler
+app.use((error, req, res, next) => {
+  console.error('Global error handler:', error);
 
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+  // Don't leak error details in production
+  const isDevelopment = process.env.NODE_ENV !== 'production';
+
+  res.status(error.status || 500).json({
+    success: false,
+    message: error.message || 'Internal server error',
+    ...(isDevelopment && { stack: error.stack })
+  });
 });
 
-module.exports = app;
+// Export for Cloudflare Workers or other serverless platforms
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = app;
+}
+
+// Start server for local development
+const PORT = process.env.PORT || 3001;
+if (process.env.NODE_ENV !== 'production') {
+  app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+    console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
+  });
+}

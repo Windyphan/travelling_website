@@ -1,14 +1,35 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { Icon, Icons } from '../../components/common/Icons';
+import TourManagement from './TourManagement';
 
 const AdminDashboard: React.FC = () => {
   const { state } = useAuth();
+  const [activeTab, setActiveTab] = useState('dashboard');
 
   if (state.user?.role !== 'admin') {
     return <Navigate to="/" replace />;
   }
+
+  const tabs = [
+    { id: 'dashboard', name: 'Dashboard', icon: Icons.FiBarChart },
+    { id: 'tours', name: 'Tours', icon: Icons.FiMapPin },
+    { id: 'services', name: 'Services', icon: Icons.FiSettings },
+    { id: 'bookings', name: 'Bookings', icon: Icons.FiCalendar },
+    { id: 'users', name: 'Users', icon: Icons.FiUsers },
+    { id: 'content', name: 'Content', icon: Icons.FiEdit3 },
+  ];
+
+  const renderContent = () => {
+    switch (activeTab) {
+      case 'tours':
+        return <TourManagement />;
+      case 'dashboard':
+      default:
+        return <DashboardOverview />;
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-dark-900 transition-colors duration-200">
@@ -18,99 +39,157 @@ const AdminDashboard: React.FC = () => {
           <p className="text-gray-600 dark:text-gray-400">Manage your travel business</p>
         </div>
 
-        {/* Quick Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <div className="bg-white dark:bg-dark-800 rounded-lg shadow-lg p-6 border dark:border-dark-700">
-            <div className="flex items-center">
-              <div className="w-12 h-12 bg-blue-100 dark:bg-blue-900 rounded-lg flex items-center justify-center">
-                <Icon icon={Icons.FiCalendar} className="w-6 h-6 text-blue-600 dark:text-blue-400" />
-              </div>
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Total Bookings</p>
-                <p className="text-2xl font-bold text-gray-900 dark:text-white">142</p>
-              </div>
-            </div>
+        {/* Navigation Tabs */}
+        <div className="mb-8">
+          <div className="border-b border-gray-200 dark:border-dark-600">
+            <nav className="flex space-x-8">
+              {tabs.map((tab) => (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id)}
+                  className={`flex items-center py-4 px-1 border-b-2 font-medium text-sm transition-colors duration-200 ${
+                    activeTab === tab.id
+                      ? 'border-primary-500 text-primary-600 dark:text-primary-400'
+                      : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-dark-500'
+                  }`}
+                >
+                  <Icon icon={tab.icon} className="w-5 h-5 mr-2" />
+                  {tab.name}
+                </button>
+              ))}
+            </nav>
           </div>
+        </div>
 
-          <div className="bg-white dark:bg-dark-800 rounded-lg shadow-lg p-6 border dark:border-dark-700">
-            <div className="flex items-center">
-              <div className="w-12 h-12 bg-green-100 dark:bg-green-900 rounded-lg flex items-center justify-center">
-                <Icon icon={Icons.FiDollarSign} className="w-6 h-6 text-green-600 dark:text-green-400" />
-              </div>
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Revenue</p>
-                <p className="text-2xl font-bold text-gray-900 dark:text-white">$24,500</p>
-              </div>
+        {/* Content */}
+        {renderContent()}
+      </div>
+    </div>
+  );
+};
+
+// Dashboard Overview Component
+const DashboardOverview: React.FC = () => {
+  return (
+    <div className="space-y-8">
+      {/* Quick Stats */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="bg-white dark:bg-dark-800 rounded-lg shadow-lg p-6 border dark:border-dark-700">
+          <div className="flex items-center">
+            <div className="w-12 h-12 bg-blue-100 dark:bg-blue-900 rounded-lg flex items-center justify-center">
+              <Icon icon={Icons.FiCalendar} className="w-6 h-6 text-blue-600 dark:text-blue-400" />
             </div>
-          </div>
-
-          <div className="bg-white dark:bg-dark-800 rounded-lg shadow-lg p-6 border dark:border-dark-700">
-            <div className="flex items-center">
-              <div className="w-12 h-12 bg-purple-100 dark:bg-purple-900 rounded-lg flex items-center justify-center">
-                <Icon icon={Icons.FiUsers} className="w-6 h-6 text-purple-600 dark:text-purple-400" />
-              </div>
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Active Tours</p>
-                <p className="text-2xl font-bold text-gray-900 dark:text-white">12</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white dark:bg-dark-800 rounded-lg shadow-lg p-6 border dark:border-dark-700">
-            <div className="flex items-center">
-              <div className="w-12 h-12 bg-orange-100 dark:bg-orange-900 rounded-lg flex items-center justify-center">
-                <Icon icon={Icons.FiStar} className="w-6 h-6 text-orange-600 dark:text-orange-400" />
-              </div>
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Reviews</p>
-                <p className="text-2xl font-bold text-gray-900 dark:text-white">4.8</p>
-              </div>
+            <div className="ml-4">
+              <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Total Bookings</p>
+              <p className="text-2xl font-bold text-gray-900 dark:text-white">142</p>
             </div>
           </div>
         </div>
 
-        {/* Management Sections */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          <div className="bg-white dark:bg-dark-800 rounded-lg shadow-lg p-6 border dark:border-dark-700">
-            <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">Quick Actions</h2>
-            <div className="space-y-3">
-              <button className="w-full flex items-center justify-between p-3 bg-primary-50 dark:bg-primary-900/20 rounded-lg hover:bg-primary-100 dark:hover:bg-primary-900/30 transition-colors duration-200">
-                <span className="text-primary-700 dark:text-primary-300 font-medium">Add New Tour</span>
-                <Icon icon={Icons.FiPlus} className="w-5 h-5 text-primary-600 dark:text-primary-400" />
-              </button>
-              <button className="w-full flex items-center justify-between p-3 bg-green-50 dark:bg-green-900/20 rounded-lg hover:bg-green-100 dark:hover:bg-green-900/30 transition-colors duration-200">
-                <span className="text-green-700 dark:text-green-300 font-medium">Manage Bookings</span>
-                <Icon icon={Icons.FiCalendar} className="w-5 h-5 text-green-600 dark:text-green-400" />
-              </button>
-              <button className="w-full flex items-center justify-between p-3 bg-purple-50 dark:bg-purple-900/20 rounded-lg hover:bg-purple-100 dark:hover:bg-purple-900/30 transition-colors duration-200">
-                <span className="text-purple-700 dark:text-purple-300 font-medium">View Analytics</span>
-                <Icon icon={Icons.FiBarChart} className="w-5 h-5 text-purple-600 dark:text-purple-400" />
-              </button>
+        <div className="bg-white dark:bg-dark-800 rounded-lg shadow-lg p-6 border dark:border-dark-700">
+          <div className="flex items-center">
+            <div className="w-12 h-12 bg-green-100 dark:bg-green-900 rounded-lg flex items-center justify-center">
+              <Icon icon={Icons.FiDollarSign} className="w-6 h-6 text-green-600 dark:text-green-400" />
+            </div>
+            <div className="ml-4">
+              <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Revenue</p>
+              <p className="text-2xl font-bold text-gray-900 dark:text-white">$24,500</p>
             </div>
           </div>
+        </div>
 
-          <div className="bg-white dark:bg-dark-800 rounded-lg shadow-lg p-6 border dark:border-dark-700">
-            <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">Recent Activity</h2>
-            <div className="space-y-4">
-              <div className="flex items-center space-x-3 p-3 rounded-lg bg-gray-50 dark:bg-dark-700">
-                <div className="w-8 h-8 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center">
-                  <Icon icon={Icons.FiUser} className="w-4 h-4 text-blue-600 dark:text-blue-400" />
-                </div>
-                <div className="flex-1">
-                  <p className="text-sm font-medium text-gray-900 dark:text-white">New booking received</p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">2 minutes ago</p>
-                </div>
+        <div className="bg-white dark:bg-dark-800 rounded-lg shadow-lg p-6 border dark:border-dark-700">
+          <div className="flex items-center">
+            <div className="w-12 h-12 bg-purple-100 dark:bg-purple-900 rounded-lg flex items-center justify-center">
+              <Icon icon={Icons.FiMapPin} className="w-6 h-6 text-purple-600 dark:text-purple-400" />
+            </div>
+            <div className="ml-4">
+              <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Active Tours</p>
+              <p className="text-2xl font-bold text-gray-900 dark:text-white">28</p>
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white dark:bg-dark-800 rounded-lg shadow-lg p-6 border dark:border-dark-700">
+          <div className="flex items-center">
+            <div className="w-12 h-12 bg-orange-100 dark:bg-orange-900 rounded-lg flex items-center justify-center">
+              <Icon icon={Icons.FiUsers} className="w-6 h-6 text-orange-600 dark:text-orange-400" />
+            </div>
+            <div className="ml-4">
+              <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Total Customers</p>
+              <p className="text-2xl font-bold text-gray-900 dark:text-white">1,234</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Quick Actions */}
+      <div className="bg-white dark:bg-dark-800 rounded-lg shadow-lg p-6 border dark:border-dark-700">
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Quick Actions</h3>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <button className="flex items-center p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg hover:bg-blue-100 dark:hover:bg-blue-900/30 transition-colors duration-200">
+            <Icon icon={Icons.FiPlus} className="w-6 h-6 text-blue-600 dark:text-blue-400 mr-3" />
+            <span className="text-blue-900 dark:text-blue-300 font-medium">Create Tour</span>
+          </button>
+
+          <button className="flex items-center p-4 bg-green-50 dark:bg-green-900/20 rounded-lg hover:bg-green-100 dark:hover:bg-green-900/30 transition-colors duration-200">
+            <Icon icon={Icons.FiCalendar} className="w-6 h-6 text-green-600 dark:text-green-400 mr-3" />
+            <span className="text-green-900 dark:text-green-300 font-medium">View Bookings</span>
+          </button>
+
+          <button className="flex items-center p-4 bg-purple-50 dark:bg-purple-900/20 rounded-lg hover:bg-purple-100 dark:hover:bg-purple-900/30 transition-colors duration-200">
+            <Icon icon={Icons.FiUsers} className="w-6 h-6 text-purple-600 dark:text-purple-400 mr-3" />
+            <span className="text-purple-900 dark:text-purple-300 font-medium">Manage Users</span>
+          </button>
+
+          <button className="flex items-center p-4 bg-orange-50 dark:bg-orange-900/20 rounded-lg hover:bg-orange-100 dark:hover:bg-orange-900/30 transition-colors duration-200">
+            <Icon icon={Icons.FiBarChart} className="w-6 h-6 text-orange-600 dark:text-orange-400 mr-3" />
+            <span className="text-orange-900 dark:text-orange-300 font-medium">View Reports</span>
+          </button>
+        </div>
+      </div>
+
+      {/* Recent Activity */}
+      <div className="bg-white dark:bg-dark-800 rounded-lg shadow-lg p-6 border dark:border-dark-700">
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Recent Activity</h3>
+        <div className="space-y-4">
+          <div className="flex items-center justify-between py-3 border-b dark:border-dark-600 last:border-b-0">
+            <div className="flex items-center">
+              <div className="w-10 h-10 bg-green-100 dark:bg-green-900/20 rounded-lg flex items-center justify-center mr-3">
+                <Icon icon={Icons.FiCheck} className="w-5 h-5 text-green-600 dark:text-green-400" />
               </div>
-              <div className="flex items-center space-x-3 p-3 rounded-lg bg-gray-50 dark:bg-dark-700">
-                <div className="w-8 h-8 bg-green-100 dark:bg-green-900 rounded-full flex items-center justify-center">
-                  <Icon icon={Icons.FiDollarSign} className="w-4 h-4 text-green-600 dark:text-green-400" />
-                </div>
-                <div className="flex-1">
-                  <p className="text-sm font-medium text-gray-900 dark:text-white">Payment processed</p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">15 minutes ago</p>
-                </div>
+              <div>
+                <p className="text-sm font-medium text-gray-900 dark:text-white">New booking confirmed</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400">Vietnam Heritage Tour - 2 participants</p>
               </div>
             </div>
+            <span className="text-xs text-gray-500 dark:text-gray-400">2 mins ago</span>
+          </div>
+
+          <div className="flex items-center justify-between py-3 border-b dark:border-dark-600 last:border-b-0">
+            <div className="flex items-center">
+              <div className="w-10 h-10 bg-blue-100 dark:bg-blue-900/20 rounded-lg flex items-center justify-center mr-3">
+                <Icon icon={Icons.FiUser} className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+              </div>
+              <div>
+                <p className="text-sm font-medium text-gray-900 dark:text-white">New user registered</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400">john.doe@example.com</p>
+              </div>
+            </div>
+            <span className="text-xs text-gray-500 dark:text-gray-400">15 mins ago</span>
+          </div>
+
+          <div className="flex items-center justify-between py-3">
+            <div className="flex items-center">
+              <div className="w-10 h-10 bg-yellow-100 dark:bg-yellow-900/20 rounded-lg flex items-center justify-center mr-3">
+                <Icon icon={Icons.FiStar} className="w-5 h-5 text-yellow-600 dark:text-yellow-400" />
+              </div>
+              <div>
+                <p className="text-sm font-medium text-gray-900 dark:text-white">New review received</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400">5 stars for Tokyo Cultural Tour</p>
+              </div>
+            </div>
+            <span className="text-xs text-gray-500 dark:text-gray-400">1 hour ago</span>
           </div>
         </div>
       </div>

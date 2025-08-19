@@ -45,9 +45,9 @@ const getAllUsers = async (req, res) => {
   try {
     const { page = 1, limit = 20 } = req.query;
     const offset = (page - 1) * limit;
-
+    
     const users = await User.findAll(req.db, parseInt(limit), parseInt(offset));
-
+    
     res.json({
       success: true,
       data: users.map(user => user.toJSON())
@@ -252,7 +252,7 @@ const getAllContent = async (req, res) => {
   try {
     const { page = 1, limit = 20, type, status } = req.query;
     const offset = (page - 1) * limit;
-
+    
     const options = {
       limit: parseInt(limit),
       offset: parseInt(offset),
@@ -261,7 +261,7 @@ const getAllContent = async (req, res) => {
     };
 
     const content = await Content.findAll(req.db, options);
-
+    
     res.json({
       success: true,
       data: content

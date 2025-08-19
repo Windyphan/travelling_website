@@ -9,11 +9,18 @@ import Home from './pages/Home';
 import Tours from './pages/Tours';
 import TourDetail from './pages/TourDetail';
 import Booking from './pages/Booking';
+import Services from './pages/Services';
+import ServiceDetail from './pages/ServiceDetail';
+import ServiceBooking from './pages/ServiceBooking';
+import Blogs from './pages/Blogs';
+import BlogDetail from './pages/BlogDetail';
 import Login from './pages/auth/Login';
 import Register from './pages/auth/Register';
 import Profile from './pages/Profile';
 import MyBookings from './pages/MyBookings';
 import AdminDashboard from './pages/admin/Dashboard';
+import BlogManagement from './pages/admin/BlogManagement';
+import BlogEditor from './pages/admin/BlogEditor';
 import ProtectedRoute from './components/common/ProtectedRoute';
 import { Toaster } from 'react-hot-toast';
 
@@ -40,6 +47,10 @@ function App() {
                   <Route path="/" element={<Home />} />
                   <Route path="/tours" element={<Tours />} />
                   <Route path="/tours/:slug" element={<TourDetail />} />
+                  <Route path="/services" element={<Services />} />
+                  <Route path="/services/:serviceId" element={<ServiceDetail />} />
+                  <Route path="/blog" element={<Blogs />} />
+                  <Route path="/blog/:slug" element={<BlogDetail />} />
                   <Route path="/login" element={<Login />} />
                   <Route path="/register" element={<Register />} />
 
@@ -59,11 +70,31 @@ function App() {
                       <Booking />
                     </ProtectedRoute>
                   } />
+                  <Route path="/service-booking/:serviceId" element={
+                    <ProtectedRoute>
+                      <ServiceBooking />
+                    </ProtectedRoute>
+                  } />
 
                   {/* Admin Routes */}
                   <Route path="/admin/*" element={
                     <ProtectedRoute requiredRole="admin">
                       <AdminDashboard />
+                    </ProtectedRoute>
+                  } />
+                  <Route path="/admin/blogs" element={
+                    <ProtectedRoute requiredRole="admin">
+                      <BlogManagement />
+                    </ProtectedRoute>
+                  } />
+                  <Route path="/admin/blogs/new" element={
+                    <ProtectedRoute requiredRole="admin">
+                      <BlogEditor />
+                    </ProtectedRoute>
+                  } />
+                  <Route path="/admin/blogs/edit/:blogId" element={
+                    <ProtectedRoute requiredRole="admin">
+                      <BlogEditor />
                     </ProtectedRoute>
                   } />
                 </Routes>

@@ -33,6 +33,26 @@ CREATE TABLE IF NOT EXISTS tours (
   updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
+-- Services table
+CREATE TABLE IF NOT EXISTS services (
+  id TEXT PRIMARY KEY,
+  title TEXT NOT NULL,
+  subtitle TEXT,
+  description TEXT NOT NULL,
+  itinerary TEXT, -- JSON array of itinerary items
+  price REAL NOT NULL,
+  duration TEXT,
+  included TEXT, -- JSON array of included items
+  excluded TEXT, -- JSON array of excluded items
+  category TEXT NOT NULL, -- 'domestic', 'international', 'car-rental', 'other-services'
+  images TEXT, -- JSON array of image URLs
+  videos TEXT, -- JSON array of video URLs
+  featured INTEGER DEFAULT 0, -- 0 for false, 1 for true
+  status TEXT DEFAULT 'active',
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
 -- Bookings table
 CREATE TABLE IF NOT EXISTS bookings (
   id TEXT PRIMARY KEY,
@@ -79,6 +99,9 @@ CREATE TABLE IF NOT EXISTS content (
 CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
 CREATE INDEX IF NOT EXISTS idx_tours_status ON tours(status);
 CREATE INDEX IF NOT EXISTS idx_tours_location ON tours(location);
+CREATE INDEX IF NOT EXISTS idx_services_category ON services(category);
+CREATE INDEX IF NOT EXISTS idx_services_status ON services(status);
+CREATE INDEX IF NOT EXISTS idx_services_featured ON services(featured);
 CREATE INDEX IF NOT EXISTS idx_bookings_user_id ON bookings(user_id);
 CREATE INDEX IF NOT EXISTS idx_bookings_tour_id ON bookings(tour_id);
 CREATE INDEX IF NOT EXISTS idx_bookings_status ON bookings(status);
