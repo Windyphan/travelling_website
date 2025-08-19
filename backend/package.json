@@ -9,6 +9,7 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
+    "@cloudflare/workers-types": "^4.20240806.0",
     "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
     "dotenv": "^16.3.1",
@@ -17,11 +18,11 @@
     "helmet": "^7.0.0",
     "joi": "^17.9.2",
     "jsonwebtoken": "^9.0.2",
-    "@cloudflare/workers-types": "^4.20240806.0",
-    "wrangler": "^3.0.0",
-    "uuid": "^9.0.0",
+    "multer": "^2.0.2",
     "nodemailer": "^6.9.4",
-    "stripe": "^13.5.0"
+    "stripe": "^13.5.0",
+    "uuid": "^9.0.0",
+    "wrangler": "^3.0.0"
   },
   "devDependencies": {
     "nodemon": "^3.0.1"

@@ -1,5 +1,23 @@
 const Tour = require('../models/Tour');
 const { r2Helpers } = require('../config/storage');
+const multer = require('multer');
+
+// Configure multer for memory storage (files will be uploaded to R2)
+const storage = multer.memoryStorage();
+const upload = multer({
+  storage: storage,
+  limits: {
+    fileSize: 5 * 1024 * 1024, // 5MB limit
+  },
+  fileFilter: (req, file, cb) => {
+    // Accept only image files
+    if (file.mimetype.startsWith('image/')) {
+      cb(null, true);
+    } else {
+      cb(new Error('Only image files are allowed'), false);
+    }
+  }
+});
 
 // Get all tours with filtering and pagination
 const getTours = async (req, res) => {
@@ -62,10 +80,10 @@ const getTours = async (req, res) => {
 const getFeaturedTours = async (req, res) => {
   try {
     const { limit = 6 } = req.query;
-    const tours = await Tour.findAll(req.db, { 
-      limit: parseInt(limit), 
-      offset: 0, 
-      featured: true 
+    const tours = await Tour.findAll(req.db, {
+      limit: parseInt(limit),
+      offset: 0,
+      featured: true
     });
 
     res.json({
@@ -293,5 +311,6 @@ module.exports = {
   updateTour,
   deleteTour,
   getTourStats,
-  checkAvailability
+  checkAvailability,
+  upload
 };
