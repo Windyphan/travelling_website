@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { auth, editorAuth } = require('../middleware/auth');
+const { requireAuth, adminAuth } = require('../middleware/auth');
 const Content = require('../models/Content');
 
 // Get content
@@ -125,8 +125,8 @@ const deleteContent = async (req, res) => {
 // Routes
 router.get('/', getContent);
 router.get('/:slug', getContentBySlug);
-router.post('/', editorAuth, createContent);
-router.put('/:id', editorAuth, updateContent);
-router.delete('/:id', editorAuth, deleteContent);
+router.post('/', adminAuth, createContent);
+router.put('/:id', adminAuth, updateContent);
+router.delete('/:id', adminAuth, deleteContent);
 
 module.exports = router;

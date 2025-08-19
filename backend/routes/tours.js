@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { auth, adminAuth } = require('../middleware/auth');
+const { requireAuth, adminAuth } = require('../middleware/auth');
 const {
   getTours,
   getFeaturedTours,

@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { auth } = require('../middleware/auth');
+const { requireAuth } = require('../middleware/auth');
 const {
   createPaymentIntent,
   confirmPayment,
@@ -11,17 +11,17 @@ const {
 // @route   POST /api/payments/create-intent
 // @desc    Create Stripe payment intent
 // @access  Private
-router.post('/create-intent', auth, createPaymentIntent);
+router.post('/create-intent', requireAuth, createPaymentIntent);
 
 // @route   POST /api/payments/confirm
 // @desc    Confirm payment
 // @access  Private
-router.post('/confirm', auth, confirmPayment);
+router.post('/confirm', requireAuth, confirmPayment);
 
 // @route   POST /api/payments/vnpay
 // @desc    Create VNPay payment
 // @access  Private
-router.post('/vnpay', auth, createVNPayPayment);
+router.post('/vnpay', requireAuth, createVNPayPayment);
 
 // @route   POST /api/payments/webhook
 // @desc    Handle payment webhooks

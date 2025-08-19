@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { auth, editorAuth } = require('../middleware/auth');
+const { requireAuth } = require('../middleware/auth');
 const Review = require('../models/Review');
 const Tour = require('../models/Tour');
 
@@ -78,6 +78,6 @@ router.get('/', getReviews);
 // @route   POST /api/reviews
 // @desc    Create new review
 // @access  Private
-router.post('/', auth, createReview);
+router.post('/', requireAuth, createReview);
 
 module.exports = router;

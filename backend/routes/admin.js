@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { adminAuth, editorAuth } = require('../middleware/auth');
+const { adminAuth } = require('../middleware/auth');
 const {
   getDashboardStats,
   getAllUsers,
@@ -34,17 +34,17 @@ router.post('/upload-image', adminAuth, uploadImage);
 router.delete('/delete-image', adminAuth, deleteImage);
 
 // Content management routes
-router.get('/content', editorAuth, getAllContent);
-router.post('/content', editorAuth, createContent);
-router.put('/content/:contentId', editorAuth, updateContent);
-router.delete('/content/:contentId', editorAuth, deleteContent);
+router.get('/content', adminAuth, getAllContent);
+router.post('/content', adminAuth, createContent);
+router.put('/content/:contentId', adminAuth, updateContent);
+router.delete('/content/:contentId', adminAuth, deleteContent);
 
 // Tour management routes
-router.get('/tours', editorAuth, getTours);
+router.get('/tours', adminAuth, getTours);
 router.get('/tours/stats', adminAuth, getTourStats);
-router.get('/tours/:id', editorAuth, getTour);
-router.post('/tours', editorAuth, createTour);
-router.put('/tours/:id', editorAuth, updateTour);
+router.get('/tours/:id', adminAuth, getTour);
+router.post('/tours', adminAuth, createTour);
+router.put('/tours/:id', adminAuth, updateTour);
 router.delete('/tours/:id', adminAuth, deleteTour);
 
 module.exports = router;
