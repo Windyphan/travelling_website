@@ -221,7 +221,7 @@ const BlogDetail: React.FC = () => {
                 <img
                   key={index}
                   src={image}
-                  alt={`Gallery image ${index + 1}`}
+                  alt={`Gallery view ${index + 1}`}
                   className="w-full h-64 object-cover rounded-lg shadow-md hover:shadow-lg transition-shadow"
                 />
               ))}
