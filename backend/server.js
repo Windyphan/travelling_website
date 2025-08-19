@@ -2,13 +2,30 @@ const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
-const connectDB = require('./config/database');
+const { initializeDatabase } = require('./config/database');
 require('dotenv').config();
 
 const app = express();
 
-// Connect to MongoDB
-connectDB();
+// Middleware to inject DB and R2 into request
+app.use(async (req, res, next) => {
+  // In production with Cloudflare Workers, these would come from the environment
+  // For development, you'll need to set up your D1 and R2 bindings
+  if (process.env.NODE_ENV === 'production') {
+    req.db = req.env?.DB;
+    req.r2 = req.env?.IMAGES;
+  } else {
+    // For local development, you might want to use a local SQLite database
+    // or connect to your D1 database via wrangler
+    console.log('Development mode: DB and R2 bindings should be set up via wrangler');
+  }
+  next();
+});
+
+// Initialize database tables on startup
+if (process.env.NODE_ENV === 'production') {
+  initializeDatabase(process.env).catch(console.error);
+}
 
 // Security middleware
 app.use(helmet());
@@ -47,9 +64,6 @@ app.use(cors(corsOptions));
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
-// Serve static files
-app.use('/uploads', express.static('uploads'));
-
 // Routes
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/tours', require('./routes/tours'));
@@ -75,3 +89,5 @@ const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
+
+module.exports = app;

@@ -17,8 +17,9 @@
     "helmet": "^7.0.0",
     "joi": "^17.9.2",
     "jsonwebtoken": "^9.0.2",
-    "mongoose": "^7.5.0",
-    "multer": "^1.4.5-lts.1",
+    "@cloudflare/workers-types": "^4.20240806.0",
+    "wrangler": "^3.0.0",
+    "uuid": "^9.0.0",
     "nodemailer": "^6.9.4",
     "stripe": "^13.5.0"
   },
@@ -30,9 +31,9 @@
     "booking",
     "api",
     "express",
-    "mongodb"
+    "cloudflare-d1",
+    "cloudflare-r2"
   ],
   "author": "Travel Company",
   "license": "MIT"
 }
-

@@ -13,7 +13,8 @@
     "deploy:all": "npm run deploy:backend && npm run deploy:frontend"
   },
   "devDependencies": {
-    "concurrently": "^8.2.0"
+    "concurrently": "^8.2.0",
+    "wrangler": "^4.31.0"
   },
   "keywords": [
     "travel",

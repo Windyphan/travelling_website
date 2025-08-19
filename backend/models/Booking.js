@@ -1,152 +1,107 @@
-const mongoose = require('mongoose');
+const { v4: uuidv4 } = require('uuid');
+const { dbHelpers } = require('../config/database');
 
-const bookingSchema = new mongoose.Schema({
-  bookingNumber: {
-    type: String,
-    unique: true,
-    required: true
-  },
-  tour: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Tour',
-    required: true
-  },
-  customer: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
-    required: true
-  },
-  travelers: [{
-    name: {
-      type: String,
-      required: true
-    },
-    age: Number,
-    type: {
-      type: String,
-      enum: ['adult', 'child', 'infant'],
-      default: 'adult'
-    },
-    passportNumber: String,
-    nationality: String,
-    dietaryRequirements: String
-  }],
-  bookingDetails: {
-    startDate: {
-      type: Date,
-      required: true
-    },
-    endDate: Date,
-    numberOfTravelers: {
-      adults: { type: Number, default: 1 },
-      children: { type: Number, default: 0 },
-      infants: { type: Number, default: 0 }
-    },
-    totalTravelers: {
-      type: Number,
-      required: true
-    }
-  },
-  pricing: {
-    basePrice: Number,
-    seasonalMultiplier: Number,
-    groupDiscount: Number,
-    addOns: [{
-      name: String,
-      price: Number,
-      quantity: Number
-    }],
-    subtotal: Number,
-    taxes: Number,
-    totalAmount: {
-      type: Number,
-      required: true
-    },
-    currency: {
-      type: String,
-      default: 'USD'
-    }
-  },
-  payment: {
-    status: {
-      type: String,
-      enum: ['pending', 'paid', 'partially_paid', 'refunded', 'failed'],
-      default: 'pending'
-    },
-    method: {
-      type: String,
-      enum: ['credit_card', 'bank_transfer', 'vnpay', 'momo']
-    },
-    transactionId: String,
-    paidAmount: {
-      type: Number,
-      default: 0
-    },
-    paymentDate: Date,
-    refundAmount: {
-      type: Number,
-      default: 0
-    },
-    refundDate: Date
-  },
-  status: {
-    type: String,
-    enum: ['pending', 'confirmed', 'in_progress', 'completed', 'cancelled'],
-    default: 'pending'
-  },
-  specialRequests: String,
-  emergencyContact: {
-    name: String,
-    phone: String,
-    relationship: String
-  },
-  documents: [{
-    type: String,
-    url: String,
-    uploadDate: Date
-  }],
-  notifications: {
-    confirmationSent: { type: Boolean, default: false },
-    reminderSent: { type: Boolean, default: false },
-    followUpSent: { type: Boolean, default: false }
-  },
-  createdBy: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User'
-  },
-  notes: [{ 
-    content: String,
-    author: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'User'
-    },
-    createdAt: {
-      type: Date,
-      default: Date.now
-    }
-  }]
-}, {
-  timestamps: true
-});
-
-// Generate booking number
-bookingSchema.pre('save', async function(next) {
-  if (!this.bookingNumber) {
-    const prefix = 'TRV';
-    const timestamp = Date.now().toString().slice(-6);
-    const random = Math.floor(Math.random() * 1000).toString().padStart(3, '0');
-    this.bookingNumber = `${prefix}${timestamp}${random}`;
+class Booking {
+  constructor(data) {
+    this.id = data.id || uuidv4();
+    this.user_id = data.user_id;
+    this.tour_id = data.tour_id;
+    this.booking_date = data.booking_date;
+    this.participants = data.participants;
+    this.total_amount = data.total_amount;
+    this.status = data.status || 'pending';
+    this.payment_status = data.payment_status || 'pending';
+    this.payment_intent_id = data.payment_intent_id;
+    this.special_requests = data.special_requests;
+    this.created_at = data.created_at;
+    this.updated_at = data.updated_at;
   }
-  next();
-});
 
-// Calculate total travelers
-bookingSchema.pre('save', function(next) {
-  if (this.isModified('bookingDetails.numberOfTravelers')) {
-    const { adults, children, infants } = this.bookingDetails.numberOfTravelers;
-    this.bookingDetails.totalTravelers = adults + children + infants;
+  // Save booking to database
+  async save(db) {
+    const bookingData = {
+      id: this.id,
+      user_id: this.user_id,
+      tour_id: this.tour_id,
+      booking_date: this.booking_date,
+      participants: this.participants,
+      total_amount: this.total_amount,
+      status: this.status,
+      payment_status: this.payment_status,
+      payment_intent_id: this.payment_intent_id,
+      special_requests: this.special_requests
+    };
+
+    return await dbHelpers.insert(db, 'bookings', bookingData);
   }
-  next();
-});
 
-module.exports = mongoose.model('Booking', bookingSchema);
+  // Find booking by ID
+  static async findById(db, id) {
+    const bookings = await dbHelpers.query(db, 'SELECT * FROM bookings WHERE id = ?', [id]);
+    return bookings.length > 0 ? new Booking(bookings[0]) : null;
+  }
+
+  // Find bookings by user ID
+  static async findByUserId(db, userId) {
+    const bookings = await dbHelpers.query(
+      db,
+      'SELECT * FROM bookings WHERE user_id = ? ORDER BY created_at DESC',
+      [userId]
+    );
+    return bookings.map(booking => new Booking(booking));
+  }
+
+  // Get all bookings with pagination
+  static async findAll(db, options = {}) {
+    const { limit = 50, offset = 0, status, payment_status } = options;
+
+    let sql = 'SELECT * FROM bookings';
+    const params = [];
+    const conditions = [];
+
+    if (status) {
+      conditions.push('status = ?');
+      params.push(status);
+    }
+
+    if (payment_status) {
+      conditions.push('payment_status = ?');
+      params.push(payment_status);
+    }
+
+    if (conditions.length > 0) {
+      sql += ' WHERE ' + conditions.join(' AND ');
+    }
+
+    sql += ' ORDER BY created_at DESC LIMIT ? OFFSET ?';
+    params.push(limit, offset);
+
+    const bookings = await dbHelpers.query(db, sql, params);
+    return bookings.map(booking => new Booking(booking));
+  }
+
+  // Update booking
+  async update(db, updateData) {
+    return await dbHelpers.update(db, 'bookings', updateData, 'id = ?', [this.id]);
+  }
+
+  // Delete booking
+  async delete(db) {
+    return await dbHelpers.delete(db, 'bookings', 'id = ?', [this.id]);
+  }
+
+  // Get booking statistics
+  static async getStats(db) {
+    const totalBookings = await dbHelpers.query(db, 'SELECT COUNT(*) as count FROM bookings');
+    const bookingsByStatus = await dbHelpers.query(db, 'SELECT status, COUNT(*) as count FROM bookings GROUP BY status');
+    const totalRevenue = await dbHelpers.query(db, 'SELECT SUM(total_amount) as total FROM bookings WHERE payment_status = ?', ['completed']);
+
+    return {
+      total: totalBookings[0].count,
+      byStatus: bookingsByStatus,
+      totalRevenue: totalRevenue[0].total || 0
+    };
+  }
+}
+
+module.exports = Booking;

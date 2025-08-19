@@ -1,192 +1,178 @@
-const mongoose = require('mongoose');
+const { v4: uuidv4 } = require('uuid');
+const { dbHelpers } = require('../config/database');
+const { r2Helpers } = require('../config/storage');
 
-const tourSchema = new mongoose.Schema({
-  title: {
-    type: String,
-    required: true,
-    trim: true
-  },
-  slug: {
-    type: String,
-    unique: true,
-    lowercase: true
-  },
-  description: {
-    type: String,
-    required: true
-  },
-  shortDescription: {
-    type: String,
-    required: true,
-    maxlength: 200
-  },
-  destination: {
-    type: String,
-    required: true
-  },
-  duration: {
-    days: {
-      type: Number,
-      required: true
-    },
-    nights: {
-      type: Number,
-      required: true
+class Tour {
+  constructor(data) {
+    this.id = data.id || uuidv4();
+    this.title = data.title;
+    this.description = data.description;
+    this.price = data.price;
+    this.duration = data.duration;
+    this.location = data.location;
+    this.max_participants = data.max_participants;
+    this.difficulty_level = data.difficulty_level;
+    this.image_url = data.image_url;
+    this.images = data.images ? (typeof data.images === 'string' ? JSON.parse(data.images) : data.images) : [];
+    this.itinerary = data.itinerary ? (typeof data.itinerary === 'string' ? JSON.parse(data.itinerary) : data.itinerary) : {};
+    this.included = data.included ? (typeof data.included === 'string' ? JSON.parse(data.included) : data.included) : [];
+    this.excluded = data.excluded ? (typeof data.excluded === 'string' ? JSON.parse(data.excluded) : data.excluded) : [];
+    this.status = data.status || 'active';
+    this.created_at = data.created_at;
+    this.updated_at = data.updated_at;
+  }
+
+  // Save tour to database
+  async save(db) {
+    const tourData = {
+      id: this.id,
+      title: this.title,
+      description: this.description,
+      price: this.price,
+      duration: this.duration,
+      location: this.location,
+      max_participants: this.max_participants,
+      difficulty_level: this.difficulty_level,
+      image_url: this.image_url,
+      images: JSON.stringify(this.images),
+      itinerary: JSON.stringify(this.itinerary),
+      included: JSON.stringify(this.included),
+      excluded: JSON.stringify(this.excluded),
+      status: this.status
+    };
+
+    return await dbHelpers.insert(db, 'tours', tourData);
+  }
+
+  // Update tour images using R2
+  async updateImages(r2Bucket, newImageFiles, oldImages = []) {
+    try {
+      // Delete old images from R2 if they exist
+      if (oldImages.length > 0) {
+        for (const imageUrl of oldImages) {
+          await r2Helpers.deleteImage(r2Bucket, imageUrl);
+        }
+      }
+
+      // Upload new images to R2
+      const uploadedImageUrls = [];
+      if (newImageFiles && newImageFiles.length > 0) {
+        for (const file of newImageFiles) {
+          r2Helpers.validateImage(file);
+          const imageUrl = await r2Helpers.uploadImage(r2Bucket, file, 'tours');
+          uploadedImageUrls.push(imageUrl);
+        }
+      }
+
+      this.images = uploadedImageUrls;
+      if (uploadedImageUrls.length > 0) {
+        this.image_url = uploadedImageUrls[0]; // Set first image as primary
+      }
+
+      return uploadedImageUrls;
+    } catch (error) {
+      console.error('Error updating tour images:', error);
+      throw error;
     }
-  },
-  pricing: {
-    basePrice: {
-      type: Number,
-      required: true
-    },
-    currency: {
-      type: String,
-      default: 'USD'
-    },
-    priceType: {
-      type: String,
-      enum: ['per_person', 'per_group'],
-      default: 'per_person'
-    },
-    seasonalPricing: [{
-      season: String,
-      startDate: Date,
-      endDate: Date,
-      multiplier: Number
-    }],
-    groupDiscounts: [{
-      minPeople: Number,
-      discount: Number
-    }]
-  },
-  itinerary: [{
-    day: Number,
-    title: String,
-    description: String,
-    activities: [String],
-    meals: [String],
-    accommodation: String
-  }],
-  inclusions: [String],
-  exclusions: [String],
-  highlights: [String],
-  images: [{
-    url: String,
-    alt: String,
-    isPrimary: Boolean
-  }],
-  videos: [{
-    url: String,
-    title: String
-  }],
-  category: {
-    type: String,
-    enum: ['adventure', 'luxury', 'family', 'cultural', 'beach', 'city', 'nature'],
-    required: true
-  },
-  difficulty: {
-    type: String,
-    enum: ['easy', 'moderate', 'challenging', 'extreme'],
-    default: 'moderate'
-  },
-  maxGroupSize: {
-    type: Number,
-    default: 20
-  },
-  minAge: {
-    type: Number,
-    default: 0
-  },
-  availability: [{
-    startDate: Date,
-    endDate: Date,
-    availableSpots: Number,
-    bookedSpots: { type: Number, default: 0 }
-  }],
-  location: {
-    coordinates: {
-      type: [Number], // [longitude, latitude]
-      index: '2dsphere'
-    },
-    address: String,
-    city: String,
-    country: String
-  },
-  status: {
-    type: String,
-    enum: ['draft', 'published', 'archived'],
-    default: 'draft'
-  },
-  featured: {
-    type: Boolean,
-    default: false
-  },
-  ratings: {
-    average: {
-      type: Number,
-      default: 0
-    },
-    count: {
-      type: Number,
-      default: 0
+  }
+
+  // Find tour by ID
+  static async findById(db, id) {
+    const tours = await dbHelpers.query(db, 'SELECT * FROM tours WHERE id = ?', [id]);
+    return tours.length > 0 ? new Tour(tours[0]) : null;
+  }
+
+  // Get all tours with pagination
+  static async findAll(db, options = {}) {
+    const { limit = 20, offset = 0, status = 'active', location, difficulty_level } = options;
+
+    let sql = 'SELECT * FROM tours WHERE status = ?';
+    const params = [status];
+
+    if (location) {
+      sql += ' AND location LIKE ?';
+      params.push(`%${location}%`);
     }
-  },
-  tags: [String],
-  seoData: {
-    metaTitle: String,
-    metaDescription: String,
-    keywords: [String]
-  }
-}, {
-  timestamps: true
-});
 
-// Generate slug from title
-tourSchema.pre('save', function(next) {
-  if (this.isModified('title')) {
-    this.slug = this.title
-      .toLowerCase()
-      .replace(/[^\w\s-]/g, '')
-      .replace(/[\s_-]+/g, '-')
-      .replace(/^-+|-+$/g, '');
-  }
-  next();
-});
+    if (difficulty_level) {
+      sql += ' AND difficulty_level = ?';
+      params.push(difficulty_level);
+    }
 
-// Calculate current price based on season and group size
-tourSchema.methods.calculatePrice = function(date, groupSize = 1) {
-  let price = this.pricing.basePrice;
-  
-  // Apply seasonal pricing
-  const seasonalPrice = this.pricing.seasonalPricing.find(season => {
-    return date >= season.startDate && date <= season.endDate;
-  });
-  
-  if (seasonalPrice) {
-    price *= seasonalPrice.multiplier;
-  }
-  
-  // Apply group discounts
-  const groupDiscount = this.pricing.groupDiscounts
-    .filter(discount => groupSize >= discount.minPeople)
-    .sort((a, b) => b.minPeople - a.minPeople)[0];
-    
-  if (groupDiscount) {
-    price *= (1 - groupDiscount.discount / 100);
-  }
-  
-  return Math.round(price * 100) / 100;
-};
+    sql += ' ORDER BY created_at DESC LIMIT ? OFFSET ?';
+    params.push(limit, offset);
 
-// Check availability for a specific date
-tourSchema.methods.checkAvailability = function(startDate, groupSize) {
-  const availability = this.availability.find(slot => {
-    return startDate >= slot.startDate && startDate <= slot.endDate;
-  });
-  
-  if (!availability) return false;
-  
-  return (availability.availableSpots - availability.bookedSpots) >= groupSize;
-};
+    const tours = await dbHelpers.query(db, sql, params);
+    return tours.map(tour => new Tour(tour));
+  }
 
-module.exports = mongoose.model('Tour', tourSchema);
+  // Search tours
+  static async search(db, searchTerm) {
+    const sql = `
+      SELECT * FROM tours 
+      WHERE status = 'active' 
+      AND (title LIKE ? OR description LIKE ? OR location LIKE ?)
+      ORDER BY created_at DESC
+    `;
+    const searchPattern = `%${searchTerm}%`;
+    const tours = await dbHelpers.query(db, sql, [searchPattern, searchPattern, searchPattern]);
+    return tours.map(tour => new Tour(tour));
+  }
+
+  // Update tour
+  async update(db, updateData) {
+    // Handle JSON fields
+    if (updateData.images) {
+      updateData.images = JSON.stringify(updateData.images);
+    }
+    if (updateData.itinerary) {
+      updateData.itinerary = JSON.stringify(updateData.itinerary);
+    }
+    if (updateData.included) {
+      updateData.included = JSON.stringify(updateData.included);
+    }
+    if (updateData.excluded) {
+      updateData.excluded = JSON.stringify(updateData.excluded);
+    }
+
+    return await dbHelpers.update(db, 'tours', updateData, 'id = ?', [this.id]);
+  }
+
+  // Delete tour
+  async delete(db, r2Bucket) {
+    // Delete images from R2 storage
+    if (this.images && this.images.length > 0) {
+      for (const imageUrl of this.images) {
+        await r2Helpers.deleteImage(r2Bucket, imageUrl);
+      }
+    }
+
+    return await dbHelpers.delete(db, 'tours', 'id = ?', [this.id]);
+  }
+
+  // Get tour stats
+  static async getStats(db) {
+    const totalTours = await dbHelpers.query(db, 'SELECT COUNT(*) as count FROM tours WHERE status = ?', ['active']);
+    const toursByLocation = await dbHelpers.query(db, 'SELECT location, COUNT(*) as count FROM tours WHERE status = ? GROUP BY location', ['active']);
+    const toursByDifficulty = await dbHelpers.query(db, 'SELECT difficulty_level, COUNT(*) as count FROM tours WHERE status = ? GROUP BY difficulty_level', ['active']);
+
+    return {
+      total: totalTours[0].count,
+      byLocation: toursByLocation,
+      byDifficulty: toursByDifficulty
+    };
+  }
+
+  // Convert to JSON
+  toJSON() {
+    return {
+      ...this,
+      images: typeof this.images === 'string' ? JSON.parse(this.images) : this.images,
+      itinerary: typeof this.itinerary === 'string' ? JSON.parse(this.itinerary) : this.itinerary,
+      included: typeof this.included === 'string' ? JSON.parse(this.included) : this.included,
+      excluded: typeof this.excluded === 'string' ? JSON.parse(this.excluded) : this.excluded
+    };
+  }
+}
+
+module.exports = Tour;

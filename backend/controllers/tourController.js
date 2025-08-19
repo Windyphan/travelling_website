@@ -1,19 +1,5 @@
 const Tour = require('../models/Tour');
-const multer = require('multer');
-const path = require('path');
-
-// Configure multer for image uploads
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, 'uploads/tours');
-  },
-  filename: (req, file, cb) => {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-    cb(null, file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname));
-  }
-});
-
-const upload = multer({ storage: storage });
+const { r2Helpers } = require('../config/storage');
 
 // Get all tours with filtering and pagination
 const getTours = async (req, res) => {
@@ -21,206 +7,202 @@ const getTours = async (req, res) => {
     const {
       page = 1,
       limit = 12,
-      destination,
-      category,
+      location,
+      difficulty_level,
       minPrice,
       maxPrice,
-      duration,
-      sortBy = 'createdAt',
-      sortOrder = 'desc',
       search
     } = req.query;
 
-    // Build filter object
-    const filter = { status: 'published' };
-    
-    if (destination) filter.destination = new RegExp(destination, 'i');
-    if (category) filter.category = category;
-    if (minPrice || maxPrice) {
-      filter['pricing.basePrice'] = {};
-      if (minPrice) filter['pricing.basePrice'].$gte = Number(minPrice);
-      if (maxPrice) filter['pricing.basePrice'].$lte = Number(maxPrice);
-    }
-    if (duration) {
-      filter['duration.days'] = Number(duration);
-    }
+    const offset = (page - 1) * limit;
+    const options = {
+      limit: parseInt(limit),
+      offset: parseInt(offset),
+      location,
+      difficulty_level
+    };
+
+    let tours;
     if (search) {
-      filter.$or = [
-        { title: new RegExp(search, 'i') },
-        { description: new RegExp(search, 'i') },
-        { destination: new RegExp(search, 'i') }
-      ];
+      tours = await Tour.search(req.db, search);
+    } else {
+      tours = await Tour.findAll(req.db, options);
     }
 
-    // Sort options
-    const sortOptions = {};
-    sortOptions[sortBy] = sortOrder === 'desc' ? -1 : 1;
-
-    const tours = await Tour.find(filter)
-      .sort(sortOptions)
-      .limit(limit * 1)
-      .skip((page - 1) * limit)
-      .select('-__v');
-
-    const total = await Tour.countDocuments(filter);
+    // Filter by price if specified
+    if (minPrice || maxPrice) {
+      tours = tours.filter(tour => {
+        const price = tour.price;
+        if (minPrice && price < minPrice) return false;
+        if (maxPrice && price > maxPrice) return false;
+        return true;
+      });
+    }
 
     res.json({
-      tours,
+      success: true,
+      data: tours.map(tour => tour.toJSON()),
       pagination: {
-        currentPage: Number(page),
-        totalPages: Math.ceil(total / limit),
-        totalTours: total,
-        hasNext: page < Math.ceil(total / limit),
+        currentPage: parseInt(page),
+        totalPages: Math.ceil(tours.length / limit),
+        hasNext: page * limit < tours.length,
         hasPrev: page > 1
       }
     });
   } catch (error) {
     console.error('Get tours error:', error);
-    res.status(500).json({ message: 'Server error fetching tours' });
+    res.status(500).json({
+      success: false,
+      message: 'Error fetching tours'
+    });
   }
 };
 
-// Get featured tours
-const getFeaturedTours = async (req, res) => {
+// Get single tour by ID
+const getTour = async (req, res) => {
   try {
-    const tours = await Tour.find({ 
-      status: 'published', 
-      featured: true 
-    })
-    .sort({ 'ratings.average': -1 })
-    .limit(4)
-    .select('title shortDescription images pricing duration destination ratings');
+    const tour = await Tour.findById(req.db, req.params.id);
 
-    res.json({ tours });
-  } catch (error) {
-    console.error('Get featured tours error:', error);
-    res.status(500).json({ message: 'Server error fetching featured tours' });
-  }
-};
-
-// Get single tour by slug
-const getTourBySlug = async (req, res) => {
-  try {
-    const { slug } = req.params;
-    
-    const tour = await Tour.findOne({ slug, status: 'published' });
-    
     if (!tour) {
-      return res.status(404).json({ message: 'Tour not found' });
+      return res.status(404).json({
+        success: false,
+        message: 'Tour not found'
+      });
     }
 
-    res.json({ tour });
+    res.json({
+      success: true,
+      data: tour.toJSON()
+    });
   } catch (error) {
-    console.error('Get tour by slug error:', error);
-    res.status(500).json({ message: 'Server error fetching tour' });
+    console.error('Get tour error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error fetching tour'
+    });
   }
 };
 
-// Create new tour (Admin only)
+// Create new tour (admin only)
 const createTour = async (req, res) => {
   try {
-    const tourData = {
-      ...req.body,
-      createdBy: req.user.id
-    };
-
-    // Parse JSON fields if they come as strings
-    if (typeof tourData.itinerary === 'string') {
-      tourData.itinerary = JSON.parse(tourData.itinerary);
-    }
-    if (typeof tourData.pricing === 'string') {
-      tourData.pricing = JSON.parse(tourData.pricing);
-    }
-
+    const tourData = req.body;
     const tour = new Tour(tourData);
-    await tour.save();
+
+    // Handle image uploads if provided
+    if (req.files && req.files.length > 0) {
+      const imageUrls = await tour.updateImages(req.r2, req.files);
+      tour.images = imageUrls;
+      if (imageUrls.length > 0) {
+        tour.image_url = imageUrls[0];
+      }
+    }
+
+    await tour.save(req.db);
 
     res.status(201).json({
-      message: 'Tour created successfully',
-      tour
+      success: true,
+      data: tour.toJSON(),
+      message: 'Tour created successfully'
     });
   } catch (error) {
     console.error('Create tour error:', error);
-    res.status(500).json({ message: 'Server error creating tour' });
+    res.status(500).json({
+      success: false,
+      message: 'Error creating tour'
+    });
   }
 };
 
-// Update tour (Admin only)
+// Update tour (admin only)
 const updateTour = async (req, res) => {
   try {
-    const { id } = req.params;
-    
-    const tour = await Tour.findByIdAndUpdate(
-      id,
-      { $set: req.body },
-      { new: true, runValidators: true }
-    );
+    const tour = await Tour.findById(req.db, req.params.id);
 
     if (!tour) {
-      return res.status(404).json({ message: 'Tour not found' });
+      return res.status(404).json({
+        success: false,
+        message: 'Tour not found'
+      });
     }
 
+    const updateData = req.body;
+
+    // Handle image uploads if provided
+    if (req.files && req.files.length > 0) {
+      const oldImages = tour.images || [];
+      const imageUrls = await tour.updateImages(req.r2, req.files, oldImages);
+      updateData.images = imageUrls;
+      if (imageUrls.length > 0) {
+        updateData.image_url = imageUrls[0];
+      }
+    }
+
+    await tour.update(req.db, updateData);
+
     res.json({
-      message: 'Tour updated successfully',
-      tour
+      success: true,
+      message: 'Tour updated successfully'
     });
   } catch (error) {
     console.error('Update tour error:', error);
-    res.status(500).json({ message: 'Server error updating tour' });
+    res.status(500).json({
+      success: false,
+      message: 'Error updating tour'
+    });
   }
 };
 
-// Delete tour (Admin only)
+// Delete tour (admin only)
 const deleteTour = async (req, res) => {
   try {
-    const { id } = req.params;
-    
-    const tour = await Tour.findByIdAndDelete(id);
-    
+    const tour = await Tour.findById(req.db, req.params.id);
+
     if (!tour) {
-      return res.status(404).json({ message: 'Tour not found' });
+      return res.status(404).json({
+        success: false,
+        message: 'Tour not found'
+      });
     }
 
-    res.json({ message: 'Tour deleted successfully' });
+    await tour.delete(req.db, req.r2);
+
+    res.json({
+      success: true,
+      message: 'Tour deleted successfully'
+    });
   } catch (error) {
     console.error('Delete tour error:', error);
-    res.status(500).json({ message: 'Server error deleting tour' });
+    res.status(500).json({
+      success: false,
+      message: 'Error deleting tour'
+    });
   }
 };
 
-// Check tour availability
-const checkAvailability = async (req, res) => {
+// Get tour statistics (admin only)
+const getTourStats = async (req, res) => {
   try {
-    const { tourId } = req.params;
-    const { startDate, groupSize = 1 } = req.query;
-
-    const tour = await Tour.findById(tourId);
-    
-    if (!tour) {
-      return res.status(404).json({ message: 'Tour not found' });
-    }
-
-    const isAvailable = tour.checkAvailability(new Date(startDate), Number(groupSize));
-    const price = tour.calculatePrice(new Date(startDate), Number(groupSize));
+    const stats = await Tour.getStats(req.db);
 
     res.json({
-      available: isAvailable,
-      price,
-      currency: tour.pricing.currency
+      success: true,
+      data: stats
     });
   } catch (error) {
-    console.error('Check availability error:', error);
-    res.status(500).json({ message: 'Server error checking availability' });
+    console.error('Get tour stats error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error fetching tour statistics'
+    });
   }
 };
 
 module.exports = {
   getTours,
-  getFeaturedTours,
-  getTourBySlug,
+  getTour,
   createTour,
   updateTour,
   deleteTour,
-  checkAvailability,
-  upload
+  getTourStats
 };

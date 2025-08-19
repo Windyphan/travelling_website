@@ -9,7 +9,7 @@ const registerSchema = Joi.object({
   email: Joi.string().email().required(),
   password: Joi.string().min(6).required(),
   phone: Joi.string().optional(),
-  country: Joi.string().optional()
+  address: Joi.string().optional()
 });
 
 const loginSchema = Joi.object({
@@ -32,10 +32,10 @@ const register = async (req, res) => {
       return res.status(400).json({ message: error.details[0].message });
     }
 
-    const { name, email, password, phone, country } = req.body;
+    const { name, email, password, phone, address } = req.body;
 
     // Check if user already exists
-    const existingUser = await User.findOne({ email });
+    const existingUser = await User.findByEmail(req.db, email);
     if (existingUser) {
       return res.status(400).json({ message: 'User already exists with this email' });
     }
@@ -46,27 +46,23 @@ const register = async (req, res) => {
       email,
       password,
       phone,
-      country
+      address
     });
 
-    await user.save();
+    await user.save(req.db);
 
     // Generate token
-    const token = generateToken(user._id);
+    const token = generateToken(user.id);
 
     res.status(201).json({
+      success: true,
       message: 'User registered successfully',
       token,
-      user: {
-        id: user._id,
-        name: user.name,
-        email: user.email,
-        role: user.role
-      }
+      user: user.toJSON()
     });
   } catch (error) {
     console.error('Registration error:', error);
-    res.status(500).json({ message: 'Server error during registration' });
+    res.status(500).json({ message: 'Error creating user' });
   }
 };
 
@@ -80,105 +76,75 @@ const login = async (req, res) => {
 
     const { email, password } = req.body;
 
-    // Find user
-    const user = await User.findOne({ email });
+    // Find user by email
+    const user = await User.findByEmail(req.db, email);
     if (!user) {
-      return res.status(401).json({ message: 'Invalid email or password' });
+      return res.status(400).json({ message: 'Invalid email or password' });
     }
 
     // Check password
-    const isMatch = await user.comparePassword(password);
-    if (!isMatch) {
-      return res.status(401).json({ message: 'Invalid email or password' });
+    const isPasswordValid = await user.comparePassword(password);
+    if (!isPasswordValid) {
+      return res.status(400).json({ message: 'Invalid email or password' });
     }
 
     // Generate token
-    const token = generateToken(user._id);
+    const token = generateToken(user.id);
 
     res.json({
+      success: true,
       message: 'Login successful',
       token,
-      user: {
-        id: user._id,
-        name: user.name,
-        email: user.email,
-        role: user.role,
-        preferences: user.preferences
-      }
+      user: user.toJSON()
     });
   } catch (error) {
     console.error('Login error:', error);
-    res.status(500).json({ message: 'Server error during login' });
+    res.status(500).json({ message: 'Error logging in' });
   }
 };
 
 // Get current user profile
 const getProfile = async (req, res) => {
   try {
-    const user = await User.findById(req.user.id)
-      .select('-password')
-      .populate('bookingHistory');
+    const user = await User.findById(req.db, req.user.id);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
 
-    res.json({ user });
+    res.json({
+      success: true,
+      user: user.toJSON()
+    });
   } catch (error) {
-    console.error('Profile fetch error:', error);
-    res.status(500).json({ message: 'Server error fetching profile' });
+    console.error('Get profile error:', error);
+    res.status(500).json({ message: 'Error fetching profile' });
   }
 };
 
 // Update user profile
 const updateProfile = async (req, res) => {
   try {
-    const allowedUpdates = ['name', 'phone', 'country', 'preferences'];
-    const updates = {};
+    const { name, phone, address } = req.body;
+    const updateData = {};
 
-    Object.keys(req.body).forEach(key => {
-      if (allowedUpdates.includes(key)) {
-        updates[key] = req.body[key];
-      }
-    });
+    if (name) updateData.name = name;
+    if (phone) updateData.phone = phone;
+    if (address) updateData.address = address;
 
-    const user = await User.findByIdAndUpdate(
-      req.user.id,
-      { $set: updates },
-      { new: true, runValidators: true }
-    ).select('-password');
+    const user = await User.findById(req.db, req.user.id);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    await user.update(req.db, updateData);
 
     res.json({
-      message: 'Profile updated successfully',
-      user
+      success: true,
+      message: 'Profile updated successfully'
     });
   } catch (error) {
-    console.error('Profile update error:', error);
-    res.status(500).json({ message: 'Server error updating profile' });
-  }
-};
-
-// Change password
-const changePassword = async (req, res) => {
-  try {
-    const { currentPassword, newPassword } = req.body;
-
-    if (!currentPassword || !newPassword) {
-      return res.status(400).json({ message: 'Current and new passwords are required' });
-    }
-
-    const user = await User.findById(req.user.id);
-    
-    // Verify current password
-    const isMatch = await user.comparePassword(currentPassword);
-    if (!isMatch) {
-      return res.status(401).json({ message: 'Current password is incorrect' });
-    }
-
-    // Update password
-    user.password = newPassword;
-    await user.save();
-
-    res.json({ message: 'Password updated successfully' });
-  } catch (error) {
-    console.error('Password change error:', error);
-    res.status(500).json({ message: 'Server error changing password' });
+    console.error('Update profile error:', error);
+    res.status(500).json({ message: 'Error updating profile' });
   }
 };
 
@@ -186,6 +152,5 @@ module.exports = {
   register,
   login,
   getProfile,
-  updateProfile,
-  changePassword
+  updateProfile
 };

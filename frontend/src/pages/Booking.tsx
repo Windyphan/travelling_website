@@ -529,3 +529,4 @@ const Booking: React.FC = () => {
 };
 
 export default Booking;
+
