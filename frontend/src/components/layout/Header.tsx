@@ -11,7 +11,6 @@ const Header: React.FC = () => {
   const { state, logout } = useAuth();
   const { isDarkMode, toggleTheme } = useTheme();
   const navigate = useNavigate();
-
   // Handle scroll to change header background
   useEffect(() => {
     const handleScroll = () => {
@@ -28,27 +27,6 @@ const Header: React.FC = () => {
     navigate('/');
     setIsUserMenuOpen(false);
   };
-
-  const navigation = [
-    { name: 'Home', href: '/' },
-    { name: 'Tours', href: '/tours' },
-    { name: 'Destinations', href: '/destinations' },
-    { name: 'About', href: '/about' },
-    { name: 'Contact', href: '/contact' },
-  ];
-
-  const logoTextClasses = isScrolled
-    ? `transition-colors duration-300 ${isDarkMode ? 'text-white' : 'text-gray-900'}`
-    : `transition-colors duration-300 ${isDarkMode ? 'text-white drop-shadow-lg' : 'text-gray-900 drop-shadow-lg'}`;
-
-  const navLinkClasses = isScrolled
-    ? `px-3 py-2 text-sm font-medium transition-all duration-300 hover:scale-105 ${isDarkMode ? 'text-gray-300 hover:text-primary-400' : 'text-gray-700 hover:text-primary-600'}`
-    : `px-3 py-2 text-sm font-medium transition-all duration-300 hover:scale-105 ${isDarkMode ? 'text-white hover:text-primary-200 drop-shadow-md' : 'text-gray-900 hover:text-primary-600 drop-shadow-md'}`;
-
-  const buttonClasses = isScrolled
-    ? `p-2 rounded-lg transition-all duration-300 hover:scale-105 ${isDarkMode ? 'bg-dark-700 text-gray-300 hover:bg-dark-600' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`
-    : `p-2 rounded-lg transition-all duration-300 hover:scale-105 ${isDarkMode ? 'bg-white/20 text-white hover:bg-white/30 backdrop-blur-sm' : 'bg-black/20 text-gray-900 hover:bg-black/30 backdrop-blur-sm'}`;
-
   const userTextClasses = isScrolled
     ? `font-medium transition-colors duration-300 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`
     : `font-medium transition-colors duration-300 ${isDarkMode ? 'text-white drop-shadow-md' : 'text-gray-900 drop-shadow-md'}`;
@@ -66,39 +44,17 @@ const Header: React.FC = () => {
       }}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-center items-center h-16 relative">
-          {/* Centered Logo */}
-          <div className="absolute left-1/2 transform -translate-x-1/2">
-            <Link to="/" className="flex items-center">
-              <div className="w-12 h-12 bg-primary-600 rounded-lg flex items-center justify-center shadow-lg">
-                <span className="text-white font-bold text-2xl">T</span>
               </div>
               <span
                 className={`ml-3 text-2xl font-bold transition-colors duration-300 ${logoTextClasses}`}
               >
                 TravelCo
-              </span>
-            </Link>
-          </div>
-
-          {/* Desktop Navigation - Left Side */}
-          <nav className="hidden md:flex space-x-8 absolute left-0">
-            {navigation.slice(0, 2).map((item) => (
-              <Link
                 key={item.name}
                 to={item.href}
                 className={`px-3 py-2 text-sm font-medium transition-all duration-300 hover:scale-105 ${navLinkClasses}`}
-              >
-                {item.name}
-              </Link>
-            ))}
           </nav>
 
           {/* Desktop Navigation - Right Side */}
-          <nav className="hidden md:flex space-x-8 absolute right-16">
-            {navigation.slice(2).map((item) => (
-              <Link
-                key={item.name}
                 to={item.href}
                 className={`px-3 py-2 text-sm font-medium transition-all duration-300 hover:scale-105 ${navLinkClasses}`}
               >
@@ -117,7 +73,6 @@ const Header: React.FC = () => {
             >
               <Icon icon={isDarkMode ? Icons.FiSun : Icons.FiMoon} className="w-5 h-5" />
             </button>
-
             {state.user && (
               <div className="relative">
                 <button
@@ -147,7 +102,6 @@ const Header: React.FC = () => {
                     }`}
                   />
                 </button>
-
                 {/* User Dropdown */}
                 {isUserMenuOpen && (
                   <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-dark-700 rounded-lg shadow-xl py-1 border dark:border-dark-600 backdrop-blur-md">
@@ -186,7 +140,6 @@ const Header: React.FC = () => {
               </div>
             )}
           </div>
-
           {/* Mobile menu button */}
           <div className="md:hidden flex items-center space-x-2 absolute right-0">
             <button
@@ -227,3 +180,50 @@ const Header: React.FC = () => {
 };
 
 export default Header;
+    { name: 'Tours', href: '/tours' },
+    { name: 'Destinations', href: '/destinations' },
+    { name: 'About', href: '/about' },
+    { name: 'Contact', href: '/contact' },
+  ];
+
+  const headerClasses = isScrolled
+    ? `${isDarkMode ? 'bg-dark-800/95' : 'bg-white/95'} backdrop-blur-md shadow-lg`
+    : 'bg-transparent';
+
+  const logoTextClasses = isScrolled
+    ? `transition-colors duration-300 ${isDarkMode ? 'text-white' : 'text-gray-900'}`
+    : `transition-colors duration-300 ${isDarkMode ? 'text-white drop-shadow-lg' : 'text-gray-900 drop-shadow-lg'}`;
+
+  const navLinkClasses = isScrolled
+    ? `px-3 py-2 text-sm font-medium transition-all duration-300 hover:scale-105 ${isDarkMode ? 'text-gray-300 hover:text-primary-400' : 'text-gray-700 hover:text-primary-600'}`
+    : `px-3 py-2 text-sm font-medium transition-all duration-300 hover:scale-105 ${isDarkMode ? 'text-white hover:text-primary-200 drop-shadow-md' : 'text-gray-900 hover:text-primary-600 drop-shadow-md'}`;
+
+  const buttonClasses = isScrolled
+    ? `p-2 rounded-lg transition-all duration-300 hover:scale-105 ${isDarkMode ? 'bg-dark-700 text-gray-300 hover:bg-dark-600' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`
+    : `p-2 rounded-lg transition-all duration-300 hover:scale-105 ${isDarkMode ? 'bg-white/20 text-white hover:bg-white/30 backdrop-blur-sm' : 'bg-black/20 text-gray-900 hover:bg-black/30 backdrop-blur-sm'}`;
+
+        <div className="flex justify-center items-center h-16 relative">
+          {/* Centered Logo */}
+          <div className="absolute left-1/2 transform -translate-x-1/2">
+            <Link to="/" className="flex items-center">
+              <div className="w-12 h-12 bg-primary-600 rounded-lg flex items-center justify-center shadow-lg">
+                <span className="text-white font-bold text-2xl">T</span>
+              </span>
+            </Link>
+          </div>
+
+          {/* Desktop Navigation - Left Side */}
+          <nav className="hidden md:flex space-x-8 absolute left-0">
+            {navigation.slice(0, 2).map((item) => (
+              <Link
+              >
+                {item.name}
+              </Link>
+            ))}
+          <nav className="hidden md:flex space-x-8 absolute right-16">
+            {navigation.slice(2).map((item) => (
+              <Link
+                key={item.name}
+
+
+
