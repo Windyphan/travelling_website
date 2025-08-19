@@ -1,5 +1,4 @@
 // Database configuration for Cloudflare D1 accessed from Vercel
-const { D1Database } = require('@cloudflare/workers-types');
 
 // For Vercel deployment accessing Cloudflare D1
 const getDB = () => {
