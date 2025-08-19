@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { useAuth } from '../../contexts/AuthContext';
 import { Icon, Icons } from '../../components/common/Icons';
 import TourManagement from './TourManagement';
 
