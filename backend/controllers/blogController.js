@@ -1,9 +1,9 @@
-const { getDatabase, generateId } = require('../config/database');
+const { getDB, generateId } = require('../config/database');
 
 // Get all blogs with filtering and pagination
 const getBlogs = async (req, res) => {
   try {
-    const db = getDatabase(req);
+    const db = getDB(req);
     if (!db) {
       return res.status(500).json({ success: false, message: 'Database not available' });
     }
@@ -128,7 +128,7 @@ const getBlogs = async (req, res) => {
 // Get single blog by slug
 const getBlogBySlug = async (req, res) => {
   try {
-    const db = getDatabase(req);
+    const db = getDB(req);
     if (!db) {
       return res.status(500).json({ success: false, message: 'Database not available' });
     }
@@ -178,7 +178,7 @@ const getBlogBySlug = async (req, res) => {
 // Get single blog by ID (for admin)
 const getBlogById = async (req, res) => {
   try {
-    const db = getDatabase(req);
+    const db = getDB(req);
     if (!db) {
       return res.status(500).json({ success: false, message: 'Database not available' });
     }
@@ -222,7 +222,7 @@ const getBlogById = async (req, res) => {
 // Create new blog
 const createBlog = async (req, res) => {
   try {
-    const db = getDatabase(req);
+    const db = getDB(req);
     if (!db) {
       return res.status(500).json({ success: false, message: 'Database not available' });
     }
@@ -304,7 +304,7 @@ const createBlog = async (req, res) => {
 // Update blog
 const updateBlog = async (req, res) => {
   try {
-    const db = getDatabase(req);
+    const db = getDB(req);
     if (!db) {
       return res.status(500).json({ success: false, message: 'Database not available' });
     }
@@ -400,7 +400,7 @@ const updateBlog = async (req, res) => {
 // Delete blog
 const deleteBlog = async (req, res) => {
   try {
-    const db = getDatabase(req);
+    const db = getDB(req);
     if (!db) {
       return res.status(500).json({ success: false, message: 'Database not available' });
     }
@@ -425,7 +425,7 @@ const deleteBlog = async (req, res) => {
 // Update blog status
 const updateBlogStatus = async (req, res) => {
   try {
-    const db = getDatabase(req);
+    const db = getDB(req);
     if (!db) {
       return res.status(500).json({ success: false, message: 'Database not available' });
     }

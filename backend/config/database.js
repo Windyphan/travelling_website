@@ -1,5 +1,17 @@
 // Database configuration for Cloudflare D1 accessed from Vercel
 
+// Utility functions
+const generateId = () => {
+  return 'id_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+};
+
+const generateBookingNumber = () => {
+  const prefix = 'BK';
+  const timestamp = Date.now().toString().slice(-6);
+  const random = Math.random().toString(36).substr(2, 4).toUpperCase();
+  return `${prefix}${timestamp}${random}`;
+};
+
 // For Vercel deployment accessing Cloudflare D1
 const getDB = () => {
   // In Vercel environment, we need to use Cloudflare's REST API to access D1
@@ -235,4 +247,6 @@ module.exports = {
   executeQuery,
   getRecord,
   getRecords,
+  generateId,
+  generateBookingNumber
 };
