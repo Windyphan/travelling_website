@@ -4,7 +4,6 @@ import { Icon, Icons } from '../../components/common/Icons';
 import TourManagement from './TourManagement';
 
 const AdminDashboard: React.FC = () => {
-  const { state } = useAuth();
   const [activeTab, setActiveTab] = useState('dashboard');
 
   const tabs = [

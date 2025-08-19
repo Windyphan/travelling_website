@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
-import * as yup from 'yup';
 import { toursAPI, bookingsAPI } from '../utils/api';
 import { BookingForm } from '../types';
 import { Icon, Icons } from '../components/common/Icons';
@@ -51,7 +50,6 @@ const DirectBooking: React.FC = () => {
     formState: { errors, isSubmitting },
   } = useForm<DirectBookingForm>({
     // Remove the resolver temporarily to avoid type conflicts
-    // resolver: yupResolver(schema),
     mode: 'onBlur',
     defaultValues: {
       customerInfo: {
