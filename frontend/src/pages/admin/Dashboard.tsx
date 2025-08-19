@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { Navigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { Icon, Icons } from '../../components/common/Icons';
 import TourManagement from './TourManagement';

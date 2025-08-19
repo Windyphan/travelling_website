@@ -18,27 +18,6 @@ interface DirectBookingForm extends Omit<BookingForm, 'tourId' | 'travelers'> {
   totalTravelers: number;
 }
 
-const schema = yup.object().shape({
-  customerInfo: yup.object().shape({
-    name: yup.string().required('Name is required'),
-    email: yup.string().email('Invalid email').required('Email is required'),
-    phone: yup.string().required('Phone number is required'),
-  }),
-  startDate: yup.string().required('Start date is required'),
-  numberOfTravelers: yup.object().shape({
-    adults: yup.number().min(1, 'At least 1 adult required').required(),
-    children: yup.number().min(0).required(),
-    infants: yup.number().min(0).required(),
-  }),
-  totalTravelers: yup.number().min(1, 'At least 1 traveler required').required(),
-  specialRequests: yup.string().notRequired(),
-  emergencyContact: yup.object().shape({
-    name: yup.string().notRequired(),
-    phone: yup.string().notRequired(),
-    relationship: yup.string().notRequired(),
-  }).notRequired(),
-});
-
 const DirectBooking: React.FC = () => {
   const { tourId } = useParams<{ tourId: string }>();
   const navigate = useNavigate();

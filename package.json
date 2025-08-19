@@ -26,6 +26,7 @@
   "author": "Travel Company",
   "license": "MIT",
   "dependencies": {
+    "better-sqlite3": "^12.2.0",
     "react-feather": "^2.0.10"
   }
 }

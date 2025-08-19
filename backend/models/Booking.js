@@ -3,36 +3,61 @@ const { dbHelpers } = require('../config/database');
 
 class Booking {
   constructor(data) {
-    this.id = data.id || uuidv4();
-    this.user_id = data.user_id;
-    this.tour_id = data.tour_id;
-    this.booking_date = data.booking_date;
-    this.participants = data.participants;
-    this.total_amount = data.total_amount;
-    this.status = data.status || 'pending';
-    this.payment_status = data.payment_status || 'pending';
-    this.payment_intent_id = data.payment_intent_id;
+    this.id = data.id;
+    this.booking_number = data.booking_number || `BK${Date.now()}`;
+    this.type = data.type; // 'tour' or 'service'
+    this.item_id = data.item_id;
+
+    // Customer information (no user account needed)
+    this.customer_name = data.customer_name;
+    this.customer_email = data.customer_email;
+    this.customer_phone = data.customer_phone;
+
+    // Booking details
+    this.start_date = data.start_date;
+    this.total_travelers = data.total_travelers;
     this.special_requests = data.special_requests;
-    this.created_at = data.created_at;
-    this.updated_at = data.updated_at;
+
+    // Pricing
+    this.total_amount = data.total_amount;
+    this.currency = data.currency || 'USD';
+
+    // Status and tracking
+    this.status = data.status || 'pending';
+    this.contacted_at = data.contacted_at;
+    this.confirmed_at = data.confirmed_at;
+
+    // Timestamps
+    this.created_at = data.created_at || new Date().toISOString();
+    this.updated_at = data.updated_at || new Date().toISOString();
   }
 
   // Save booking to database
   async save(db) {
     const bookingData = {
-      id: this.id,
-      user_id: this.user_id,
-      tour_id: this.tour_id,
-      booking_date: this.booking_date,
-      participants: this.participants,
+      booking_number: this.booking_number,
+      type: this.type,
+      item_id: this.item_id,
+      customer_name: this.customer_name,
+      customer_email: this.customer_email,
+      customer_phone: this.customer_phone,
+      start_date: this.start_date,
+      total_travelers: this.total_travelers,
+      special_requests: this.special_requests,
       total_amount: this.total_amount,
+      currency: this.currency,
       status: this.status,
-      payment_status: this.payment_status,
-      payment_intent_id: this.payment_intent_id,
-      special_requests: this.special_requests
+      contacted_at: this.contacted_at,
+      confirmed_at: this.confirmed_at,
+      created_at: this.created_at,
+      updated_at: this.updated_at
     };
 
-    return await dbHelpers.insert(db, 'bookings', bookingData);
+    const result = await dbHelpers.insert(db, 'bookings', bookingData);
+    if (result && result.meta && result.meta.last_row_id) {
+      this.id = result.meta.last_row_id;
+    }
+    return result;
   }
 
   // Find booking by ID
@@ -41,19 +66,25 @@ class Booking {
     return bookings.length > 0 ? new Booking(bookings[0]) : null;
   }
 
-  // Find bookings by user ID
-  static async findByUserId(db, userId) {
+  // Find booking by booking number
+  static async findByBookingNumber(db, bookingNumber) {
+    const bookings = await dbHelpers.query(db, 'SELECT * FROM bookings WHERE booking_number = ?', [bookingNumber]);
+    return bookings.length > 0 ? new Booking(bookings[0]) : null;
+  }
+
+  // Find bookings by customer email
+  static async findByCustomerEmail(db, email) {
     const bookings = await dbHelpers.query(
       db,
-      'SELECT * FROM bookings WHERE user_id = ? ORDER BY created_at DESC',
-      [userId]
+      'SELECT * FROM bookings WHERE customer_email = ? ORDER BY created_at DESC',
+      [email]
     );
     return bookings.map(booking => new Booking(booking));
   }
 
-  // Get all bookings with pagination
+  // Get all bookings with pagination (admin only)
   static async findAll(db, options = {}) {
-    const { limit = 50, offset = 0, status, payment_status } = options;
+    const { limit = 50, offset = 0, status, type } = options;
 
     let sql = 'SELECT * FROM bookings';
     const params = [];
@@ -64,9 +95,9 @@ class Booking {
       params.push(status);
     }
 
-    if (payment_status) {
-      conditions.push('payment_status = ?');
-      params.push(payment_status);
+    if (type) {
+      conditions.push('type = ?');
+      params.push(type);
     }
 
     if (conditions.length > 0) {
@@ -80,8 +111,28 @@ class Booking {
     return bookings.map(booking => new Booking(booking));
   }
 
+  // Update booking status
+  async updateStatus(db, status) {
+    const updateData = {
+      status,
+      updated_at: new Date().toISOString()
+    };
+
+    if (status === 'contacted') {
+      updateData.contacted_at = new Date().toISOString();
+    } else if (status === 'confirmed') {
+      updateData.confirmed_at = new Date().toISOString();
+    }
+
+    this.status = status;
+    this.updated_at = updateData.updated_at;
+
+    return await dbHelpers.update(db, 'bookings', updateData, 'id = ?', [this.id]);
+  }
+
   // Update booking
   async update(db, updateData) {
+    updateData.updated_at = new Date().toISOString();
     return await dbHelpers.update(db, 'bookings', updateData, 'id = ?', [this.id]);
   }
 
@@ -90,16 +141,41 @@ class Booking {
     return await dbHelpers.delete(db, 'bookings', 'id = ?', [this.id]);
   }
 
-  // Get booking statistics
+  // Get booking statistics (admin only)
   static async getStats(db) {
     const totalBookings = await dbHelpers.query(db, 'SELECT COUNT(*) as count FROM bookings');
     const bookingsByStatus = await dbHelpers.query(db, 'SELECT status, COUNT(*) as count FROM bookings GROUP BY status');
-    const totalRevenue = await dbHelpers.query(db, 'SELECT SUM(total_amount) as total FROM bookings WHERE payment_status = ?', ['completed']);
+    const bookingsByType = await dbHelpers.query(db, 'SELECT type, COUNT(*) as count FROM bookings GROUP BY type');
+    const totalRevenue = await dbHelpers.query(db, 'SELECT SUM(total_amount) as total FROM bookings WHERE status IN (?, ?)', ['confirmed', 'completed']);
 
     return {
-      total: totalBookings[0].count,
+      total: totalBookings[0]?.count || 0,
       byStatus: bookingsByStatus,
-      totalRevenue: totalRevenue[0].total || 0
+      byType: bookingsByType,
+      totalRevenue: totalRevenue[0]?.total || 0
+    };
+  }
+
+  // Convert to JSON
+  toJSON() {
+    return {
+      id: this.id,
+      booking_number: this.booking_number,
+      type: this.type,
+      item_id: this.item_id,
+      customer_name: this.customer_name,
+      customer_email: this.customer_email,
+      customer_phone: this.customer_phone,
+      start_date: this.start_date,
+      total_travelers: this.total_travelers,
+      special_requests: this.special_requests,
+      total_amount: this.total_amount,
+      currency: this.currency,
+      status: this.status,
+      contacted_at: this.contacted_at,
+      confirmed_at: this.confirmed_at,
+      created_at: this.created_at,
+      updated_at: this.updated_at
     };
   }
 }
