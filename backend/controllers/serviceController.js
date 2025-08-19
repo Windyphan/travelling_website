@@ -1,9 +1,9 @@
-const { getDatabase, generateId, generateBookingNumber } = require('../config/database');
+const { getDB, generateId, generateBookingNumber } = require('../config/database');
 
 // Get all services with filtering
 const getServices = async (req, res) => {
   try {
-    const db = getDatabase(req);
+    const db = getDB(req);
     if (!db) {
       return res.status(500).json({ success: false, message: 'Database not available' });
     }
@@ -114,7 +114,7 @@ const getServices = async (req, res) => {
 // Get single service by ID
 const getServiceById = async (req, res) => {
   try {
-    const db = getDatabase(req);
+    const db = getDB(req);
     if (!db) {
       return res.status(500).json({ success: false, message: 'Database not available' });
     }
@@ -149,7 +149,7 @@ const getServiceById = async (req, res) => {
 // Create service booking
 const createServiceBooking = async (req, res) => {
   try {
-    const db = getDatabase(req);
+    const db = getDB(req);
     if (!db) {
       return res.status(500).json({ success: false, message: 'Database not available' });
     }
@@ -256,7 +256,7 @@ const createServiceBooking = async (req, res) => {
 // Get user's service bookings
 const getUserServiceBookings = async (req, res) => {
   try {
-    const db = getDatabase(req);
+    const db = getDB(req);
     if (!db) {
       return res.status(500).json({ success: false, message: 'Database not available' });
     }
@@ -292,7 +292,7 @@ const getUserServiceBookings = async (req, res) => {
 // Admin: Get all service bookings
 const getAllServiceBookings = async (req, res) => {
   try {
-    const db = getDatabase(req);
+    const db = getDB(req);
     if (!db) {
       return res.status(500).json({ success: false, message: 'Database not available' });
     }
@@ -361,7 +361,7 @@ const getAllServiceBookings = async (req, res) => {
 // Admin: Update service booking status
 const updateServiceBookingStatus = async (req, res) => {
   try {
-    const db = getDatabase(req);
+    const db = getDB(req);
     if (!db) {
       return res.status(500).json({ success: false, message: 'Database not available' });
     }
