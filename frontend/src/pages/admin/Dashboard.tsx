@@ -8,10 +8,6 @@ const AdminDashboard: React.FC = () => {
   const { state } = useAuth();
   const [activeTab, setActiveTab] = useState('dashboard');
 
-  if (state.user?.role !== 'admin') {
-    return <Navigate to="/" replace />;
-  }
-
   const tabs = [
     { id: 'dashboard', name: 'Dashboard', icon: Icons.FiBarChart },
     { id: 'tours', name: 'Tours', icon: Icons.FiMapPin },

@@ -124,11 +124,11 @@ const getTour = async (req, res) => {
   }
 };
 
-// Get tour by slug
+// Get tour by slug (using ID for now until slug is implemented)
 const getTourBySlug = async (req, res) => {
   try {
     const { slug } = req.params;
-    // For now, we'll use ID since we don't have slug in our model yet
+    // Since we don't have slug column yet, treat the slug parameter as ID
     const tour = await Tour.findById(req.db, slug);
 
     if (!tour) {

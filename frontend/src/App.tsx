@@ -15,9 +15,6 @@ import ServiceBooking from './pages/ServiceBooking';
 import Blogs from './pages/Blogs';
 import BlogDetail from './pages/BlogDetail';
 import Login from './pages/auth/Login';
-import Register from './pages/auth/Register';
-import Profile from './pages/Profile';
-import MyBookings from './pages/MyBookings';
 import AdminDashboard from './pages/admin/Dashboard';
 import BlogManagement from './pages/admin/BlogManagement';
 import BlogEditor from './pages/admin/BlogEditor';
@@ -52,19 +49,7 @@ function App() {
                   <Route path="/blog" element={<Blogs />} />
                   <Route path="/blog/:slug" element={<BlogDetail />} />
                   <Route path="/login" element={<Login />} />
-                  <Route path="/register" element={<Register />} />
 
-                  {/* Protected Routes */}
-                  <Route path="/profile" element={
-                    <ProtectedRoute>
-                      <Profile />
-                    </ProtectedRoute>
-                  } />
-                  <Route path="/my-bookings" element={
-                    <ProtectedRoute>
-                      <MyBookings />
-                    </ProtectedRoute>
-                  } />
                   <Route path="/booking/:tourId" element={
                     <ProtectedRoute>
                       <Booking />

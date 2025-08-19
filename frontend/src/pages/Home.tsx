@@ -359,7 +359,7 @@ const Home: React.FC = () => {
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {featuredTours?.data?.tours?.slice(0, 3).map((tour: Tour) => (
+              {featuredTours?.data?.data?.slice(0, 3).map((tour: Tour) => (
                 <div key={tour._id} className="bg-white dark:bg-dark-700 rounded-xl shadow-lg overflow-hidden group hover:shadow-2xl transition-all duration-300 border dark:border-dark-600">
                   <div className="relative h-48 overflow-hidden">
                     <img

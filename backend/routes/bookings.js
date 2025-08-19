@@ -1,31 +1,25 @@
 const express = require('express');
 const router = express.Router();
-const { auth } = require('../middleware/auth');
+const { adminAuth } = require('../middleware/auth');
 const {
-  createBooking,
-  getUserBookings,
-  getBooking,
-  cancelBooking
+  createDirectBooking,
+  getAllBookings,
+  updateBookingStatus
 } = require('../controllers/bookingController');
 
 // @route   POST /api/bookings
-// @desc    Create new booking
-// @access  Private
-router.post('/', auth, createBooking);
+// @desc    Create new direct booking (no user authentication required)
+// @access  Public
+router.post('/', createDirectBooking);
 
 // @route   GET /api/bookings
-// @desc    Get user's bookings
-// @access  Private
-router.get('/', auth, getUserBookings);
+// @desc    Get all bookings (admin only)
+// @access  Private (Admin)
+router.get('/', adminAuth, getAllBookings);
 
-// @route   GET /api/bookings/:id
-// @desc    Get single booking
-// @access  Private
-router.get('/:id', auth, getBooking);
-
-// @route   PUT /api/bookings/:id/cancel
-// @desc    Cancel booking
-// @access  Private
-router.put('/:id/cancel', auth, cancelBooking);
+// @route   PUT /api/bookings/:id/status
+// @desc    Update booking status (admin only)
+// @access  Private (Admin)
+router.put('/:id/status', adminAuth, updateBookingStatus);
 
 module.exports = router;

@@ -1,6 +1,6 @@
 const Booking = require('../models/Booking');
 const Tour = require('../models/Tour');
-const User = require('../models/User');
+const Service = require('../models/Service');
 const nodemailer = require('nodemailer');
 
 // Create email transporter
@@ -16,247 +16,202 @@ const createEmailTransporter = () => {
   });
 };
 
-// Send booking confirmation email
-const sendConfirmationEmail = async (booking, customer, tour) => {
+// Send booking notification to staff
+const sendStaffNotification = async (booking, customerInfo, tourOrService) => {
   try {
     const transporter = createEmailTransporter();
-    
+
     const emailTemplate = `
-      <h2>Booking Confirmation - ${tour.title}</h2>
-      <p>Dear ${customer.name},</p>
-      <p>Thank you for booking with us! Your booking has been confirmed.</p>
+      <h2>New Booking Received - ${tourOrService.title}</h2>
+      <p>A new booking has been submitted through the website.</p>
+      
+      <h3>Customer Information:</h3>
+      <ul>
+        <li><strong>Name:</strong> ${customerInfo.name}</li>
+        <li><strong>Email:</strong> ${customerInfo.email}</li>
+        <li><strong>Phone:</strong> ${customerInfo.phone}</li>
+      </ul>
       
       <h3>Booking Details:</h3>
       <ul>
         <li><strong>Booking Number:</strong> ${booking.bookingNumber}</li>
-        <li><strong>Tour:</strong> ${tour.title}</li>
-        <li><strong>Start Date:</strong> ${booking.bookingDetails.startDate.toDateString()}</li>
-        <li><strong>Duration:</strong> ${tour.duration.days} days / ${tour.duration.nights} nights</li>
-        <li><strong>Travelers:</strong> ${booking.bookingDetails.totalTravelers}</li>
-        <li><strong>Total Amount:</strong> ${booking.pricing.currency} ${booking.pricing.totalAmount}</li>
+        <li><strong>${booking.type === 'tour' ? 'Tour' : 'Service'}:</strong> ${tourOrService.title}</li>
+        <li><strong>Start Date:</strong> ${booking.startDate}</li>
+        <li><strong>Travelers:</strong> ${booking.totalTravelers}</li>
+        <li><strong>Total Amount:</strong> ${booking.currency} ${booking.totalAmount}</li>
+        ${booking.specialRequests ? `<li><strong>Special Requests:</strong> ${booking.specialRequests}</li>` : ''}
       </ul>
       
-      <p>We will contact you soon with more details about your trip.</p>
-      <p>Best regards,<br>${process.env.COMPANY_NAME}</p>
+      <p>Please contact the customer to confirm this booking.</p>
     `;
 
     await transporter.sendMail({
       from: process.env.EMAIL_USER,
-      to: customer.email,
-      subject: `Booking Confirmation - ${booking.bookingNumber}`,
+      to: process.env.STAFF_EMAIL || process.env.EMAIL_USER,
+      subject: `New Booking - ${booking.bookingNumber}`,
       html: emailTemplate
     });
   } catch (error) {
-    console.error('Email sending error:', error);
+    console.error('Staff email sending error:', error);
   }
 };
 
-// Create new booking
-const createBooking = async (req, res) => {
+// Send confirmation email to customer
+const sendCustomerConfirmation = async (booking, customerInfo, tourOrService) => {
+  try {
+    const transporter = createEmailTransporter();
+
+    const emailTemplate = `
+      <h2>Booking Request Received - ${tourOrService.title}</h2>
+      <p>Dear ${customerInfo.name},</p>
+      <p>Thank you for your booking request! We have received your information and will contact you soon to confirm your booking.</p>
+      
+      <h3>Booking Details:</h3>
+      <ul>
+        <li><strong>Booking Number:</strong> ${booking.bookingNumber}</li>
+        <li><strong>${booking.type === 'tour' ? 'Tour' : 'Service'}:</strong> ${tourOrService.title}</li>
+        <li><strong>Start Date:</strong> ${booking.startDate}</li>
+        <li><strong>Travelers:</strong> ${booking.totalTravelers}</li>
+        <li><strong>Total Amount:</strong> ${booking.currency} ${booking.totalAmount}</li>
+      </ul>
+      
+      <p>Our team will contact you within 24 hours to confirm your booking and provide payment instructions.</p>
+      <p>Best regards,<br>${process.env.COMPANY_NAME || 'Travel Company'}</p>
+    `;
+
+    await transporter.sendMail({
+      from: process.env.EMAIL_USER,
+      to: customerInfo.email,
+      subject: `Booking Request Received - ${booking.bookingNumber}`,
+      html: emailTemplate
+    });
+  } catch (error) {
+    console.error('Customer email sending error:', error);
+  }
+};
+
+// Create booking without user account
+const createDirectBooking = async (req, res) => {
   try {
     const {
-      tourId,
-      startDate,
-      numberOfTravelers,
-      travelers,
-      specialRequests,
-      emergencyContact
+      type, // 'tour' or 'service'
+      itemId, // tour or service ID
+      customerInfo, // { name, email, phone }
+      bookingDetails, // { startDate, totalTravelers, specialRequests }
+      pricing // { totalAmount, currency }
     } = req.body;
 
-    // Validate tour exists and is available
-    const tour = await Tour.findById(tourId);
-    if (!tour) {
-      return res.status(404).json({ message: 'Tour not found' });
-    }
-
-    const totalTravelers = numberOfTravelers.adults + numberOfTravelers.children + numberOfTravelers.infants;
-    
-    // Check availability
-    if (!tour.checkAvailability(new Date(startDate), totalTravelers)) {
-      return res.status(400).json({ message: 'Tour not available for selected date and group size' });
-    }
-
-    // Calculate pricing
-    const basePrice = tour.calculatePrice(new Date(startDate), totalTravelers);
-    const subtotal = basePrice * totalTravelers;
-    const taxes = subtotal * 0.1; // 10% tax
-    const totalAmount = subtotal + taxes;
-
-    // Calculate end date
-    const endDate = new Date(startDate);
-    endDate.setDate(endDate.getDate() + tour.duration.days - 1);
-
-    // Create booking
-    const booking = new Booking({
-      tour: tourId,
-      customer: req.user.id,
-      travelers,
-      bookingDetails: {
-        startDate: new Date(startDate),
-        endDate,
-        numberOfTravelers,
-        totalTravelers
-      },
-      pricing: {
-        basePrice,
-        subtotal,
-        taxes,
-        totalAmount,
-        currency: tour.pricing.currency
-      },
-      specialRequests,
-      emergencyContact
-    });
-
-    await booking.save();
-
-    // Update tour availability
-    const availability = tour.availability.find(slot => {
-      const bookingDate = new Date(startDate);
-      return bookingDate >= slot.startDate && bookingDate <= slot.endDate;
-    });
-    
-    if (availability) {
-      availability.bookedSpots += totalTravelers;
-      await tour.save();
-    }
-
-    // Add booking to user's history
-    await User.findByIdAndUpdate(
-      req.user.id,
-      { $push: { bookingHistory: booking._id } }
-    );
-
-    // Populate booking for response
-    await booking.populate(['tour', 'customer']);
-
-    // Send confirmation email
-    sendConfirmationEmail(booking, req.user, tour);
-
-    res.status(201).json({
-      message: 'Booking created successfully',
-      booking
-    });
-  } catch (error) {
-    console.error('Create booking error:', error);
-    res.status(500).json({ message: 'Server error creating booking' });
-  }
-};
-
-// Get user's bookings
-const getUserBookings = async (req, res) => {
-  try {
-    const { page = 1, limit = 10, status } = req.query;
-    
-    const filter = { customer: req.user.id };
-    if (status) filter.status = status;
-
-    const bookings = await Booking.find(filter)
-      .populate('tour', 'title images duration destination')
-      .sort({ createdAt: -1 })
-      .limit(limit * 1)
-      .skip((page - 1) * limit);
-
-    const total = await Booking.countDocuments(filter);
-
-    res.json({
-      bookings,
-      pagination: {
-        currentPage: Number(page),
-        totalPages: Math.ceil(total / limit),
-        totalBookings: total
-      }
-    });
-  } catch (error) {
-    console.error('Get user bookings error:', error);
-    res.status(500).json({ message: 'Server error fetching bookings' });
-  }
-};
-
-// Get single booking
-const getBooking = async (req, res) => {
-  try {
-    const { id } = req.params;
-    
-    const booking = await Booking.findOne({
-      _id: id,
-      customer: req.user.id
-    }).populate(['tour', 'customer']);
-
-    if (!booking) {
-      return res.status(404).json({ message: 'Booking not found' });
-    }
-
-    res.json({ booking });
-  } catch (error) {
-    console.error('Get booking error:', error);
-    res.status(500).json({ message: 'Server error fetching booking' });
-  }
-};
-
-// Cancel booking
-const cancelBooking = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const { reason } = req.body;
-
-    const booking = await Booking.findOne({
-      _id: id,
-      customer: req.user.id
-    });
-
-    if (!booking) {
-      return res.status(404).json({ message: 'Booking not found' });
-    }
-
-    if (booking.status === 'cancelled') {
-      return res.status(400).json({ message: 'Booking already cancelled' });
-    }
-
-    // Check if cancellation is allowed (e.g., at least 24 hours before start date)
-    const now = new Date();
-    const startDate = new Date(booking.bookingDetails.startDate);
-    const hoursDifference = (startDate - now) / (1000 * 60 * 60);
-
-    if (hoursDifference < 24) {
-      return res.status(400).json({ 
-        message: 'Cancellation not allowed less than 24 hours before start date' 
+    // Validate required fields
+    if (!type || !itemId || !customerInfo || !bookingDetails || !pricing) {
+      return res.status(400).json({
+        success: false,
+        message: 'Missing required booking information'
       });
     }
 
-    booking.status = 'cancelled';
-    booking.notes.push({
-      content: `Booking cancelled by customer. Reason: ${reason}`,
-      author: req.user.id
-    });
-
-    await booking.save();
-
-    // Update tour availability
-    const tour = await Tour.findById(booking.tour);
-    const availability = tour.availability.find(slot => {
-      const bookingDate = booking.bookingDetails.startDate;
-      return bookingDate >= slot.startDate && bookingDate <= slot.endDate;
-    });
-    
-    if (availability) {
-      availability.bookedSpots -= booking.bookingDetails.totalTravelers;
-      await tour.save();
+    // Get tour or service details
+    let tourOrService;
+    if (type === 'tour') {
+      tourOrService = await Tour.findById(req.db, itemId);
+    } else if (type === 'service') {
+      tourOrService = await Service.findById(req.db, itemId);
     }
 
-    res.json({
-      message: 'Booking cancelled successfully',
-      booking
+    if (!tourOrService) {
+      return res.status(404).json({
+        success: false,
+        message: `${type} not found`
+      });
+    }
+
+    // Create booking object
+    const bookingData = {
+      bookingNumber: `BK${Date.now()}`,
+      type,
+      itemId,
+      customerName: customerInfo.name,
+      customerEmail: customerInfo.email,
+      customerPhone: customerInfo.phone,
+      startDate: bookingDetails.startDate,
+      totalTravelers: bookingDetails.totalTravelers,
+      specialRequests: bookingDetails.specialRequests || null,
+      totalAmount: pricing.totalAmount,
+      currency: pricing.currency || 'USD',
+      status: 'pending',
+      createdAt: new Date()
+    };
+
+    const booking = new Booking(bookingData);
+    await booking.save(req.db);
+
+    // Send emails
+    await Promise.all([
+      sendStaffNotification(booking, customerInfo, tourOrService),
+      sendCustomerConfirmation(booking, customerInfo, tourOrService)
+    ]);
+
+    res.status(201).json({
+      success: true,
+      message: 'Booking request submitted successfully. We will contact you soon!',
+      bookingNumber: booking.bookingNumber
     });
   } catch (error) {
-    console.error('Cancel booking error:', error);
-    res.status(500).json({ message: 'Server error cancelling booking' });
+    console.error('Create booking error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error creating booking'
+    });
+  }
+};
+
+// Get all bookings (admin only)
+const getAllBookings = async (req, res) => {
+  try {
+    const bookings = await Booking.findAll(req.db);
+    res.json({
+      success: true,
+      data: bookings.map(booking => booking.toJSON())
+    });
+  } catch (error) {
+    console.error('Get bookings error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error fetching bookings'
+    });
+  }
+};
+
+// Update booking status (admin only)
+const updateBookingStatus = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { status } = req.body;
+
+    const booking = await Booking.findById(req.db, id);
+    if (!booking) {
+      return res.status(404).json({
+        success: false,
+        message: 'Booking not found'
+      });
+    }
+
+    await booking.updateStatus(req.db, status);
+
+    res.json({
+      success: true,
+      message: 'Booking status updated successfully'
+    });
+  } catch (error) {
+    console.error('Update booking status error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error updating booking status'
+    });
   }
 };
 
 module.exports = {
-  createBooking,
-  getUserBookings,
-  getBooking,
-  cancelBooking
+  createDirectBooking,
+  getAllBookings,
+  updateBookingStatus
 };

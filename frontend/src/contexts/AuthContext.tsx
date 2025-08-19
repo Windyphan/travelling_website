@@ -1,38 +1,34 @@
 import React, { createContext, useContext, useReducer, useEffect, ReactNode } from 'react';
 import { User } from '../types';
-import { authAPI } from '../utils/api';
+import { authAPI, adminAPI_functions } from '../utils/api';
 
 interface AuthState {
-  user: User | null;
+  admin: User | null;
   token: string | null;
   isLoading: boolean;
   isAuthenticated: boolean;
 }
 
 interface AuthAction {
-  type: 'LOGIN_START' | 'LOGIN_SUCCESS' | 'LOGIN_FAILURE' | 'LOGOUT' | 'UPDATE_PROFILE' | 'SET_LOADING';
+  type: 'LOGIN_START' | 'LOGIN_SUCCESS' | 'LOGIN_FAILURE' | 'LOGOUT' | 'SET_LOADING';
   payload?: any;
 }
 
 const initialState: AuthState = {
-  user: null,
-  token: localStorage.getItem('token'),
+  admin: null,
+  token: localStorage.getItem('adminToken'),
   isLoading: true,
   isAuthenticated: false,
 };
 
 const AuthContext = createContext<{
   state: AuthState;
-  login: (email: string, password: string) => Promise<void>;
-  register: (data: any) => Promise<void>;
+  adminLogin: (email: string, password: string) => Promise<void>;
   logout: () => void;
-  updateProfile: (data: Partial<User>) => Promise<void>;
 }>({
   state: initialState,
-  login: async () => {},
-  register: async () => {},
+  adminLogin: async () => {},
   logout: () => {},
-  updateProfile: async () => {},
 });
 
 const authReducer = (state: AuthState, action: AuthAction): AuthState => {
@@ -45,7 +41,7 @@ const authReducer = (state: AuthState, action: AuthAction): AuthState => {
     case 'LOGIN_SUCCESS':
       return {
         ...state,
-        user: action.payload.user,
+        admin: action.payload.user,
         token: action.payload.token,
         isLoading: false,
         isAuthenticated: true,
@@ -53,7 +49,7 @@ const authReducer = (state: AuthState, action: AuthAction): AuthState => {
     case 'LOGIN_FAILURE':
       return {
         ...state,
-        user: null,
+        admin: null,
         token: null,
         isLoading: false,
         isAuthenticated: false,
@@ -61,14 +57,9 @@ const authReducer = (state: AuthState, action: AuthAction): AuthState => {
     case 'LOGOUT':
       return {
         ...state,
-        user: null,
+        admin: null,
         token: null,
         isAuthenticated: false,
-      };
-    case 'UPDATE_PROFILE':
-      return {
-        ...state,
-        user: action.payload,
       };
     case 'SET_LOADING':
       return {
@@ -84,42 +75,41 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const [state, dispatch] = useReducer(authReducer, initialState);
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem('adminToken');
     if (token) {
-      fetchUserProfile();
+      // Verify token is still valid using the admin profile endpoint
+      adminAPI_functions.getProfile()
+        .then(response => {
+          dispatch({
+            type: 'LOGIN_SUCCESS',
+            payload: {
+              user: response.data.data,
+              token,
+            },
+          });
+        })
+        .catch(() => {
+          localStorage.removeItem('adminToken');
+          dispatch({ type: 'LOGIN_FAILURE' });
+        })
+        .finally(() => {
+          dispatch({ type: 'SET_LOADING', payload: false });
+        });
     } else {
       dispatch({ type: 'SET_LOADING', payload: false });
     }
   }, []);
 
-  const fetchUserProfile = async () => {
+  const adminLogin = async (email: string, password: string) => {
+    dispatch({ type: 'LOGIN_START' });
     try {
-      const response = await authAPI.getProfile();
+      const response = await authAPI.adminLogin(email, password);
+      const { token, user } = response.data.data;
+
+      localStorage.setItem('adminToken', token);
       dispatch({
         type: 'LOGIN_SUCCESS',
-        payload: {
-          user: response.data.user,
-          token: localStorage.getItem('token'),
-        },
-      });
-    } catch (error) {
-      localStorage.removeItem('token');
-      localStorage.removeItem('user');
-      dispatch({ type: 'LOGIN_FAILURE' });
-    }
-  };
-
-  const login = async (email: string, password: string) => {
-    try {
-      dispatch({ type: 'LOGIN_START' });
-      const response = await authAPI.login({ email, password });
-
-      localStorage.setItem('token', response.data.token);
-      localStorage.setItem('user', JSON.stringify(response.data.user));
-
-      dispatch({
-        type: 'LOGIN_SUCCESS',
-        payload: response.data,
+        payload: { user, token },
       });
     } catch (error: any) {
       dispatch({ type: 'LOGIN_FAILURE' });
@@ -127,53 +117,13 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     }
   };
 
-  const register = async (data: any) => {
-    try {
-      dispatch({ type: 'LOGIN_START' });
-      const response = await authAPI.register(data);
-
-      localStorage.setItem('token', response.data.token);
-      localStorage.setItem('user', JSON.stringify(response.data.user));
-
-      dispatch({
-        type: 'LOGIN_SUCCESS',
-        payload: response.data,
-      });
-    } catch (error: any) {
-      dispatch({ type: 'LOGIN_FAILURE' });
-      throw new Error(error.response?.data?.message || 'Registration failed');
-    }
-  };
-
   const logout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
+    localStorage.removeItem('adminToken');
     dispatch({ type: 'LOGOUT' });
   };
 
-  const updateProfile = async (data: Partial<User>) => {
-    try {
-      const response = await authAPI.updateProfile(data);
-      dispatch({
-        type: 'UPDATE_PROFILE',
-        payload: response.data.user,
-      });
-      localStorage.setItem('user', JSON.stringify(response.data.user));
-    } catch (error: any) {
-      throw new Error(error.response?.data?.message || 'Profile update failed');
-    }
-  };
-
   return (
-    <AuthContext.Provider
-      value={{
-        state,
-        login,
-        register,
-        logout,
-        updateProfile,
-      }}
-    >
+    <AuthContext.Provider value={{ state, adminLogin, logout }}>
       {children}
     </AuthContext.Provider>
   );
