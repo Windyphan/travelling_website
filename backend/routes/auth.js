@@ -1,37 +1,61 @@
-const express = require('express');
-const router = express.Router();
-const { auth } = require('../middleware/auth');
-const {
+import {
   register,
   login,
   getProfile,
   updateProfile,
-  changePassword
-} = require('../controllers/authController');
+  changePassword,
+} from '../controllers/authController.js';
+import auth from '../middleware/auth.js';
 
-// @route   POST /api/auth/register
-// @desc    Register a new user
-// @access  Public
-router.post('/register', register);
+// Route handler for auth endpoints
+const handle = async (request, env) => {
+  const url = new URL(request.url);
+  const path = url.pathname.replace('/api/auth', '');
+  const method = request.method;
 
-// @route   POST /api/auth/login
-// @desc    Login user
-// @access  Public
-router.post('/login', login);
+  try {
+    // Public routes
+    if (path === '/register' && method === 'POST') {
+      return await register(request, env);
+    }
 
-// @route   GET /api/auth/profile
-// @desc    Get current user profile
-// @access  Private
-router.get('/profile', auth, getProfile);
+    if (path === '/login' && method === 'POST') {
+      return await login(request, env);
+    }
 
-// @route   PUT /api/auth/profile
-// @desc    Update user profile
-// @access  Private
-router.put('/profile', auth, updateProfile);
+    // Protected routes - require authentication
+    const authResult = await auth(request);
+    if (authResult) {
+      return authResult; // Return error response from auth middleware
+    }
 
-// @route   PUT /api/auth/change-password
-// @desc    Change user password
-// @access  Private
-router.put('/change-password', auth, changePassword);
+    if (path === '/profile' && method === 'GET') {
+      return await getProfile(request, env);
+    }
 
-module.exports = router;
+    if (path === '/profile' && method === 'PUT') {
+      return await updateProfile(request, env);
+    }
+
+    if (path === '/change-password' && method === 'PUT') {
+      return await changePassword(request, env);
+    }
+
+    // 404 for unmatched auth routes
+    return new Response(JSON.stringify({ message: 'Auth route not found' }), {
+      status: 404,
+      headers: { 'Content-Type': 'application/json' }
+    });
+
+  } catch (error) {
+    return new Response(JSON.stringify({
+      message: 'Auth request failed',
+      error: error.message
+    }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json' }
+    });
+  }
+};
+
+export default { handle };

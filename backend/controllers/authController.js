@@ -1,156 +1,241 @@
-const jwt = require('jsonwebtoken');
-const bcrypt = require('bcryptjs');
-const User = require('../models/User');
-const Joi = require('joi');
+import { getDB, executeQuery, getRecord, getRecords } from '../config/database.js';
 
-// Validation schemas
-const registerSchema = Joi.object({
-  name: Joi.string().min(2).max(50).required(),
-  email: Joi.string().email().required(),
-  password: Joi.string().min(6).required(),
-  phone: Joi.string().optional(),
-  address: Joi.string().optional()
-});
-
-const loginSchema = Joi.object({
-  email: Joi.string().email().required(),
-  password: Joi.string().required()
-});
-
-// Generate JWT token
-const generateToken = (userId) => {
-  return jwt.sign({ id: userId }, process.env.JWT_SECRET, {
-    expiresIn: '7d'
-  });
+// Simple hash function for passwords (in production, use a proper crypto library)
+const hashPassword = async (password) => {
+  const encoder = new TextEncoder();
+  const data = encoder.encode(password);
+  const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+  return Array.from(new Uint8Array(hashBuffer))
+    .map(b => b.toString(16).padStart(2, '0'))
+    .join('');
 };
 
-// Register new user
-const register = async (req, res) => {
+// Generate JWT Token
+const generateToken = async (userId) => {
+  const header = { alg: 'HS256', typ: 'JWT' };
+  const payload = {
+    userId,
+    exp: Math.floor(Date.now() / 1000) + (30 * 24 * 60 * 60) // 30 days
+  };
+
+  const encoder = new TextEncoder();
+  const headerEncoded = btoa(JSON.stringify(header));
+  const payloadEncoded = btoa(JSON.stringify(payload));
+
+  const data = encoder.encode(`${headerEncoded}.${payloadEncoded}`);
+  const key = await crypto.subtle.importKey(
+    'raw',
+    encoder.encode(process.env.JWT_SECRET || 'fallback_secret'),
+    { name: 'HMAC', hash: 'SHA-256' },
+    false,
+    ['sign']
+  );
+
+  const signature = await crypto.subtle.sign('HMAC', key, data);
+  const signatureEncoded = btoa(String.fromCharCode(...new Uint8Array(signature)));
+
+  return `${headerEncoded}.${payloadEncoded}.${signatureEncoded}`;
+};
+
+// @desc    Register user
+const register = async (request, env) => {
   try {
-    const { error } = registerSchema.validate(req.body);
-    if (error) {
-      return res.status(400).json({ message: error.details[0].message });
-    }
+    const { name, email, password } = await request.json();
+    const db = getDB(env);
 
-    const { name, email, password, phone, address } = req.body;
+    // Check if user exists
+    const existingUser = await getRecord(db,
+      'SELECT id FROM users WHERE email = ?', [email]
+    );
 
-    // Check if user already exists
-    const existingUser = await User.findByEmail(req.db, email);
     if (existingUser) {
-      return res.status(400).json({ message: 'User already exists with this email' });
+      return new Response(JSON.stringify({ message: 'User already exists' }), {
+        status: 400,
+        headers: { 'Content-Type': 'application/json' }
+      });
     }
 
-    // Create new user
-    const user = new User({
+    // Hash password
+    const hashedPassword = await hashPassword(password);
+
+    // Create user
+    const result = await executeQuery(db,
+      'INSERT INTO users (name, email, password, created_at, updated_at) VALUES (?, ?, ?, ?, ?)',
+      [name, email, hashedPassword, new Date().toISOString(), new Date().toISOString()]
+    );
+
+    const token = await generateToken(result.meta.last_row_id);
+
+    return new Response(JSON.stringify({
+      id: result.meta.last_row_id,
       name,
       email,
-      password,
-      phone,
-      address
-    });
-
-    await user.save(req.db);
-
-    // Generate token
-    const token = generateToken(user.id);
-
-    res.status(201).json({
-      success: true,
-      message: 'User registered successfully',
       token,
-      user: user.toJSON()
+    }), {
+      status: 201,
+      headers: { 'Content-Type': 'application/json' }
     });
   } catch (error) {
-    console.error('Registration error:', error);
-    res.status(500).json({ message: 'Error creating user' });
+    return new Response(JSON.stringify({ message: error.message }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json' }
+    });
   }
 };
 
-// Login user
-const login = async (req, res) => {
+// @desc    Authenticate user & get token
+const login = async (request, env) => {
   try {
-    const { error } = loginSchema.validate(req.body);
-    if (error) {
-      return res.status(400).json({ message: error.details[0].message });
-    }
+    const { email, password } = await request.json();
+    const db = getDB(env);
 
-    const { email, password } = req.body;
+    // Check for user
+    const user = await getRecord(db,
+      'SELECT * FROM users WHERE email = ?', [email]
+    );
 
-    // Find user by email
-    const user = await User.findByEmail(req.db, email);
     if (!user) {
-      return res.status(400).json({ message: 'Invalid email or password' });
+      return new Response(JSON.stringify({ message: 'Invalid credentials' }), {
+        status: 400,
+        headers: { 'Content-Type': 'application/json' }
+      });
     }
 
-    // Check password
-    const isPasswordValid = await user.comparePassword(password);
-    if (!isPasswordValid) {
-      return res.status(400).json({ message: 'Invalid email or password' });
+    // Verify password
+    const hashedPassword = await hashPassword(password);
+    if (hashedPassword !== user.password) {
+      return new Response(JSON.stringify({ message: 'Invalid credentials' }), {
+        status: 400,
+        headers: { 'Content-Type': 'application/json' }
+      });
     }
 
-    // Generate token
-    const token = generateToken(user.id);
+    const token = await generateToken(user.id);
 
-    res.json({
-      success: true,
-      message: 'Login successful',
+    return new Response(JSON.stringify({
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      role: user.role || 'user',
       token,
-      user: user.toJSON()
+    }), {
+      headers: { 'Content-Type': 'application/json' }
     });
   } catch (error) {
-    console.error('Login error:', error);
-    res.status(500).json({ message: 'Error logging in' });
+    return new Response(JSON.stringify({ message: error.message }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json' }
+    });
   }
 };
 
-// Get current user profile
-const getProfile = async (req, res) => {
+// @desc    Get user profile
+const getProfile = async (request, env) => {
   try {
-    const user = await User.findById(req.db, req.user.id);
+    const userId = request.userId; // Set by auth middleware
+    const db = getDB(env);
+
+    const user = await getRecord(db,
+      'SELECT id, name, email, phone, address, date_of_birth, gender, role, created_at FROM users WHERE id = ?',
+      [userId]
+    );
+
     if (!user) {
-      return res.status(404).json({ message: 'User not found' });
+      return new Response(JSON.stringify({ message: 'User not found' }), {
+        status: 404,
+        headers: { 'Content-Type': 'application/json' }
+      });
     }
 
-    res.json({
-      success: true,
-      user: user.toJSON()
+    return new Response(JSON.stringify(user), {
+      headers: { 'Content-Type': 'application/json' }
     });
   } catch (error) {
-    console.error('Get profile error:', error);
-    res.status(500).json({ message: 'Error fetching profile' });
+    return new Response(JSON.stringify({ message: error.message }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json' }
+    });
   }
 };
 
-// Update user profile
-const updateProfile = async (req, res) => {
+// @desc    Update user profile
+const updateProfile = async (request, env) => {
   try {
-    const { name, phone, address } = req.body;
-    const updateData = {};
+    const userId = request.userId; // Set by auth middleware
+    const { name, email, phone, address, dateOfBirth, gender } = await request.json();
+    const db = getDB(env);
 
-    if (name) updateData.name = name;
-    if (phone) updateData.phone = phone;
-    if (address) updateData.address = address;
+    await executeQuery(db,
+      'UPDATE users SET name = ?, email = ?, phone = ?, address = ?, date_of_birth = ?, gender = ?, updated_at = ? WHERE id = ?',
+      [name, email, phone, address, dateOfBirth, gender, new Date().toISOString(), userId]
+    );
 
-    const user = await User.findById(req.db, req.user.id);
+    const updatedUser = await getRecord(db,
+      'SELECT id, name, email, phone, address, date_of_birth, gender, role FROM users WHERE id = ?',
+      [userId]
+    );
+
+    return new Response(JSON.stringify(updatedUser), {
+      headers: { 'Content-Type': 'application/json' }
+    });
+  } catch (error) {
+    return new Response(JSON.stringify({ message: error.message }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json' }
+    });
+  }
+};
+
+// @desc    Change password
+const changePassword = async (request, env) => {
+  try {
+    const userId = request.userId; // Set by auth middleware
+    const { currentPassword, newPassword } = await request.json();
+    const db = getDB(env);
+
+    // Get current user
+    const user = await getRecord(db,
+      'SELECT password FROM users WHERE id = ?', [userId]
+    );
+
     if (!user) {
-      return res.status(404).json({ message: 'User not found' });
+      return new Response(JSON.stringify({ message: 'User not found' }), {
+        status: 404,
+        headers: { 'Content-Type': 'application/json' }
+      });
     }
 
-    await user.update(req.db, updateData);
+    // Verify current password
+    const hashedCurrentPassword = await hashPassword(currentPassword);
+    if (hashedCurrentPassword !== user.password) {
+      return new Response(JSON.stringify({ message: 'Current password is incorrect' }), {
+        status: 400,
+        headers: { 'Content-Type': 'application/json' }
+      });
+    }
 
-    res.json({
-      success: true,
-      message: 'Profile updated successfully'
+    // Hash new password and update
+    const hashedNewPassword = await hashPassword(newPassword);
+    await executeQuery(db,
+      'UPDATE users SET password = ?, updated_at = ? WHERE id = ?',
+      [hashedNewPassword, new Date().toISOString(), userId]
+    );
+
+    return new Response(JSON.stringify({ message: 'Password updated successfully' }), {
+      headers: { 'Content-Type': 'application/json' }
     });
   } catch (error) {
-    console.error('Update profile error:', error);
-    res.status(500).json({ message: 'Error updating profile' });
+    return new Response(JSON.stringify({ message: error.message }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json' }
+    });
   }
 };
 
-module.exports = {
+export {
   register,
   login,
   getProfile,
-  updateProfile
+  updateProfile,
+  changePassword,
 };

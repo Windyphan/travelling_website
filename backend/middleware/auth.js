@@ -1,54 +1,68 @@
-const jwt = require('jsonwebtoken');
-const User = require('../models/User');
-
-const auth = async (req, res, next) => {
+// JWT verification for Cloudflare Workers
+const verifyToken = async (token, secret = 'fallback_secret') => {
   try {
-    const token = req.header('Authorization')?.replace('Bearer ', '');
-    
-    if (!token) {
-      return res.status(401).json({ message: 'Access denied. No token provided.' });
+    const [headerEncoded, payloadEncoded, signatureEncoded] = token.split('.');
+
+    // Verify signature
+    const encoder = new TextEncoder();
+    const data = encoder.encode(`${headerEncoded}.${payloadEncoded}`);
+    const key = await crypto.subtle.importKey(
+      'raw',
+      encoder.encode(secret),
+      { name: 'HMAC', hash: 'SHA-256' },
+      false,
+      ['verify']
+    );
+
+    const signature = new Uint8Array(
+      Array.from(atob(signatureEncoded)).map(c => c.charCodeAt(0))
+    );
+
+    const isValid = await crypto.subtle.verify('HMAC', key, signature, data);
+
+    if (!isValid) {
+      throw new Error('Invalid token signature');
     }
 
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const user = await User.findById(decoded.id).select('-password');
-    
-    if (!user) {
-      return res.status(401).json({ message: 'Invalid token.' });
+    // Decode payload
+    const payload = JSON.parse(atob(payloadEncoded));
+
+    // Check expiration
+    if (payload.exp < Math.floor(Date.now() / 1000)) {
+      throw new Error('Token expired');
     }
 
-    req.user = user;
-    next();
+    return payload;
   } catch (error) {
-    res.status(401).json({ message: 'Invalid token.' });
+    throw new Error('Invalid token');
   }
 };
 
-const adminAuth = async (req, res, next) => {
+const auth = async (request) => {
   try {
-    await auth(req, res, () => {});
-    
-    if (req.user.role !== 'admin') {
-      return res.status(403).json({ message: 'Access denied. Admin privileges required.' });
+    const authHeader = request.headers.get('Authorization');
+
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return new Response(JSON.stringify({ message: 'No token, authorization denied' }), {
+        status: 401,
+        headers: { 'Content-Type': 'application/json' }
+      });
     }
-    
-    next();
+
+    const token = authHeader.replace('Bearer ', '');
+    const decoded = await verifyToken(token, process.env.JWT_SECRET);
+
+    // Add user ID to request object
+    request.userId = decoded.userId;
+
+    return null; // Success, continue to next handler
   } catch (error) {
-    res.status(401).json({ message: 'Authentication failed.' });
+    return new Response(JSON.stringify({ message: 'Token is not valid' }), {
+      status: 401,
+      headers: { 'Content-Type': 'application/json' }
+    });
   }
 };
 
-const editorAuth = async (req, res, next) => {
-  try {
-    await auth(req, res, () => {});
-    
-    if (!['admin', 'editor'].includes(req.user.role)) {
-      return res.status(403).json({ message: 'Access denied. Editor privileges required.' });
-    }
-    
-    next();
-  } catch (error) {
-    res.status(401).json({ message: 'Authentication failed.' });
-  }
-};
+export default auth;
 
-module.exports = { auth, adminAuth, editorAuth };
