@@ -93,7 +93,7 @@ const BlogEditor: React.FC = () => {
     handleSubmit,
     watch,
     setValue,
-    formState: { errors, isDirty },
+    formState: { errors },
     reset
   } = useForm<BlogForm>({
     resolver: yupResolver(blogSchema) as any,

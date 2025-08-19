@@ -139,7 +139,7 @@ const Blogs: React.FC = () => {
     limit: 12
   });
 
-  const { data: blogsData, isLoading, error } = useQuery({
+  const { data: blogsData, isLoading } = useQuery({
     queryKey: ['blogs', filters],
     queryFn: () => getBlogs(filters),
   });

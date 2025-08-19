@@ -1,5 +1,4 @@
 import React, { useState, useRef } from 'react';
-import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
 import { Icon, Icons } from '../components/common/Icons';
 
@@ -26,7 +25,6 @@ const Services: React.FC = () => {
   const [activeCategory, setActiveCategory] = useState<string>('all');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [searchTerm, setSearchTerm] = useState('');
-  const servicesRef = useRef<HTMLDivElement>(null);
 
   // Categories for services
   const categories = [
