@@ -143,14 +143,16 @@ const Contact: React.FC = () => {
               </h3>
               <div className="flex space-x-4">
                 <a
-                  href="#"
+                  href="mailto:info@travelcompany.com"
                   className="w-10 h-10 bg-primary-600 hover:bg-primary-700 rounded-lg flex items-center justify-center text-white transition-colors duration-200"
+                  aria-label="Send us an email"
                 >
                   <Icon icon={Icons.FiMail} className="w-5 h-5" />
                 </a>
                 <a
-                  href="#"
+                  href="tel:+15551234567"
                   className="w-10 h-10 bg-primary-600 hover:bg-primary-700 rounded-lg flex items-center justify-center text-white transition-colors duration-200"
+                  aria-label="Call us"
                 >
                   <Icon icon={Icons.FiPhone} className="w-5 h-5" />
                 </a>
