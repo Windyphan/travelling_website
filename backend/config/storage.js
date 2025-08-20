@@ -7,14 +7,14 @@ const r2Helpers = {
     try {
       const fileExtension = file.name.split('.').pop();
       const fileName = `${folder}/${uuidv4()}.${fileExtension}`;
-
+      
       await r2Bucket.put(fileName, file.stream(), {
         httpMetadata: {
           contentType: file.type,
           cacheControl: 'public, max-age=31536000', // 1 year
         },
       });
-
+      
       // Return the public URL (you'll need to configure a custom domain for R2)
       return `https://your-r2-domain.com/${fileName}`;
     } catch (error) {
@@ -29,7 +29,7 @@ const r2Helpers = {
       // Extract the key from the URL
       const urlParts = imageUrl.split('/');
       const key = urlParts.slice(-2).join('/'); // folder/filename
-
+      
       await r2Bucket.delete(key);
       return true;
     } catch (error) {
@@ -66,15 +66,15 @@ const r2Helpers = {
   validateImage(file) {
     const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
     const maxSize = 10 * 1024 * 1024; // 10MB
-
+    
     if (!allowedTypes.includes(file.type)) {
       throw new Error('Invalid file type. Only JPEG, PNG, and WebP are allowed.');
     }
-
+    
     if (file.size > maxSize) {
       throw new Error('File too large. Maximum size is 10MB.');
     }
-
+    
     return true;
   }
 };

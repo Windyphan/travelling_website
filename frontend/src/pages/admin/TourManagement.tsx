@@ -31,7 +31,12 @@ const TourManagement: React.FC = () => {
 
   const queryClient = useQueryClient();
 
-  // Fetch tours
+  // Get the correct API base URL for your setup
+  const getApiUrl = () => {
+    return process.env.REACT_APP_API_URL || 'https://your-backend-domain.vercel.app/api';
+  };
+
+  // Fetch tours with correct API URL
   const { data: toursData, isLoading } = useQuery({
     queryKey: ['admin-tours', searchTerm, filterStatus],
     queryFn: async () => {
@@ -39,9 +44,10 @@ const TourManagement: React.FC = () => {
       if (searchTerm) params.append('search', searchTerm);
       if (filterStatus !== 'all') params.append('status', filterStatus);
 
-      const response = await fetch(`/api/admin/tours?${params}`, {
+      const response = await fetch(`${getApiUrl()}/admin/tours?${params}`, {
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
+          'Authorization': `Bearer ${localStorage.getItem('token')}`,
+          'Content-Type': 'application/json'
         }
       });
       if (!response.ok) throw new Error('Failed to fetch tours');
@@ -49,10 +55,62 @@ const TourManagement: React.FC = () => {
     }
   });
 
-  // Delete tour mutation
+  // Create tour mutation
+  const createTourMutation = useMutation({
+    mutationFn: async (tourData: any) => {
+      const response = await fetch(`${getApiUrl()}/admin/tours`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(tourData)
+      });
+      if (!response.ok) {
+        const error = await response.text();
+        throw new Error(`Failed to create tour: ${error}`);
+      }
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin-tours'] });
+      toast.success('Tour created successfully');
+      setIsCreateModalOpen(false);
+    },
+    onError: (error: any) => {
+      toast.error(error.message || 'Failed to create tour');
+    }
+  });
+
+  // Update tour mutation
+  const updateTourMutation = useMutation({
+    mutationFn: async ({ id, data }: { id: string; data: any }) => {
+      const response = await fetch(`${getApiUrl()}/admin/tours/${id}`, {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+      });
+      if (!response.ok) throw new Error('Failed to update tour');
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin-tours'] });
+      toast.success('Tour updated successfully');
+      setIsEditModalOpen(false);
+      setSelectedTour(null);
+    },
+    onError: () => {
+      toast.error('Failed to update tour');
+    }
+  });
+
+  // Delete tour mutation with correct API URL
   const deleteTourMutation = useMutation({
     mutationFn: async (tourId: string) => {
-      const response = await fetch(`/api/admin/tours/${tourId}`, {
+      const response = await fetch(`${getApiUrl()}/admin/tours/${tourId}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
@@ -253,154 +311,80 @@ const TourManagement: React.FC = () => {
 
       {/* Create Tour Modal */}
       {isCreateModalOpen && (
-        <TourFormModal
+        <TourModal
           isOpen={isCreateModalOpen}
           onClose={() => setIsCreateModalOpen(false)}
-          onSuccess={() => {
-            setIsCreateModalOpen(false);
-            queryClient.invalidateQueries({ queryKey: ['admin-tours'] });
-          }}
+          onSubmit={(data) => createTourMutation.mutate(data)}
+          isLoading={createTourMutation.isPending}
+          title="Create New Tour"
         />
       )}
 
       {/* Edit Tour Modal */}
       {isEditModalOpen && selectedTour && (
-        <TourFormModal
+        <TourModal
           isOpen={isEditModalOpen}
           onClose={() => {
             setIsEditModalOpen(false);
             setSelectedTour(null);
           }}
-          tour={selectedTour}
-          onSuccess={() => {
-            setIsEditModalOpen(false);
-            setSelectedTour(null);
-            queryClient.invalidateQueries({ queryKey: ['admin-tours'] });
-          }}
+          onSubmit={(data) => updateTourMutation.mutate({ id: selectedTour.id, data })}
+          isLoading={updateTourMutation.isPending}
+          title="Edit Tour"
+          initialData={selectedTour}
         />
       )}
     </div>
   );
 };
 
-// Tour Form Modal Component
-interface TourFormModalProps {
+// Tour Modal Component
+interface TourModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSuccess: () => void;
-  tour?: Tour;
+  onSubmit: (data: any) => void;
+  isLoading: boolean;
+  title: string;
+  initialData?: Tour;
 }
 
-const TourFormModal: React.FC<TourFormModalProps> = ({ isOpen, onClose, onSuccess, tour }) => {
+const TourModal: React.FC<TourModalProps> = ({
+  isOpen,
+  onClose,
+  onSubmit,
+  isLoading,
+  title,
+  initialData
+}) => {
   const [formData, setFormData] = useState({
-    title: tour?.title || '',
-    description: tour?.description || '',
-    price: tour?.price || 0,
-    duration: tour?.duration || '',
-    location: tour?.location || '',
-    max_participants: tour?.max_participants || 1,
-    difficulty_level: tour?.difficulty_level || 'easy',
-    included: tour?.included || [],
-    excluded: tour?.excluded || [],
-    status: tour?.status || 'active'
-  });
-
-  const [images, setImages] = useState<FileList | null>(null);
-  const [includedItem, setIncludedItem] = useState('');
-  const [excludedItem, setExcludedItem] = useState('');
-
-  const createTourMutation = useMutation({
-    mutationFn: async (data: any) => {
-      const formDataToSend = new FormData();
-
-      // Add form fields
-      Object.keys(data).forEach(key => {
-        if (key === 'included' || key === 'excluded') {
-          formDataToSend.append(key, JSON.stringify(data[key]));
-        } else {
-          formDataToSend.append(key, data[key]);
-        }
-      });
-
-      // Add images
-      if (images) {
-        Array.from(images).forEach(image => {
-          formDataToSend.append('images', image);
-        });
-      }
-
-      const url = tour ? `/api/admin/tours/${tour.id}` : '/api/admin/tours';
-      const method = tour ? 'PUT' : 'POST';
-
-      const response = await fetch(url, {
-        method,
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        },
-        body: formDataToSend
-      });
-
-      if (!response.ok) throw new Error('Failed to save tour');
-      return response.json();
-    },
-    onSuccess: () => {
-      toast.success(tour ? 'Tour updated successfully' : 'Tour created successfully');
-      onSuccess();
-    },
-    onError: () => {
-      toast.error('Failed to save tour');
-    }
+    title: initialData?.title || '',
+    description: initialData?.description || '',
+    price: initialData?.price || 0,
+    duration: initialData?.duration || '',
+    location: initialData?.location || '',
+    max_participants: initialData?.max_participants || 1,
+    difficulty_level: initialData?.difficulty_level || 'easy',
+    image_url: initialData?.image_url || '',
+    images: initialData?.images || [],
+    itinerary: initialData?.itinerary || {},
+    included: initialData?.included || [],
+    excluded: initialData?.excluded || [],
+    status: initialData?.status || 'active'
   });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    createTourMutation.mutate(formData);
-  };
-
-  const addIncludedItem = () => {
-    if (includedItem.trim()) {
-      setFormData(prev => ({
-        ...prev,
-        included: [...prev.included, includedItem.trim()]
-      }));
-      setIncludedItem('');
-    }
-  };
-
-  const removeIncludedItem = (index: number) => {
-    setFormData(prev => ({
-      ...prev,
-      included: prev.included.filter((_, i) => i !== index)
-    }));
-  };
-
-  const addExcludedItem = () => {
-    if (excludedItem.trim()) {
-      setFormData(prev => ({
-        ...prev,
-        excluded: [...prev.excluded, excludedItem.trim()]
-      }));
-      setExcludedItem('');
-    }
-  };
-
-  const removeExcludedItem = (index: number) => {
-    setFormData(prev => ({
-      ...prev,
-      excluded: prev.excluded.filter((_, i) => i !== index)
-    }));
+    onSubmit(formData);
   };
 
   if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-      <div className="bg-white dark:bg-dark-800 rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+      <div className="bg-white dark:bg-dark-800 rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
         <div className="p-6">
-          <div className="flex items-center justify-between mb-6">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-              {tour ? 'Edit Tour' : 'Create New Tour'}
-            </h3>
+          <div className="flex justify-between items-center mb-6">
+            <h2 className="text-xl font-bold text-gray-900 dark:text-white">{title}</h2>
             <button
               onClick={onClose}
               className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
@@ -409,238 +393,150 @@ const TourFormModal: React.FC<TourFormModalProps> = ({ isOpen, onClose, onSucces
             </button>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Basic Information */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Tour Title
-                </label>
-                <input
-                  type="text"
-                  required
-                  value={formData.title}
-                  onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-dark-600 rounded-lg bg-white dark:bg-dark-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                />
-              </div>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                Title
+              </label>
+              <input
+                type="text"
+                value={formData.title}
+                onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                className="w-full px-3 py-2 border border-gray-300 dark:border-dark-600 rounded-lg bg-white dark:bg-dark-700 text-gray-900 dark:text-white"
+                required
+              />
+            </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Location
-                </label>
-                <input
-                  type="text"
-                  required
-                  value={formData.location}
-                  onChange={(e) => setFormData(prev => ({ ...prev, location: e.target.value }))}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-dark-600 rounded-lg bg-white dark:bg-dark-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                />
-              </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                Description
+              </label>
+              <textarea
+                value={formData.description}
+                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                rows={3}
+                className="w-full px-3 py-2 border border-gray-300 dark:border-dark-600 rounded-lg bg-white dark:bg-dark-700 text-gray-900 dark:text-white"
+                required
+              />
+            </div>
 
+            <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   Price ($)
                 </label>
                 <input
                   type="number"
-                  required
-                  min="0"
-                  step="0.01"
                   value={formData.price}
-                  onChange={(e) => setFormData(prev => ({ ...prev, price: parseFloat(e.target.value) }))}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-dark-600 rounded-lg bg-white dark:bg-dark-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  onChange={(e) => setFormData({ ...formData, price: Number(e.target.value) })}
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-dark-600 rounded-lg bg-white dark:bg-dark-700 text-gray-900 dark:text-white"
+                  required
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   Duration
                 </label>
                 <input
                   type="text"
-                  required
-                  placeholder="e.g., 5 days 4 nights"
                   value={formData.duration}
-                  onChange={(e) => setFormData(prev => ({ ...prev, duration: e.target.value }))}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-dark-600 rounded-lg bg-white dark:bg-dark-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  onChange={(e) => setFormData({ ...formData, duration: e.target.value })}
+                  placeholder="e.g., 5 days"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-dark-600 rounded-lg bg-white dark:bg-dark-700 text-gray-900 dark:text-white"
+                  required
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  Location
+                </label>
+                <input
+                  type="text"
+                  value={formData.location}
+                  onChange={(e) => setFormData({ ...formData, location: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-dark-600 rounded-lg bg-white dark:bg-dark-700 text-gray-900 dark:text-white"
+                  required
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   Max Participants
                 </label>
                 <input
                   type="number"
-                  required
-                  min="1"
                   value={formData.max_participants}
-                  onChange={(e) => setFormData(prev => ({ ...prev, max_participants: parseInt(e.target.value) }))}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-dark-600 rounded-lg bg-white dark:bg-dark-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  onChange={(e) => setFormData({ ...formData, max_participants: Number(e.target.value) })}
+                  min="1"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-dark-600 rounded-lg bg-white dark:bg-dark-700 text-gray-900 dark:text-white"
+                  required
                 />
               </div>
+            </div>
 
+            <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   Difficulty Level
                 </label>
                 <select
                   value={formData.difficulty_level}
-                  onChange={(e) => setFormData(prev => ({ ...prev, difficulty_level: e.target.value }))}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-dark-600 rounded-lg bg-white dark:bg-dark-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  onChange={(e) => setFormData({ ...formData, difficulty_level: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-dark-600 rounded-lg bg-white dark:bg-dark-700 text-gray-900 dark:text-white"
                 >
                   <option value="easy">Easy</option>
                   <option value="moderate">Moderate</option>
                   <option value="challenging">Challenging</option>
-                  <option value="extreme">Extreme</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  Status
+                </label>
+                <select
+                  value={formData.status}
+                  onChange={(e) => setFormData({ ...formData, status: e.target.value as 'active' | 'inactive' })}
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-dark-600 rounded-lg bg-white dark:bg-dark-700 text-gray-900 dark:text-white"
+                >
+                  <option value="active">Active</option>
+                  <option value="inactive">Inactive</option>
                 </select>
               </div>
             </div>
 
-            {/* Description */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Description
-              </label>
-              <textarea
-                required
-                rows={4}
-                value={formData.description}
-                onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-dark-600 rounded-lg bg-white dark:bg-dark-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-              />
-            </div>
-
-            {/* Images */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Tour Images
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                Image URL
               </label>
               <input
-                type="file"
-                multiple
-                accept="image/*"
-                onChange={(e) => setImages(e.target.files)}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-dark-600 rounded-lg bg-white dark:bg-dark-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                type="url"
+                value={formData.image_url}
+                onChange={(e) => setFormData({ ...formData, image_url: e.target.value })}
+                className="w-full px-3 py-2 border border-gray-300 dark:border-dark-600 rounded-lg bg-white dark:bg-dark-700 text-gray-900 dark:text-white"
+                placeholder="https://example.com/image.jpg"
               />
-              <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                Select multiple images for the tour gallery
-              </p>
             </div>
 
-            {/* Included Items */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                What's Included
-              </label>
-              <div className="flex gap-2 mb-2">
-                <input
-                  type="text"
-                  value={includedItem}
-                  onChange={(e) => setIncludedItem(e.target.value)}
-                  placeholder="Add included item"
-                  className="flex-1 px-3 py-2 border border-gray-300 dark:border-dark-600 rounded-lg bg-white dark:bg-dark-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                  onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addIncludedItem())}
-                />
-                <button
-                  type="button"
-                  onClick={addIncludedItem}
-                  className="bg-primary-600 hover:bg-primary-700 text-white px-4 py-2 rounded-lg"
-                >
-                  Add
-                </button>
-              </div>
-              <div className="flex flex-wrap gap-2">
-                {formData.included.map((item, index) => (
-                  <span
-                    key={index}
-                    className="bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-300 px-2 py-1 rounded-full text-sm flex items-center gap-1"
-                  >
-                    {item}
-                    <button
-                      type="button"
-                      onClick={() => removeIncludedItem(index)}
-                      className="text-green-600 hover:text-green-800 dark:text-green-400"
-                    >
-                      <Icon icon={Icons.FiX} className="w-3 h-3" />
-                    </button>
-                  </span>
-                ))}
-              </div>
-            </div>
-
-            {/* Excluded Items */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                What's Not Included
-              </label>
-              <div className="flex gap-2 mb-2">
-                <input
-                  type="text"
-                  value={excludedItem}
-                  onChange={(e) => setExcludedItem(e.target.value)}
-                  placeholder="Add excluded item"
-                  className="flex-1 px-3 py-2 border border-gray-300 dark:border-dark-600 rounded-lg bg-white dark:bg-dark-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                  onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addExcludedItem())}
-                />
-                <button
-                  type="button"
-                  onClick={addExcludedItem}
-                  className="bg-primary-600 hover:bg-primary-700 text-white px-4 py-2 rounded-lg"
-                >
-                  Add
-                </button>
-              </div>
-              <div className="flex flex-wrap gap-2">
-                {formData.excluded.map((item, index) => (
-                  <span
-                    key={index}
-                    className="bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-300 px-2 py-1 rounded-full text-sm flex items-center gap-1"
-                  >
-                    {item}
-                    <button
-                      type="button"
-                      onClick={() => removeExcludedItem(index)}
-                      className="text-red-600 hover:text-red-800 dark:text-red-400"
-                    >
-                      <Icon icon={Icons.FiX} className="w-3 h-3" />
-                    </button>
-                  </span>
-                ))}
-              </div>
-            </div>
-
-            {/* Status */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Status
-              </label>
-              <select
-                value={formData.status}
-                onChange={(e) => setFormData(prev => ({ ...prev, status: e.target.value as 'active' | 'inactive' }))}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-dark-600 rounded-lg bg-white dark:bg-dark-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-              >
-                <option value="active">Active</option>
-                <option value="inactive">Inactive</option>
-              </select>
-            </div>
-
-            {/* Form Actions */}
-            <div className="flex justify-end space-x-4 pt-6 border-t dark:border-dark-600">
+            <div className="flex justify-end space-x-3 pt-4">
               <button
                 type="button"
                 onClick={onClose}
-                className="px-4 py-2 text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-dark-700 rounded-lg hover:bg-gray-200 dark:hover:bg-dark-600 transition-colors duration-200"
+                className="px-4 py-2 text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-dark-600 rounded-lg hover:bg-gray-50 dark:hover:bg-dark-700"
               >
                 Cancel
               </button>
               <button
                 type="submit"
-                disabled={createTourMutation.isPending}
-                className="px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-lg font-medium transition-colors duration-200 disabled:opacity-50"
+                disabled={isLoading}
+                className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
               >
-                {createTourMutation.isPending ? 'Saving...' : (tour ? 'Update Tour' : 'Create Tour')}
+                {isLoading && <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>}
+                {initialData ? 'Update' : 'Create'} Tour
               </button>
             </div>
           </form>
