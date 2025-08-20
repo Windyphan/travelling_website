@@ -208,7 +208,18 @@ const BlogDetail: React.FC = () => {
         )}
 
         {/* Article Content */}
-        <div className="prose prose-lg dark:prose-invert max-w-none mb-12">
+        <div className="prose prose-lg dark:prose-invert max-w-none mb-12
+                       prose-headings:text-gray-900 dark:prose-headings:text-white
+                       prose-p:text-gray-700 dark:prose-p:text-gray-300
+                       prose-li:text-gray-700 dark:prose-li:text-gray-300
+                       prose-strong:text-gray-900 dark:prose-strong:text-white
+                       prose-a:text-primary-600 dark:prose-a:text-primary-400
+                       prose-blockquote:text-gray-700 dark:prose-blockquote:text-gray-300
+                       prose-blockquote:border-primary-500 dark:prose-blockquote:border-primary-400
+                       prose-code:text-gray-800 dark:prose-code:text-gray-200
+                       prose-pre:bg-gray-100 dark:prose-pre:bg-dark-800
+                       prose-th:text-gray-900 dark:prose-th:text-white
+                       prose-td:text-gray-700 dark:prose-td:text-gray-300">
           <div dangerouslySetInnerHTML={{ __html: blog.content }} />
         </div>
 
