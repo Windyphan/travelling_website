@@ -125,17 +125,17 @@ const BlogDetail: React.FC = () => {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-dark-900">
       {/* Breadcrumb */}
-      <nav className="bg-white dark:bg-dark-800 border-b dark:border-dark-700">
+      <nav className="bg-white dark:bg-dark-800 border-b dark:border-dark-700 pt-20 md:pt-24">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center space-x-2 text-sm">
             <Link to="/" className="text-gray-500 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400">
               Home
             </Link>
-            <Icon icon={Icons.FiChevronRight} className="w-4 h-4 text-gray-400" />
+            <Icon icon={Icons.FiChevronRight} className="w-4 h-4 text-gray-400 dark:text-gray-500" />
             <Link to="/blogs" className="text-gray-500 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400">
               Blog
             </Link>
-            <Icon icon={Icons.FiChevronRight} className="w-4 h-4 text-gray-400" />
+            <Icon icon={Icons.FiChevronRight} className="w-4 h-4 text-gray-400 dark:text-gray-500" />
             <span className="text-gray-900 dark:text-white font-medium truncate">
               {blog.title}
             </span>
