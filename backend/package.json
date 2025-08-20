@@ -38,6 +38,5 @@
     "cloudflare-d1",
     "cloudflare-r2"
   ],
-  "author": "Travel Company",
-  "license": "MIT"
+  "author": "Travel Company"
 }
