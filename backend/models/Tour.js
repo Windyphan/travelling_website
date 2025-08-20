@@ -18,6 +18,7 @@ class Tour {
     this.included = data.included ? (typeof data.included === 'string' ? JSON.parse(data.included) : data.included) : [];
     this.excluded = data.excluded ? (typeof data.excluded === 'string' ? JSON.parse(data.excluded) : data.excluded) : [];
     this.status = data.status || 'active';
+    this.featured = data.featured || false; // Add featured field
     this.created_at = data.created_at;
     this.updated_at = data.updated_at;
   }
@@ -38,19 +39,20 @@ class Tour {
       itinerary: JSON.stringify(this.itinerary),
       included: JSON.stringify(this.included),
       excluded: JSON.stringify(this.excluded),
-      status: this.status
+      status: this.status,
+      featured: this.featured // Add featured to save
     };
 
     const sql = `
-      INSERT INTO tours (id, title, description, price, duration, location, max_participants, difficulty_level, image_url, images, itinerary, included, excluded, status, created_at, updated_at)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))
+      INSERT INTO tours (id, title, description, price, duration, location, max_participants, difficulty_level, image_url, images, itinerary, included, excluded, status, featured, created_at, updated_at)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))
     `;
 
     const params = [
       tourData.id, tourData.title, tourData.description, tourData.price,
       tourData.duration, tourData.location, tourData.max_participants,
       tourData.difficulty_level, tourData.image_url, tourData.images,
-      tourData.itinerary, tourData.included, tourData.excluded, tourData.status
+      tourData.itinerary, tourData.included, tourData.excluded, tourData.status, tourData.featured
     ];
 
     return await run(sql, params);
@@ -166,14 +168,23 @@ class Tour {
     return await run('DELETE FROM tours WHERE id = ?', [this.id]);
   }
 
+  // Get featured tours for homepage
+  static async getFeatured(limit = 6) {
+    const sql = 'SELECT * FROM tours WHERE status = ? AND featured = ? ORDER BY created_at DESC LIMIT ?';
+    const tours = await all(sql, ['active', true, limit]);
+    return tours.map(tour => new Tour(tour));
+  }
+
   // Get tour stats
   static async getStats(db) {
     const totalTours = await get('SELECT COUNT(*) as count FROM tours WHERE status = ?', ['active']);
+    const featuredTours = await get('SELECT COUNT(*) as count FROM tours WHERE status = ? AND featured = ?', ['active', true]);
     const toursByLocation = await all('SELECT location, COUNT(*) as count FROM tours WHERE status = ? GROUP BY location', ['active']);
     const toursByDifficulty = await all('SELECT difficulty_level, COUNT(*) as count FROM tours WHERE status = ? GROUP BY difficulty_level', ['active']);
 
     return {
       total: totalTours.count,
+      featured: featuredTours.count,
       byLocation: toursByLocation,
       byDifficulty: toursByDifficulty
     };

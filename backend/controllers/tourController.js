@@ -19,6 +19,25 @@ const upload = multer({
   }
 });
 
+// Get featured tours for homepage
+const getFeaturedTours = async (req, res) => {
+  try {
+    const { limit = 6 } = req.query;
+    const featuredTours = await Tour.getFeatured(parseInt(limit));
+
+    res.json({
+      success: true,
+      data: featuredTours.map(tour => tour.toJSON())
+    });
+  } catch (error) {
+    console.error('Get featured tours error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error fetching featured tours'
+    });
+  }
+};
+
 // Get all tours with filtering and pagination
 const getTours = async (req, res) => {
   try {
@@ -72,29 +91,6 @@ const getTours = async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Error fetching tours'
-    });
-  }
-};
-
-// Get featured tours
-const getFeaturedTours = async (req, res) => {
-  try {
-    const { limit = 6 } = req.query;
-    const tours = await Tour.findAll({
-      limit: parseInt(limit),
-      offset: 0,
-      featured: true
-    });
-
-    res.json({
-      success: true,
-      data: tours.map(tour => tour.toJSON())
-    });
-  } catch (error) {
-    console.error('Get featured tours error:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Error fetching featured tours'
     });
   }
 };

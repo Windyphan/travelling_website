@@ -18,6 +18,7 @@ interface Tour {
   included: string[];
   excluded: string[];
   status: 'active' | 'inactive';
+  featured: boolean; // Add featured field
   created_at: string;
   updated_at: string;
 }
@@ -277,13 +278,20 @@ const TourManagement: React.FC = () => {
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                        tour.status === 'active'
-                          ? 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-300'
-                          : 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-300'
-                      }`}>
-                        {tour.status}
-                      </span>
+                      <div className="flex flex-col space-y-1">
+                        <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                          tour.status === 'active'
+                            ? 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-300'
+                            : 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-300'
+                        }`}>
+                          {tour.status}
+                        </span>
+                        {tour.featured && (
+                          <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-300">
+                            ⭐ Featured
+                          </span>
+                        )}
+                      </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                       <div className="flex items-center space-x-2">
@@ -369,7 +377,8 @@ const TourModal: React.FC<TourModalProps> = ({
     itinerary: initialData?.itinerary || {},
     included: initialData?.included || [],
     excluded: initialData?.excluded || [],
-    status: initialData?.status || 'active'
+    status: initialData?.status || 'active',
+    featured: initialData?.featured || false // Initialize featured field
   });
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -520,6 +529,19 @@ const TourModal: React.FC<TourModalProps> = ({
                 className="w-full px-3 py-2 border border-gray-300 dark:border-dark-600 rounded-lg bg-white dark:bg-dark-700 text-gray-900 dark:text-white"
                 placeholder="https://example.com/image.jpg"
               />
+            </div>
+
+            {/* Featured Tour Toggle */}
+            <div className="flex items-center">
+              <input
+                type="checkbox"
+                checked={formData.featured}
+                onChange={(e) => setFormData({ ...formData, featured: e.target.checked })}
+                className="h-4 w-4 text-primary-600 border-gray-300 rounded focus:ring-primary-500 dark:focus:ring-primary-400"
+              />
+              <label className="ml-3 block text-sm font-medium text-gray-700 dark:text-gray-300">
+                Featured Tour
+              </label>
             </div>
 
             <div className="flex justify-end space-x-3 pt-4">
