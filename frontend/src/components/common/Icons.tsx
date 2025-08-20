@@ -113,6 +113,7 @@ import {
     FiEdit3,
     FiPlay,
     FiBarChart,
+    FiSend,
 } from 'react-icons/fi';
 import { IconType } from 'react-icons';
 
@@ -245,6 +246,7 @@ export const Icons = {
     FiEdit3,
     FiPlay,
     FiBarChart,
+    FiSend,
 };
 
 export default Icons;
