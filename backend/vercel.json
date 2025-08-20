@@ -1,6 +1,5 @@
 {
   "version": 2,
-  "name": "travelling-website-backend",
   "builds": [
     {
       "src": "server.js",
@@ -9,16 +8,15 @@
   ],
   "routes": [
     {
-      "src": "/api/(.*)",
-      "dest": "/server.js"
-    },
-    {
       "src": "/(.*)",
       "dest": "/server.js"
     }
   ],
   "env": {
-    "NODE_ENV": "production"
+    "NODE_ENV": "production",
+    "CLOUDFLARE_API_TOKEN": "@cloudflare-api-token",
+    "CLOUDFLARE_ACCOUNT_ID": "@cloudflare-account-id",
+    "CLOUDFLARE_DATABASE_ID": "@cloudflare-database-id"
   },
   "functions": {
     "server.js": {
