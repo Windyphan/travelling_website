@@ -1,5 +1,5 @@
 const { v4: uuidv4 } = require('uuid');
-const { dbHelpers } = require('../config/database');
+const { query, get, all, run } = require('../config/database');
 const { r2Helpers } = require('../config/storage');
 
 class Tour {
@@ -41,7 +41,19 @@ class Tour {
       status: this.status
     };
 
-    return await dbHelpers.insert(db, 'tours', tourData);
+    const sql = `
+      INSERT INTO tours (id, title, description, price, duration, location, max_participants, difficulty_level, image_url, images, itinerary, included, excluded, status, created_at, updated_at)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))
+    `;
+
+    const params = [
+      tourData.id, tourData.title, tourData.description, tourData.price,
+      tourData.duration, tourData.location, tourData.max_participants,
+      tourData.difficulty_level, tourData.image_url, tourData.images,
+      tourData.itinerary, tourData.included, tourData.excluded, tourData.status
+    ];
+
+    return await run(sql, params);
   }
 
   // Update tour images using R2
@@ -77,13 +89,13 @@ class Tour {
   }
 
   // Find tour by ID
-  static async findById(db, id) {
-    const tours = await dbHelpers.query(db, 'SELECT * FROM tours WHERE id = ?', [id]);
-    return tours.length > 0 ? new Tour(tours[0]) : null;
+  static async findById(id) {
+    const tour = await get('SELECT * FROM tours WHERE id = ?', [id]);
+    return tour ? new Tour(tour) : null;
   }
 
   // Get all tours with pagination
-  static async findAll(db, options = {}) {
+  static async findAll(options = {}) {
     const { limit = 20, offset = 0, status = 'active', location, difficulty_level } = options;
 
     let sql = 'SELECT * FROM tours WHERE status = ?';
@@ -102,12 +114,12 @@ class Tour {
     sql += ' ORDER BY created_at DESC LIMIT ? OFFSET ?';
     params.push(limit, offset);
 
-    const tours = await dbHelpers.query(db, sql, params);
+    const tours = await all(sql, params);
     return tours.map(tour => new Tour(tour));
   }
 
   // Search tours
-  static async search(db, searchTerm) {
+  static async search(searchTerm) {
     const sql = `
       SELECT * FROM tours 
       WHERE status = 'active' 
@@ -115,7 +127,7 @@ class Tour {
       ORDER BY created_at DESC
     `;
     const searchPattern = `%${searchTerm}%`;
-    const tours = await dbHelpers.query(db, sql, [searchPattern, searchPattern, searchPattern]);
+    const tours = await all(sql, [searchPattern, searchPattern, searchPattern]);
     return tours.map(tour => new Tour(tour));
   }
 
@@ -135,7 +147,11 @@ class Tour {
       updateData.excluded = JSON.stringify(updateData.excluded);
     }
 
-    return await dbHelpers.update(db, 'tours', updateData, 'id = ?', [this.id]);
+    const fields = Object.keys(updateData).map(key => `${key} = ?`).join(', ');
+    const values = Object.values(updateData);
+    const sql = `UPDATE tours SET ${fields}, updated_at = datetime('now') WHERE id = ?`;
+
+    return await run(sql, [...values, this.id]);
   }
 
   // Delete tour
@@ -147,17 +163,17 @@ class Tour {
       }
     }
 
-    return await dbHelpers.delete(db, 'tours', 'id = ?', [this.id]);
+    return await run('DELETE FROM tours WHERE id = ?', [this.id]);
   }
 
   // Get tour stats
   static async getStats(db) {
-    const totalTours = await dbHelpers.query(db, 'SELECT COUNT(*) as count FROM tours WHERE status = ?', ['active']);
-    const toursByLocation = await dbHelpers.query(db, 'SELECT location, COUNT(*) as count FROM tours WHERE status = ? GROUP BY location', ['active']);
-    const toursByDifficulty = await dbHelpers.query(db, 'SELECT difficulty_level, COUNT(*) as count FROM tours WHERE status = ? GROUP BY difficulty_level', ['active']);
+    const totalTours = await get('SELECT COUNT(*) as count FROM tours WHERE status = ?', ['active']);
+    const toursByLocation = await all('SELECT location, COUNT(*) as count FROM tours WHERE status = ? GROUP BY location', ['active']);
+    const toursByDifficulty = await all('SELECT difficulty_level, COUNT(*) as count FROM tours WHERE status = ? GROUP BY difficulty_level', ['active']);
 
     return {
-      total: totalTours[0].count,
+      total: totalTours.count,
       byLocation: toursByLocation,
       byDifficulty: toursByDifficulty
     };

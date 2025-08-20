@@ -42,9 +42,9 @@ const getTours = async (req, res) => {
 
     let tours;
     if (search) {
-      tours = await Tour.search(req.db, search);
+      tours = await Tour.search(search);
     } else {
-      tours = await Tour.findAll(req.db, options);
+      tours = await Tour.findAll(options);
     }
 
     // Filter by price if specified
@@ -80,7 +80,7 @@ const getTours = async (req, res) => {
 const getFeaturedTours = async (req, res) => {
   try {
     const { limit = 6 } = req.query;
-    const tours = await Tour.findAll(req.db, {
+    const tours = await Tour.findAll({
       limit: parseInt(limit),
       offset: 0,
       featured: true
@@ -102,7 +102,7 @@ const getFeaturedTours = async (req, res) => {
 // Get single tour by ID
 const getTour = async (req, res) => {
   try {
-    const tour = await Tour.findById(req.db, req.params.id);
+    const tour = await Tour.findById(req.params.id);
 
     if (!tour) {
       return res.status(404).json({
@@ -129,7 +129,7 @@ const getTourBySlug = async (req, res) => {
   try {
     const { slug } = req.params;
     // Since we don't have slug column yet, treat the slug parameter as ID
-    const tour = await Tour.findById(req.db, slug);
+    const tour = await Tour.findById(slug);
 
     if (!tour) {
       return res.status(404).json({
