@@ -17,5 +17,10 @@
     "CLOUDFLARE_API_TOKEN": "@cloudflare_api_token",
     "CLOUDFLARE_ACCOUNT_ID": "@cloudflare_account_id",
     "CLOUDFLARE_DATABASE_ID": "@cloudflare_database_id"
+  },
+  "functions": {
+    "server.js": {
+      "maxDuration": 30
+    }
   }
 }
