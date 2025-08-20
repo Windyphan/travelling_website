@@ -45,8 +45,22 @@ class User {
 
   // Find user by email (admin only)
   static async findByEmail(email) {
-    const user = await get('SELECT * FROM users WHERE email = ? AND role = ?', [email.toLowerCase(), 'admin']);
-    return user ? new User(user) : null;
+    try {
+      console.log('🔍 Database query - Finding user by email:', email.toLowerCase());
+      const user = await get('SELECT * FROM users WHERE email = ? AND role = ?', [email.toLowerCase(), 'admin']);
+      console.log('🔍 Database result:', {
+        found: !!user,
+        userEmail: user?.email,
+        userRole: user?.role,
+        userId: user?.id,
+        passwordHashExists: !!user?.password,
+        passwordHashLength: user?.password?.length
+      });
+      return user ? new User(user) : null;
+    } catch (error) {
+      console.error('❌ Database error in findByEmail:', error);
+      return null;
+    }
   }
 
   // Find user by ID (admin only)
