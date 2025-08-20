@@ -72,14 +72,18 @@ const adminLogin = async (req, res) => {
     // Generate token
     const token = generateToken(admin.id, admin.role);
 
+    // Return response in ApiResponse format to match frontend expectations
     res.json({
       success: true,
-      token,
-      user: {
-        id: admin.id,
-        email: admin.email,
-        name: admin.name,
-        role: admin.role
+      message: 'Login successful',
+      data: {
+        token,
+        user: {
+          id: admin.id,
+          email: admin.email,
+          name: admin.name,
+          role: admin.role
+        }
       }
     });
   } catch (error) {

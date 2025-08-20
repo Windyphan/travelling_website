@@ -104,14 +104,21 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     dispatch({ type: 'LOGIN_START' });
     try {
       const response = await authAPI.adminLogin(email, password);
+
+      console.log('🔍 Frontend - Full response:', response.data);
+
+      // Backend now returns data in ApiResponse format: { success, message, data: { token, user } }
       const { token, user } = response.data.data;
-      
+
+      console.log('🔍 Frontend - Extracted:', { token: !!token, user: !!user });
+
       localStorage.setItem('adminToken', token);
       dispatch({
         type: 'LOGIN_SUCCESS',
         payload: { user, token },
       });
     } catch (error: any) {
+      console.error('🔍 Frontend - Login error:', error);
       dispatch({ type: 'LOGIN_FAILURE' });
       throw new Error(error.response?.data?.message || 'Login failed');
     }
