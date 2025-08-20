@@ -5,8 +5,8 @@ const getDB = () => {
   // For Vercel deployment accessing Cloudflare D1 via REST API
   if (process.env.CLOUDFLARE_ACCOUNT_ID && process.env.CLOUDFLARE_API_TOKEN && process.env.CLOUDFLARE_DATABASE_ID) {
     return {
-      prepare: (query) => ({
-        bind: (...params) => ({
+      prepare: (query) => {
+        const bindMethod = (...params) => ({
           all: async () => {
             try {
               const response = await fetch(`https://api.cloudflare.com/client/v4/accounts/${process.env.CLOUDFLARE_ACCOUNT_ID}/d1/database/${process.env.CLOUDFLARE_DATABASE_ID}/query`, {
@@ -45,8 +45,8 @@ const getDB = () => {
             }
           },
           first: async () => {
-            const result = await this.all();
-            return result.results?.[0] || null;
+            const allResult = await bindMethod(...params).all();
+            return allResult.results?.[0] || null;
           },
           run: async () => {
             try {
@@ -87,8 +87,9 @@ const getDB = () => {
               return { success: false, error: error.message };
             }
           }
-        })
-      })
+        });
+        return bindMethod(...[]);
+      }
     };
   }
 
