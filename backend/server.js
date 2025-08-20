@@ -16,7 +16,6 @@ const paymentRoutes = require('./routes/payments');
 const adminRoutes = require('./routes/admin');
 
 const app = express();
-const PORT = process.env.PORT || 5000;
 
 // Security middleware
 app.use(helmet());
@@ -107,11 +106,14 @@ app.use((error, req, res, next) => {
   });
 });
 
-// Start server
-app.listen(PORT, () => {
-  console.log(`🚀 Server running on port ${PORT}`);
-  console.log(`📱 Health check: http://localhost:${PORT}/health`);
-  console.log(`🌐 API base URL: http://localhost:${PORT}/api`);
-});
+// For local development
+if (process.env.NODE_ENV !== 'production') {
+  const PORT = process.env.PORT || 5000;
+  app.listen(PORT, () => {
+    console.log(`🚀 Server running on port ${PORT}`);
+    console.log(`📱 Health check: http://localhost:${PORT}/health`);
+    console.log(`🌐 API base URL: http://localhost:${PORT}/api`);
+  });
+}
 
 module.exports = app;
