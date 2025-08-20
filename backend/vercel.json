@@ -1,20 +1,5 @@
 {
   "version": 2,
-  "builds": [
-    {
-      "src": "server.js",
-      "use": "@vercel/node",
-      "config": {
-        "maxLambdaSize": "50mb"
-      }
-    }
-  ],
-  "routes": [
-    {
-      "src": "/(.*)",
-      "dest": "/server.js"
-    }
-  ],
   "env": {
     "NODE_ENV": "production",
     "CLOUDFLARE_API_TOKEN": "@CLOUDFLARE_API_TOKEN",
@@ -26,6 +11,10 @@
       "maxDuration": 30
     }
   },
-  "framework": null,
-  "outputDirectory": null
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/server.js"
+    }
+  ]
 }
