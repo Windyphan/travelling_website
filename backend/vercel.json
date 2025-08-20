@@ -22,5 +22,7 @@
     "server.js": {
       "maxDuration": 30
     }
-  }
+  },
+  "installCommand": "npm install",
+  "buildCommand": "echo 'No build needed for Node.js server'"
 }
