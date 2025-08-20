@@ -255,7 +255,7 @@ const Blogs: React.FC = () => {
                 {featuredBlogs.map((blog) => (
                   <Link
                     key={blog._id}
-                    to={`/blog/${blog.slug}`}
+                    to={`/blogs/${blog.slug}`}
                     className="group bg-white dark:bg-dark-800 rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300"
                   >
                     <div className="relative h-64 overflow-hidden">
@@ -325,7 +325,7 @@ const Blogs: React.FC = () => {
                 {regularBlogs.map((blog) => (
                   <Link
                     key={blog._id}
-                    to={`/blog/${blog.slug}`}
+                    to={`/blogs/${blog.slug}`}
                     className="group bg-white dark:bg-dark-800 rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300"
                   >
                     <div className="relative h-48 overflow-hidden">

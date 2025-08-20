@@ -14,6 +14,7 @@ import ServiceDetail from './pages/ServiceDetail';
 import ServiceBooking from './pages/ServiceBooking';
 import Blogs from './pages/Blogs';
 import BlogDetail from './pages/BlogDetail';
+import Contact from './pages/Contact'; // Add Contact import
 import Login from './pages/auth/Login';
 import AdminDashboard from './pages/admin/Dashboard';
 import BlogManagement from './pages/admin/BlogManagement';
@@ -46,8 +47,9 @@ function App() {
                   <Route path="/tours/:slug" element={<TourDetail />} />
                   <Route path="/services" element={<Services />} />
                   <Route path="/services/:serviceId" element={<ServiceDetail />} />
-                  <Route path="/blog" element={<Blogs />} />
+                  <Route path="/blogs" element={<Blogs />} /> {/* Add blogs alias route */}
                   <Route path="/blog/:slug" element={<BlogDetail />} />
+                  <Route path="/contact" element={<Contact />} /> {/* Add Contact route */}
                   <Route path="/login" element={<Login />} />
 
                   <Route path="/booking/:tourId" element={

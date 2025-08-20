@@ -114,7 +114,7 @@ const BlogDetail: React.FC = () => {
         <div className="text-center">
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Article Not Found</h1>
           <p className="text-gray-600 dark:text-gray-300 mb-8">The article you're looking for doesn't exist or has been removed.</p>
-          <Link to="/blog" className="btn-primary">
+          <Link to="/blogs" className="btn-primary">
             Back to Blog
           </Link>
         </div>
@@ -132,7 +132,7 @@ const BlogDetail: React.FC = () => {
               Home
             </Link>
             <Icon icon={Icons.FiChevronRight} className="w-4 h-4 text-gray-400" />
-            <Link to="/blog" className="text-gray-500 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400">
+            <Link to="/blogs" className="text-gray-500 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400">
               Blog
             </Link>
             <Icon icon={Icons.FiChevronRight} className="w-4 h-4 text-gray-400" />
@@ -268,7 +268,7 @@ const BlogDetail: React.FC = () => {
         {/* Related Articles CTA */}
         <div className="text-center">
           <Link
-            to="/blog"
+            to="/blogs"
             className="inline-flex items-center px-6 py-3 bg-primary-600 hover:bg-primary-700 text-white rounded-lg font-medium transition-colors duration-200"
           >
             <Icon icon={Icons.FiArrowLeft} className="w-4 h-4 mr-2" />
