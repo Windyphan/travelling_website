@@ -1,6 +1,6 @@
 const bcrypt = require('bcryptjs');
 const { v4: uuidv4 } = require('uuid');
-const { dbHelpers } = require('../config/database');
+const { query, get, all, run } = require('../config/database');
 
 class User {
   constructor(data) {
@@ -27,57 +27,59 @@ class User {
   }
 
   // Save admin user to database
-  async save(db) {
+  async save() {
     await this.hashPassword();
-    const userData = {
-      name: this.name,
-      email: this.email,
-      password: this.password,
-      phone: this.phone,
-      role: this.role,
-      created_at: this.created_at,
-      updated_at: this.updated_at
-    };
+    const sql = `
+      INSERT INTO users (id, name, email, password, phone, role, created_at, updated_at)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    `;
 
-    const result = await dbHelpers.insert(db, 'users', userData);
-    if (result && result.meta && result.meta.last_row_id) {
-      this.id = result.meta.last_row_id;
-    }
+    const params = [
+      this.id, this.name, this.email, this.password,
+      this.phone, this.role, this.created_at, this.updated_at
+    ];
+
+    const result = await run(sql, params);
     return result;
   }
 
   // Find user by email (admin only)
-  static async findByEmail(db, email) {
-    const users = await dbHelpers.query(db, 'SELECT * FROM users WHERE email = ? AND role = ?', [email.toLowerCase(), 'admin']);
-    return users.length > 0 ? new User(users[0]) : null;
+  static async findByEmail(email) {
+    const user = await get('SELECT * FROM users WHERE email = ? AND role = ?', [email.toLowerCase(), 'admin']);
+    return user ? new User(user) : null;
   }
 
   // Find user by ID (admin only)
-  static async findById(db, id) {
-    const users = await dbHelpers.query(db, 'SELECT * FROM users WHERE id = ? AND role = ?', [id, 'admin']);
-    return users.length > 0 ? new User(users[0]) : null;
+  static async findById(id) {
+    const user = await get('SELECT * FROM users WHERE id = ? AND role = ?', [id, 'admin']);
+    return user ? new User(user) : null;
   }
 
   // Get all admin users
-  static async findAll(db, options = {}) {
+  static async findAll(options = {}) {
     const { limit = 50, offset = 0 } = options;
     const sql = 'SELECT * FROM users WHERE role = ? ORDER BY created_at DESC LIMIT ? OFFSET ?';
-    const users = await dbHelpers.query(db, sql, ['admin', limit, offset]);
+    const users = await all(sql, ['admin', limit, offset]);
     return users.map(user => new User(user));
   }
 
   // Update admin user
-  async update(db, updateData) {
+  async update(updateData) {
     if (updateData.password) {
       updateData.password = await bcrypt.hash(updateData.password, 12);
     }
     updateData.updated_at = new Date().toISOString();
-    return await dbHelpers.update(db, 'users', updateData, 'id = ?', [this.id]);
+
+    const fields = Object.keys(updateData).map(key => `${key} = ?`).join(', ');
+    const values = Object.values(updateData);
+    const sql = `UPDATE users SET ${fields} WHERE id = ?`;
+
+    return await run(sql, [...values, this.id]);
   }
 
   // Delete admin user
-  async delete(db) {
-    return await dbHelpers.delete(db, 'users', 'id = ?', [this.id]);
+  async delete() {
+    return await run('DELETE FROM users WHERE id = ?', [this.id]);
   }
 
   // Convert to JSON (without password)

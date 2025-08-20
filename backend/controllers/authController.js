@@ -16,7 +16,7 @@ const adminLogin = async (req, res) => {
     const { email, password } = req.body;
 
     // Check if admin user exists
-    const admin = await User.findByEmail(req.db, email);
+    const admin = await User.findByEmail(email);
 
     if (!admin || admin.role !== 'admin') {
       return res.status(401).json({
