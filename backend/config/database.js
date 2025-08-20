@@ -5,8 +5,8 @@ const getDB = () => {
   // For Vercel deployment accessing Cloudflare D1 via REST API
   if (process.env.CLOUDFLARE_ACCOUNT_ID && process.env.CLOUDFLARE_API_TOKEN && process.env.CLOUDFLARE_DATABASE_ID) {
     return {
-      prepare: (query) => {
-        const bindMethod = (...params) => ({
+      prepare: (query) => ({
+        bind: (...params) => ({
           all: async () => {
             try {
               const response = await fetch(`https://api.cloudflare.com/client/v4/accounts/${process.env.CLOUDFLARE_ACCOUNT_ID}/d1/database/${process.env.CLOUDFLARE_DATABASE_ID}/query`, {
@@ -45,8 +45,38 @@ const getDB = () => {
             }
           },
           first: async () => {
-            const allResult = await bindMethod(...params).all();
-            return allResult.results?.[0] || null;
+            try {
+              const response = await fetch(`https://api.cloudflare.com/client/v4/accounts/${process.env.CLOUDFLARE_ACCOUNT_ID}/d1/database/${process.env.CLOUDFLARE_DATABASE_ID}/query`, {
+                method: 'POST',
+                headers: {
+                  'Authorization': `Bearer ${process.env.CLOUDFLARE_API_TOKEN}`,
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                  sql: query,
+                  params: params
+                })
+              });
+
+              if (!response.ok) {
+                const errorText = await response.text();
+                console.error('D1 API error response:', errorText);
+                throw new Error(`D1 API error: ${response.status} ${response.statusText}`);
+              }
+
+              const data = await response.json();
+
+              if (!data.success) {
+                console.error('D1 API returned error:', data.errors);
+                throw new Error(`D1 API error: ${data.errors?.[0]?.message || 'Unknown error'}`);
+              }
+
+              const results = data.result[0]?.results || [];
+              return results[0] || null;
+            } catch (error) {
+              console.error('D1 REST API error:', error);
+              return null;
+            }
           },
           run: async () => {
             try {
@@ -87,9 +117,8 @@ const getDB = () => {
               return { success: false, error: error.message };
             }
           }
-        });
-        return bindMethod(...[]);
-      }
+        })
+      })
     };
   }
 
