@@ -153,7 +153,8 @@ async function get(sql, params = []) {
   try {
     const db = getDB();
     const stmt = db.prepare(sql);
-    const result = await stmt.bind(...params).first();
+    const bound = stmt.bind(...params);
+    const result = await bound.first();
     return result;
   } catch (error) {
     console.error('Database get error:', error);
@@ -163,8 +164,16 @@ async function get(sql, params = []) {
 
 // Helper to get all rows
 async function all(sql, params = []) {
-  const result = await query(sql, params);
-  return result.success ? result.data : [];
+  try {
+    const db = getDB();
+    const stmt = db.prepare(sql);
+    const bound = stmt.bind(...params);
+    const result = await bound.all();
+    return result.results || [];
+  } catch (error) {
+    console.error('Database all error:', error);
+    return [];
+  }
 }
 
 // Helper to run insert/update/delete
@@ -172,7 +181,8 @@ async function run(sql, params = []) {
   try {
     const db = getDB();
     const stmt = db.prepare(sql);
-    const result = await stmt.bind(...params).run();
+    const bound = stmt.bind(...params);
+    const result = await bound.run();
 
     return {
       success: result.success,
