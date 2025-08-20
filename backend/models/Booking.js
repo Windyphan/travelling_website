@@ -7,26 +7,26 @@ class Booking {
     this.booking_number = data.booking_number || `BK${Date.now()}`;
     this.type = data.type; // 'tour' or 'service'
     this.item_id = data.item_id;
-
+    
     // Customer information (no user account needed)
     this.customer_name = data.customer_name;
     this.customer_email = data.customer_email;
     this.customer_phone = data.customer_phone;
-
+    
     // Booking details
     this.start_date = data.start_date;
     this.total_travelers = data.total_travelers;
     this.special_requests = data.special_requests;
-
+    
     // Pricing
     this.total_amount = data.total_amount;
     this.currency = data.currency || 'USD';
-
+    
     // Status and tracking
     this.status = data.status || 'pending';
     this.contacted_at = data.contacted_at;
     this.confirmed_at = data.confirmed_at;
-
+    
     // Timestamps
     this.created_at = data.created_at || new Date().toISOString();
     this.updated_at = data.updated_at || new Date().toISOString();

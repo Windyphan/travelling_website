@@ -20,7 +20,7 @@ class Review {
       rating: this.rating,
       comment: this.comment
     };
-
+    
     return await dbHelpers.insert(db, 'reviews', reviewData);
   }
 
@@ -33,13 +33,13 @@ class Review {
   // Find reviews by tour ID
   static async findByTourId(db, tourId, limit = 10, offset = 0) {
     const reviews = await dbHelpers.query(
-      db,
+      db, 
       `SELECT r.*, u.name as user_name 
        FROM reviews r 
        JOIN users u ON r.user_id = u.id 
        WHERE r.tour_id = ? 
        ORDER BY r.created_at DESC 
-       LIMIT ? OFFSET ?`,
+       LIMIT ? OFFSET ?`, 
       [tourId, limit, offset]
     );
     return reviews.map(review => new Review(review));
@@ -48,12 +48,12 @@ class Review {
   // Find reviews by user ID
   static async findByUserId(db, userId) {
     const reviews = await dbHelpers.query(
-      db,
+      db, 
       `SELECT r.*, t.title as tour_title 
        FROM reviews r 
        JOIN tours t ON r.tour_id = t.id 
        WHERE r.user_id = ? 
-       ORDER BY r.created_at DESC`,
+       ORDER BY r.created_at DESC`, 
       [userId]
     );
     return reviews.map(review => new Review(review));
@@ -62,13 +62,13 @@ class Review {
   // Get all reviews with pagination
   static async findAll(db, limit = 50, offset = 0) {
     const reviews = await dbHelpers.query(
-      db,
+      db, 
       `SELECT r.*, u.name as user_name, t.title as tour_title 
        FROM reviews r 
        JOIN users u ON r.user_id = u.id 
        JOIN tours t ON r.tour_id = t.id 
        ORDER BY r.created_at DESC 
-       LIMIT ? OFFSET ?`,
+       LIMIT ? OFFSET ?`, 
       [limit, offset]
     );
     return reviews.map(review => new Review(review));
@@ -77,8 +77,8 @@ class Review {
   // Get average rating for a tour
   static async getAverageRating(db, tourId) {
     const result = await dbHelpers.query(
-      db,
-      'SELECT AVG(rating) as average, COUNT(*) as count FROM reviews WHERE tour_id = ?',
+      db, 
+      'SELECT AVG(rating) as average, COUNT(*) as count FROM reviews WHERE tour_id = ?', 
       [tourId]
     );
     return {

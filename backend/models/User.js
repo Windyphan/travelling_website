@@ -1,10 +1,9 @@
 const bcrypt = require('bcryptjs');
-const { v4: uuidv4 } = require('uuid');
 const { query, get, all, run } = require('../config/database');
 
 class User {
   constructor(data) {
-    this.id = data.id || uuidv4();
+    this.id = data.id; // Use database auto-increment ID
     this.name = data.name;
     this.email = data.email?.toLowerCase();
     this.password = data.password;
@@ -30,16 +29,17 @@ class User {
   async save() {
     await this.hashPassword();
     const sql = `
-      INSERT INTO users (id, name, email, password, phone, role, created_at, updated_at)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+      INSERT INTO users (name, email, password, phone, role, created_at, updated_at)
+      VALUES (?, ?, ?, ?, ?, ?, ?)
     `;
 
     const params = [
-      this.id, this.name, this.email, this.password,
+      this.name, this.email, this.password,
       this.phone, this.role, this.created_at, this.updated_at
     ];
 
     const result = await run(sql, params);
+    this.id = result.meta.last_row_id; // Set the auto-generated ID
     return result;
   }
 

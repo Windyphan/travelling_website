@@ -105,7 +105,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     try {
       const response = await authAPI.adminLogin(email, password);
       const { token, user } = response.data.data;
-
+      
       localStorage.setItem('adminToken', token);
       dispatch({
         type: 'LOGIN_SUCCESS',

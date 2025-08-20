@@ -20,7 +20,7 @@ const createEmailTransporter = () => {
 const sendStaffNotification = async (booking, customerInfo, tourOrService) => {
   try {
     const transporter = createEmailTransporter();
-
+    
     const emailTemplate = `
       <h2>New Booking Received - ${tourOrService.title}</h2>
       <p>A new booking has been submitted through the website.</p>
@@ -60,7 +60,7 @@ const sendStaffNotification = async (booking, customerInfo, tourOrService) => {
 const sendCustomerConfirmation = async (booking, customerInfo, tourOrService) => {
   try {
     const transporter = createEmailTransporter();
-
+    
     const emailTemplate = `
       <h2>Booking Request Received - ${tourOrService.title}</h2>
       <p>Dear ${customerInfo.name},</p>

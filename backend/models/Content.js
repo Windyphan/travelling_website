@@ -24,7 +24,7 @@ class Content {
       image_url: this.image_url,
       status: this.status
     };
-
+    
     return await dbHelpers.insert(db, 'content', contentData);
   }
 
@@ -60,8 +60,8 @@ class Content {
   // Find content by type
   static async findByType(db, type, status = 'published') {
     const content = await dbHelpers.query(
-      db,
-      'SELECT * FROM content WHERE type = ? AND status = ? ORDER BY created_at DESC',
+      db, 
+      'SELECT * FROM content WHERE type = ? AND status = ? ORDER BY created_at DESC', 
       [type, status]
     );
     return content.map(item => new Content(item));
@@ -70,28 +70,28 @@ class Content {
   // Get all content with pagination
   static async findAll(db, options = {}) {
     const { limit = 20, offset = 0, status, type } = options;
-
+    
     let sql = 'SELECT * FROM content';
     const params = [];
     const conditions = [];
-
+    
     if (status) {
       conditions.push('status = ?');
       params.push(status);
     }
-
+    
     if (type) {
       conditions.push('type = ?');
       params.push(type);
     }
-
+    
     if (conditions.length > 0) {
       sql += ' WHERE ' + conditions.join(' AND ');
     }
-
+    
     sql += ' ORDER BY created_at DESC LIMIT ? OFFSET ?';
     params.push(limit, offset);
-
+    
     const content = await dbHelpers.query(db, sql, params);
     return content.map(item => new Content(item));
   }
@@ -107,7 +107,7 @@ class Content {
     if (this.image_url) {
       await r2Helpers.deleteImage(r2Bucket, this.image_url);
     }
-
+    
     return await dbHelpers.delete(db, 'content', 'id = ?', [this.id]);
   }
 }

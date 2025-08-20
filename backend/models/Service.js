@@ -40,7 +40,7 @@ class Service {
       featured: this.featured ? 1 : 0,
       status: this.status
     };
-
+    
     return await dbHelpers.insert(db, 'services', serviceData);
   }
 
@@ -81,29 +81,29 @@ class Service {
   // Get all services with filtering
   static async findAll(db, options = {}) {
     const { limit = 20, offset = 0, category, featured, status = 'active', search } = options;
-
+    
     let sql = 'SELECT * FROM services WHERE status = ?';
     const params = [status];
-
+    
     if (category && category !== 'all') {
       sql += ' AND category = ?';
       params.push(category);
     }
-
+    
     if (featured !== undefined) {
       sql += ' AND featured = ?';
       params.push(featured ? 1 : 0);
     }
-
+    
     if (search) {
       sql += ' AND (title LIKE ? OR subtitle LIKE ? OR description LIKE ?)';
       const searchPattern = `%${search}%`;
       params.push(searchPattern, searchPattern, searchPattern);
     }
-
+    
     sql += ' ORDER BY featured DESC, created_at DESC LIMIT ? OFFSET ?';
     params.push(limit, offset);
-
+    
     const services = await dbHelpers.query(db, sql, params);
     return services.map(service => new Service(service));
   }
@@ -111,8 +111,8 @@ class Service {
   // Get services by category
   static async findByCategory(db, category) {
     const services = await dbHelpers.query(
-      db,
-      'SELECT * FROM services WHERE category = ? AND status = ? ORDER BY featured DESC, created_at DESC',
+      db, 
+      'SELECT * FROM services WHERE category = ? AND status = ? ORDER BY featured DESC, created_at DESC', 
       [category, 'active']
     );
     return services.map(service => new Service(service));
@@ -121,8 +121,8 @@ class Service {
   // Get featured services
   static async getFeatured(db, limit = 6) {
     const services = await dbHelpers.query(
-      db,
-      'SELECT * FROM services WHERE featured = 1 AND status = ? ORDER BY created_at DESC LIMIT ?',
+      db, 
+      'SELECT * FROM services WHERE featured = 1 AND status = ? ORDER BY created_at DESC LIMIT ?', 
       ['active', limit]
     );
     return services.map(service => new Service(service));
@@ -162,7 +162,7 @@ class Service {
     if (updateData.featured !== undefined) {
       updateData.featured = updateData.featured ? 1 : 0;
     }
-
+    
     return await dbHelpers.update(db, 'services', updateData, 'id = ?', [this.id]);
   }
 
@@ -174,7 +174,7 @@ class Service {
         await r2Helpers.deleteImage(r2Bucket, imageUrl);
       }
     }
-
+    
     return await dbHelpers.delete(db, 'services', 'id = ?', [this.id]);
   }
 
@@ -183,7 +183,7 @@ class Service {
     const totalServices = await dbHelpers.query(db, 'SELECT COUNT(*) as count FROM services WHERE status = ?', ['active']);
     const servicesByCategory = await dbHelpers.query(db, 'SELECT category, COUNT(*) as count FROM services WHERE status = ? GROUP BY category', ['active']);
     const featuredServices = await dbHelpers.query(db, 'SELECT COUNT(*) as count FROM services WHERE featured = 1 AND status = ?', ['active']);
-
+    
     return {
       total: totalServices[0].count,
       byCategory: servicesByCategory,
