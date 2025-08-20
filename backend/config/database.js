@@ -1,4 +1,5 @@
 // Database configuration for Cloudflare D1 accessed from Vercel
+const fetch = require('node-fetch');
 
 const getDB = () => {
   // For Vercel deployment accessing Cloudflare D1 via REST API
