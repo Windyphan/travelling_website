@@ -243,12 +243,12 @@ const Home: React.FC = () => {
         </div>
       </section>
 
-      {/* Core Services Section */}
-      <section className="py-20 bg-gray-50 dark:bg-dark-900 transition-colors duration-200">
+      {/* Core Services Section - Make this WHITE in dark mode */}
+      <section className="py-20 bg-gray-50 dark:bg-white transition-colors duration-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">Our Core Services</h2>
-            <p className="text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
+            <h2 className="text-4xl font-bold text-gray-900 dark:text-gray-900 mb-4">Our Core Services</h2>
+            <p className="text-xl text-gray-600 dark:text-gray-600 max-w-2xl mx-auto">
               Comprehensive travel solutions to make your journey seamless and memorable
             </p>
           </div>
@@ -310,7 +310,7 @@ const Home: React.FC = () => {
                 ].map((service, index) => (
                   <div
                     key={index}
-                    className="flex-none w-80 bg-white dark:bg-dark-700 rounded-xl shadow-lg overflow-hidden border dark:border-dark-600 group hover:shadow-2xl transition-all duration-300"
+                    className="flex-none w-80 bg-white dark:bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200 dark:border-gray-300 group hover:shadow-2xl transition-all duration-300"
                   >
                     <div className="relative h-48 overflow-hidden">
                       <img
@@ -324,17 +324,17 @@ const Home: React.FC = () => {
                       </div>
                     </div>
                     <div className="p-6">
-                      <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
+                      <h3 className="text-xl font-bold text-gray-900 dark:text-gray-900 mb-2">
                         {service.title}
                       </h3>
-                      <p className="text-gray-600 dark:text-gray-300 text-sm mb-4 line-clamp-2">
+                      <p className="text-gray-600 dark:text-gray-600 text-sm mb-4 line-clamp-2">
                         {service.description}
                       </p>
                       <div className="flex flex-wrap gap-2 mb-4">
                         {service.features.map((feature, featureIndex) => (
                           <span
                             key={featureIndex}
-                            className="bg-blue-100 dark:bg-blue-900/20 text-blue-800 dark:text-blue-300 px-2 py-1 rounded-full text-xs"
+                            className="bg-blue-100 dark:bg-blue-100 text-blue-800 dark:text-blue-800 px-2 py-1 rounded-full text-xs"
                           >
                             {feature}
                           </span>
@@ -352,15 +352,15 @@ const Home: React.FC = () => {
             {/* Scroll buttons */}
             <button
               onClick={() => scrollLeft(coreServicesRef)}
-              className="absolute left-0 top-1/2 -translate-y-1/2 bg-white dark:bg-dark-700 shadow-lg rounded-full p-3 hover:bg-gray-50 dark:hover:bg-dark-600 transition-colors duration-200 z-10"
+              className="absolute left-0 top-1/2 -translate-y-1/2 bg-white dark:bg-gray-100 shadow-lg rounded-full p-3 hover:bg-gray-50 dark:hover:bg-gray-200 transition-colors duration-200 z-10 border border-gray-200 dark:border-gray-300"
             >
-              <Icon icon={Icons.FiChevronLeft} className="w-6 h-6 text-gray-600 dark:text-gray-300" />
+              <Icon icon={Icons.FiChevronLeft} className="w-6 h-6 text-gray-600 dark:text-gray-700" />
             </button>
             <button
               onClick={() => scrollRight(coreServicesRef)}
-              className="absolute right-0 top-1/2 -translate-y-1/2 bg-white dark:bg-dark-700 shadow-lg rounded-full p-3 hover:bg-gray-50 dark:hover:bg-dark-600 transition-colors duration-200 z-10"
+              className="absolute right-0 top-1/2 -translate-y-1/2 bg-white dark:bg-gray-100 shadow-lg rounded-full p-3 hover:bg-gray-50 dark:hover:bg-gray-200 transition-colors duration-200 z-10 border border-gray-200 dark:border-gray-300"
             >
-              <Icon icon={Icons.FiChevronRight} className="w-6 h-6 text-gray-600 dark:text-gray-300" />
+              <Icon icon={Icons.FiChevronRight} className="w-6 h-6 text-gray-600 dark:text-gray-700" />
             </button>
           </div>
         </div>
@@ -460,12 +460,12 @@ const Home: React.FC = () => {
         </div>
       </section>
 
-      {/* Car Rentals Section */}
-      <section className="py-20 bg-gray-50 dark:bg-dark-900 transition-colors duration-200">
+      {/* Car Rentals Section - Make this WHITE in dark mode too */}
+      <section className="py-20 bg-gray-50 dark:bg-white transition-colors duration-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">Car Rentals</h2>
-            <p className="text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
+            <h2 className="text-4xl font-bold text-gray-900 dark:text-gray-900 mb-4">Car Rentals</h2>
+            <p className="text-xl text-gray-600 dark:text-gray-600 max-w-2xl mx-auto">
               Choose from our premium fleet
             </p>
           </div>
@@ -474,23 +474,23 @@ const Home: React.FC = () => {
             <div className="overflow-x-auto scrollbar-hide" ref={carRentalsRef}>
               <div className="flex space-x-6 pb-4">
                 {carRentals.map((car, index) => (
-                  <div key={index} className="flex-none w-80 bg-white dark:bg-dark-700 rounded-xl shadow-lg overflow-hidden border dark:border-dark-600">
+                  <div key={index} className="flex-none w-80 bg-white dark:bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200 dark:border-gray-300">
                     <div className="relative h-48 overflow-hidden">
                       <img
                         src={car.image}
                         alt={car.name}
                         className="w-full h-full object-cover hover:scale-110 transition-transform duration-300"
                       />
-                      <div className="absolute top-4 right-4 bg-white dark:bg-dark-800 text-gray-900 dark:text-white px-3 py-1 rounded-full text-sm font-medium">
+                      <div className="absolute top-4 right-4 bg-white dark:bg-gray-100 text-gray-900 dark:text-gray-900 px-3 py-1 rounded-full text-sm font-medium border border-gray-200 dark:border-gray-300">
                         ${car.price}{car.priceUnit}
                       </div>
                     </div>
                     <div className="p-6">
-                      <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">{car.name}</h3>
-                      <p className="text-gray-600 dark:text-gray-300 text-sm mb-4">{car.description}</p>
+                      <h3 className="text-xl font-bold text-gray-900 dark:text-gray-900 mb-2">{car.name}</h3>
+                      <p className="text-gray-600 dark:text-gray-600 text-sm mb-4">{car.description}</p>
                       <div className="flex flex-wrap gap-2 mb-4">
                         {car.features.map((feature, featureIndex) => (
-                          <span key={featureIndex} className="bg-blue-100 dark:bg-blue-900/20 text-blue-800 dark:text-blue-300 px-2 py-1 rounded-full text-xs">
+                          <span key={featureIndex} className="bg-blue-100 dark:bg-blue-100 text-blue-800 dark:text-blue-800 px-2 py-1 rounded-full text-xs">
                             {feature}
                           </span>
                         ))}
@@ -510,15 +510,15 @@ const Home: React.FC = () => {
             {/* Scroll buttons */}
             <button
               onClick={() => scrollLeft(carRentalsRef)}
-              className="absolute left-0 top-1/2 -translate-y-1/2 bg-white dark:bg-dark-700 shadow-lg rounded-full p-3 hover:bg-gray-50 dark:hover:bg-dark-600 transition-colors duration-200"
+              className="absolute left-0 top-1/2 -translate-y-1/2 bg-white dark:bg-gray-100 shadow-lg rounded-full p-3 hover:bg-gray-50 dark:hover:bg-gray-200 transition-colors duration-200 border border-gray-200 dark:border-gray-300"
             >
-              <Icon icon={Icons.FiChevronLeft} className="w-6 h-6 text-gray-600 dark:text-gray-300" />
+              <Icon icon={Icons.FiChevronLeft} className="w-6 h-6 text-gray-600 dark:text-gray-700" />
             </button>
             <button
               onClick={() => scrollRight(carRentalsRef)}
-              className="absolute right-0 top-1/2 -translate-y-1/2 bg-white dark:bg-dark-700 shadow-lg rounded-full p-3 hover:bg-gray-50 dark:hover:bg-dark-600 transition-colors duration-200"
+              className="absolute right-0 top-1/2 -translate-y-1/2 bg-white dark:bg-gray-100 shadow-lg rounded-full p-3 hover:bg-gray-50 dark:hover:bg-gray-200 transition-colors duration-200 border border-gray-200 dark:border-gray-300"
             >
-              <Icon icon={Icons.FiChevronRight} className="w-6 h-6 text-gray-600 dark:text-gray-300" />
+              <Icon icon={Icons.FiChevronRight} className="w-6 h-6 text-gray-600 dark:text-gray-700" />
             </button>
           </div>
         </div>
