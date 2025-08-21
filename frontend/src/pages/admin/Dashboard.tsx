@@ -3,8 +3,10 @@ import { useQuery } from '@tanstack/react-query';
 import { Icon, Icons } from '../../components/common/Icons';
 import TourManagement from './TourManagement';
 import BlogManagement from './BlogManagement';
+import ServiceManagement from './ServiceManagement';
+import BookingManagement from './BookingManagement';
+import CustomerManagement from './CustomerManagement';
 
-// Add interfaces for dashboard data
 interface DashboardStats {
   totalBookings: number;
   totalTours: number;
@@ -13,85 +15,15 @@ interface DashboardStats {
   recentBookings: any[];
 }
 
-const AdminDashboard: React.FC = () => {
-  const [activeTab, setActiveTab] = useState('dashboard');
-
-  const tabs = [
-    { id: 'dashboard', name: 'Dashboard', icon: Icons.FiBarChart },
-    { id: 'tours', name: 'Tours', icon: Icons.FiMapPin },
-    { id: 'services', name: 'Services', icon: Icons.FiSettings },
-    { id: 'bookings', name: 'Bookings', icon: Icons.FiCalendar },
-    { id: 'users', name: 'Users', icon: Icons.FiUsers },
-    { id: 'content', name: 'Content', icon: Icons.FiEdit3 },
-  ];
-
-  const renderContent = () => {
-    switch (activeTab) {
-      case 'tours':
-        return <TourManagement />;
-      case 'services':
-        return <ServiceManagement />;
-      case 'bookings':
-        return <BookingManagement />;
-      case 'users':
-        return <UserManagement />;
-      case 'content':
-        return <BlogManagement />;
-      case 'dashboard':
-      default:
-        return <DashboardOverview onQuickAction={setActiveTab} />;
-    }
-  };
-
-  return (
-    <div className="min-h-screen bg-gray-50 dark:bg-dark-900 transition-colors duration-200">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Admin Dashboard</h1>
-          <p className="text-gray-600 dark:text-gray-400">Manage your travel business</p>
-        </div>
-
-        {/* Navigation Tabs */}
-        <div className="mb-8">
-          <div className="border-b border-gray-200 dark:border-dark-600">
-            <nav className="flex space-x-8">
-              {tabs.map((tab) => (
-                <button
-                  key={tab.id}
-                  onClick={() => setActiveTab(tab.id)}
-                  className={`flex items-center py-4 px-1 border-b-2 font-medium text-sm transition-colors duration-200 ${
-                    activeTab === tab.id
-                      ? 'border-primary-500 text-primary-600 dark:text-primary-400'
-                      : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-dark-500'
-                  }`}
-                >
-                  <Icon icon={tab.icon} className="w-5 h-5 mr-2" />
-                  {tab.name}
-                </button>
-              ))}
-            </nav>
-          </div>
-        </div>
-
-        {/* Content */}
-        {renderContent()}
-      </div>
-    </div>
-  );
-};
-
-// Dashboard Overview Component with live data
 interface DashboardOverviewProps {
   onQuickAction: (tab: string) => void;
 }
 
 const DashboardOverview: React.FC<DashboardOverviewProps> = ({ onQuickAction }) => {
-  // Get the correct API base URL for your setup
   const getApiUrl = () => {
     return process.env.REACT_APP_API_URL || 'https://your-backend-domain.vercel.app/api';
   };
 
-  // Fetch dashboard stats
   const { data: statsData, isLoading } = useQuery({
     queryKey: ['dashboard-stats'],
     queryFn: async () => {
@@ -104,7 +36,7 @@ const DashboardOverview: React.FC<DashboardOverviewProps> = ({ onQuickAction }) 
       if (!response.ok) throw new Error('Failed to fetch dashboard stats');
       return response.json();
     },
-    refetchInterval: 30000, // Refresh every 30 seconds
+    refetchInterval: 30000,
   });
 
   const stats: DashboardStats = statsData?.data || {
@@ -117,7 +49,6 @@ const DashboardOverview: React.FC<DashboardOverviewProps> = ({ onQuickAction }) 
 
   return (
     <div className="space-y-8">
-      {/* Quick Stats */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <div className="bg-white dark:bg-dark-800 rounded-lg shadow-lg p-6 border dark:border-dark-700">
           <div className="flex items-center">
@@ -176,7 +107,6 @@ const DashboardOverview: React.FC<DashboardOverviewProps> = ({ onQuickAction }) 
         </div>
       </div>
 
-      {/* Quick Actions */}
       <div className="bg-white dark:bg-dark-800 rounded-lg shadow-lg p-6 border dark:border-dark-700">
         <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Quick Actions</h3>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -197,11 +127,11 @@ const DashboardOverview: React.FC<DashboardOverviewProps> = ({ onQuickAction }) 
           </button>
 
           <button
-            onClick={() => onQuickAction('users')}
+            onClick={() => onQuickAction('customers')}
             className="flex items-center p-4 bg-purple-50 dark:bg-purple-900/20 rounded-lg hover:bg-purple-100 dark:hover:bg-purple-900/30 transition-colors duration-200"
           >
             <Icon icon={Icons.FiUsers} className="w-6 h-6 text-purple-600 dark:text-purple-400 mr-3" />
-            <span className="text-purple-900 dark:text-purple-300 font-medium">Manage Users</span>
+            <span className="text-purple-900 dark:text-purple-300 font-medium">View Customers</span>
           </button>
 
           <button
@@ -214,7 +144,6 @@ const DashboardOverview: React.FC<DashboardOverviewProps> = ({ onQuickAction }) 
         </div>
       </div>
 
-      {/* Recent Activity */}
       <div className="bg-white dark:bg-dark-800 rounded-lg shadow-lg p-6 border dark:border-dark-700">
         <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Recent Activity</h3>
         <div className="space-y-4">
@@ -250,29 +179,69 @@ const DashboardOverview: React.FC<DashboardOverviewProps> = ({ onQuickAction }) 
   );
 };
 
-// Placeholder components for missing tabs
-const ServiceManagement: React.FC = () => (
-  <div className="bg-white dark:bg-dark-800 rounded-lg shadow-sm border dark:border-dark-700 p-8 text-center">
-    <Icon icon={Icons.FiSettings} className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-    <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">Service Management</h3>
-    <p className="text-gray-600 dark:text-gray-400">Coming soon...</p>
-  </div>
-);
+const AdminDashboard: React.FC = () => {
+  const [activeTab, setActiveTab] = useState('dashboard');
 
-const BookingManagement: React.FC = () => (
-  <div className="bg-white dark:bg-dark-800 rounded-lg shadow-sm border dark:border-dark-700 p-8 text-center">
-    <Icon icon={Icons.FiCalendar} className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-    <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">Booking Management</h3>
-    <p className="text-gray-600 dark:text-gray-400">Coming soon...</p>
-  </div>
-);
+  const tabs = [
+    { id: 'dashboard', name: 'Dashboard', icon: Icons.FiBarChart },
+    { id: 'tours', name: 'Tours', icon: Icons.FiMapPin },
+    { id: 'services', name: 'Services', icon: Icons.FiSettings },
+    { id: 'bookings', name: 'Bookings', icon: Icons.FiCalendar },
+    { id: 'customers', name: 'Customers', icon: Icons.FiUsers },
+    { id: 'content', name: 'Content', icon: Icons.FiEdit3 },
+  ];
 
-const UserManagement: React.FC = () => (
-  <div className="bg-white dark:bg-dark-800 rounded-lg shadow-sm border dark:border-dark-700 p-8 text-center">
-    <Icon icon={Icons.FiUsers} className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-    <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">User Management</h3>
-    <p className="text-gray-600 dark:text-gray-400">Coming soon...</p>
-  </div>
-);
+  const renderContent = () => {
+    switch (activeTab) {
+      case 'tours':
+        return <TourManagement />;
+      case 'services':
+        return <ServiceManagement />;
+      case 'bookings':
+        return <BookingManagement />;
+      case 'customers':
+        return <CustomerManagement />;
+      case 'content':
+        return <BlogManagement />;
+      case 'dashboard':
+      default:
+        return <DashboardOverview onQuickAction={setActiveTab} />;
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-50 dark:bg-dark-900 transition-colors duration-200">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Admin Dashboard</h1>
+          <p className="text-gray-600 dark:text-gray-400">Manage your travel business</p>
+        </div>
+
+        <div className="mb-8">
+          <div className="border-b border-gray-200 dark:border-dark-600">
+            <nav className="flex space-x-8">
+              {tabs.map((tab) => (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id)}
+                  className={`flex items-center py-4 px-1 border-b-2 font-medium text-sm transition-colors duration-200 ${
+                    activeTab === tab.id
+                      ? 'border-primary-500 text-primary-600 dark:text-primary-400'
+                      : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-dark-500'
+                  }`}
+                >
+                  <Icon icon={tab.icon} className="w-5 h-5 mr-2" />
+                  {tab.name}
+                </button>
+              ))}
+            </nav>
+          </div>
+        </div>
+
+        {renderContent()}
+      </div>
+    </div>
+  );
+};
 
 export default AdminDashboard;

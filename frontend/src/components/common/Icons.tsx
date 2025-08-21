@@ -114,6 +114,8 @@ import {
     FiPlay,
     FiBarChart,
     FiSend,
+    FiPackage,
+    FiRepeat,
 } from 'react-icons/fi';
 import { IconType } from 'react-icons';
 
@@ -247,6 +249,8 @@ export const Icons = {
     FiPlay,
     FiBarChart,
     FiSend,
+    FiPackage,
+    FiRepeat,
 };
 
 export default Icons;
