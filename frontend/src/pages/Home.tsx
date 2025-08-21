@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { Icon, Icons } from '../components/common/Icons';
 import ServiceBookingModal from '../components/common/ServiceBookingModal';
 import { getFeaturedTours } from '../data/mockTours';
+import { carRentals } from '../data/carRentals';
 
 const Home: React.FC = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -11,7 +12,6 @@ const Home: React.FC = () => {
     item: { id: string; title: string; price: number; type: 'tour' | 'service' } | null;
   }>({ isOpen: false, item: null });
   const carRentalsRef = useRef<HTMLDivElement>(null);
-  const galleryRef = useRef<HTMLDivElement>(null);
   const coreServicesRef = useRef<HTMLDivElement>(null);
 
   // Scroll functions
@@ -57,18 +57,6 @@ const Home: React.FC = () => {
     });
   };
 
-  // Handle service booking from core services section
-  const handleServiceBooking = (service: any) => {
-    setBookingModal({
-      isOpen: true,
-      item: {
-        id: service.title.toLowerCase().replace(/\s+/g, '-'),
-        title: service.title,
-        price: 99, // Default service price
-        type: 'service',
-      },
-    });
-  };
 
   const closeBookingModal = () => {
     setBookingModal({ isOpen: false, item: null });
@@ -485,62 +473,7 @@ const Home: React.FC = () => {
           <div className="relative">
             <div className="overflow-x-auto scrollbar-hide" ref={carRentalsRef}>
               <div className="flex space-x-6 pb-4">
-                {[
-                  {
-                    id: 'luxury-sedan',
-                    name: 'Luxury Sedan',
-                    image: 'https://images.unsplash.com/photo-1549924231-f129b911e442?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80',
-                    price: 89,
-                    priceUnit: '/day',
-                    features: ['GPS', 'AC', 'Bluetooth'],
-                    description: 'Premium comfort for business trips and city tours',
-                  },
-                  {
-                    id: 'suv-premium',
-                    name: 'SUV Premium',
-                    image: 'https://images.unsplash.com/photo-1519641471654-76ce0107ad1b?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80',
-                    price: 129,
-                    priceUnit: '/day',
-                    features: ['4WD', 'GPS', 'Premium Audio'],
-                    description: 'Perfect for family adventures and mountain trips',
-                  },
-                  {
-                    id: 'convertible',
-                    name: 'Convertible',
-                    image: 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80',
-                    price: 159,
-                    priceUnit: '/day',
-                    features: ['Convertible', 'Sport Mode', 'Premium'],
-                    description: 'Experience the open road in style',
-                  },
-                  {
-                    id: 'electric-car',
-                    name: 'Electric Car',
-                    image: 'https://images.unsplash.com/photo-1560958089-b8a1929cea89?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80',
-                    price: 99,
-                    priceUnit: '/day',
-                    features: ['Electric', 'Eco-Friendly', 'Silent'],
-                    description: 'Eco-friendly option for conscious travelers',
-                  },
-                  {
-                    id: 'sports-car',
-                    name: 'Sports Car',
-                    image: 'https://images.unsplash.com/photo-1541443131876-44b03de101c5?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80',
-                    price: 299,
-                    priceUnit: '/day',
-                    features: ['High Performance', 'Luxury', 'Manual'],
-                    description: 'Ultimate driving experience for enthusiasts',
-                  },
-                  {
-                    id: 'family-van',
-                    name: 'Family Van',
-                    image: 'https://images.unsplash.com/photo-1449965408869-eaa3f722e40d?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80',
-                    price: 109,
-                    priceUnit: '/day',
-                    features: ['8 Seats', 'Family Friendly', 'Spacious'],
-                    description: 'Ideal for large families and group travels',
-                  },
-                ].map((car, index) => (
+                {carRentals.map((car, index) => (
                   <div key={index} className="flex-none w-80 bg-white dark:bg-dark-700 rounded-xl shadow-lg overflow-hidden border dark:border-dark-600">
                     <div className="relative h-48 overflow-hidden">
                       <img

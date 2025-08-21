@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Icon, Icons } from '../components/common/Icons';
+import { carRentals, CarRental } from '../data/carRentals';
 
 // Types for services
 interface ServiceItem {
@@ -34,6 +35,22 @@ const Services: React.FC = () => {
     { id: 'car-rental', name: 'Private Car Rental', icon: Icons.FiTruck },
     { id: 'other-services', name: 'Other Travel Services', icon: Icons.FiSettings }
   ];
+
+  // Convert car rentals to ServiceItem format and combine with other services
+  const carRentalServices: ServiceItem[] = carRentals.map(car => ({
+    id: car.id,
+    title: car.title,
+    subtitle: car.subtitle,
+    description: car.description,
+    images: car.images,
+    price: car.price,
+    duration: car.duration,
+    included: car.included,
+    excluded: car.excluded,
+    category: car.category,
+    serviceType: car.serviceType,
+    status: car.status
+  }));
 
   // Mock services data (in real app, this would come from your API)
   const mockServices: ServiceItem[] = [
@@ -110,26 +127,11 @@ const Services: React.FC = () => {
       featured: true,
       status: 'active'
     },
-    // Car Rental Services
-    {
-      id: '4',
-      title: 'Luxury Car Rental',
-      subtitle: 'Premium Vehicles for Your Journey',
-      description: 'Travel in style with our premium fleet of luxury vehicles, perfect for business trips or special occasions.',
-      images: [
-        'https://images.unsplash.com/photo-1549924231-f129b911e442?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'
-      ],
-      price: 150,
-      duration: 'Per day',
-      included: ['GPS Navigation', 'Insurance', '24/7 Support', 'Free delivery in city'],
-      excluded: ['Fuel', 'Driver (optional)', 'Parking fees'],
-      category: 'car-rental',
-      serviceType: 'car-rental',
-      status: 'active'
-    },
+    // Car Rental Services - now using shared data
+    ...carRentalServices,
     // Other Services
     {
-      id: '5',
+      id: '10',
       title: 'Visa Processing Service',
       subtitle: 'Hassle-free Visa Applications',
       description: 'Complete visa processing service for all destinations with expert guidance and fast processing.',
@@ -145,7 +147,7 @@ const Services: React.FC = () => {
       status: 'active'
     },
     {
-      id: '6',
+      id: '11',
       title: 'Hotel Booking Service',
       subtitle: 'Best Accommodation Worldwide',
       description: 'Book the best hotels worldwide with our exclusive rates and personalized recommendations.',
