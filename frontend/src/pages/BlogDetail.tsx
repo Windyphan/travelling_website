@@ -124,8 +124,8 @@ const BlogDetail: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-dark-900">
-      {/* Breadcrumb */}
-      <nav className="bg-white dark:bg-dark-800 border-b dark:border-dark-700 pt-20 md:pt-24">
+      {/* Breadcrumb - positioned below header */}
+      <nav className="bg-white dark:bg-dark-850 border-b dark:border-dark-700 pt-20 md:pt-24">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center space-x-2 text-sm">
             <Link to="/" className="text-gray-500 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400">
@@ -207,62 +207,47 @@ const BlogDetail: React.FC = () => {
           </div>
         )}
 
-        {/* Article Content */}
-        <div className="prose prose-lg dark:prose-invert max-w-none mb-12
-                       prose-headings:text-gray-900 dark:prose-headings:text-white
-                       prose-p:text-gray-700 dark:prose-p:text-gray-300
-                       prose-li:text-gray-700 dark:prose-li:text-gray-300
-                       prose-strong:text-gray-900 dark:prose-strong:text-white
-                       prose-a:text-primary-600 dark:prose-a:text-primary-400
-                       prose-blockquote:text-gray-700 dark:prose-blockquote:text-gray-300
-                       prose-blockquote:border-primary-500 dark:prose-blockquote:border-primary-400
-                       prose-code:text-gray-800 dark:prose-code:text-gray-200
-                       prose-pre:bg-gray-100 dark:prose-pre:bg-dark-800
-                       prose-th:text-gray-900 dark:prose-th:text-white
-                       prose-td:text-gray-700 dark:prose-td:text-gray-300">
-          <div dangerouslySetInnerHTML={{ __html: blog.content }} />
-        </div>
+        {/* Article Content with proper dark theme colors */}
+        <div
+          className="prose prose-lg prose-gray dark:prose-invert max-w-none
+            prose-headings:text-gray-900 dark:prose-headings:text-white
+            prose-p:text-gray-700 dark:prose-p:text-gray-300
+            prose-strong:text-gray-900 dark:prose-strong:text-white
+            prose-a:text-primary-600 dark:prose-a:text-primary-400
+            prose-ul:text-gray-700 dark:prose-ul:text-gray-300
+            prose-ol:text-gray-700 dark:prose-ol:text-gray-300
+            prose-li:text-gray-700 dark:prose-li:text-gray-300
+            prose-blockquote:text-gray-700 dark:prose-blockquote:text-gray-300
+            prose-code:text-gray-900 dark:prose-code:text-white
+            prose-pre:bg-gray-100 dark:prose-pre:bg-dark-800"
+          dangerouslySetInnerHTML={{ __html: blog.content }}
+        />
 
-        {/* Gallery */}
-        {blog.gallery && blog.gallery.length > 0 && (
-          <div className="mb-12">
-            <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Gallery</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {blog.gallery.map((image, index) => (
-                <img
-                  key={index}
-                  src={image}
-                  alt={`Gallery view ${index + 1}`}
-                  className="w-full h-64 object-cover rounded-lg shadow-md hover:shadow-lg transition-shadow"
-                />
+        {/* Tags */}
+        {blog.tags && blog.tags.length > 0 && (
+          <div className="mt-12 pt-8 border-t dark:border-dark-700">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Tags</h3>
+            <div className="flex flex-wrap gap-2">
+              {blog.tags.map((tag) => (
+                <span
+                  key={tag}
+                  className="bg-gray-100 dark:bg-dark-800 text-gray-700 dark:text-gray-300 px-3 py-1 rounded-full text-sm hover:bg-gray-200 dark:hover:bg-dark-700 transition-colors cursor-pointer"
+                >
+                  #{tag}
+                </span>
               ))}
             </div>
           </div>
         )}
 
-        {/* Tags */}
-        <div className="mb-12">
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Tags</h3>
-          <div className="flex flex-wrap gap-2">
-            {blog.tags.map((tag) => (
-              <span
-                key={tag}
-                className="bg-gray-100 dark:bg-dark-700 text-gray-700 dark:text-gray-300 px-3 py-1 rounded-full text-sm hover:bg-gray-200 dark:hover:bg-dark-600 transition-colors cursor-pointer"
-              >
-                #{tag}
-              </span>
-            ))}
-          </div>
-        </div>
-
         {/* Author Bio */}
-        {blog.authorProfile?.bio && (
-          <div className="bg-white dark:bg-dark-800 rounded-lg p-6 mb-12 shadow-lg">
-            <div className="flex items-start">
+        {blog.authorProfile && (
+          <div className="mt-12 p-6 bg-gray-100 dark:bg-dark-850 rounded-lg">
+            <div className="flex items-start space-x-4">
               <img
                 src={blog.authorProfile.avatar}
                 alt={blog.authorProfile.name}
-                className="w-16 h-16 rounded-full mr-4 flex-shrink-0"
+                className="w-16 h-16 rounded-full"
               />
               <div>
                 <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
@@ -276,14 +261,14 @@ const BlogDetail: React.FC = () => {
           </div>
         )}
 
-        {/* Related Articles CTA */}
-        <div className="text-center">
+        {/* Navigation */}
+        <div className="mt-12 pt-8 border-t dark:border-dark-700">
           <Link
             to="/blogs"
-            className="inline-flex items-center px-6 py-3 bg-primary-600 hover:bg-primary-700 text-white rounded-lg font-medium transition-colors duration-200"
+            className="inline-flex items-center text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 transition-colors"
           >
             <Icon icon={Icons.FiArrowLeft} className="w-4 h-4 mr-2" />
-            More Articles
+            Back to Blog
           </Link>
         </div>
       </article>

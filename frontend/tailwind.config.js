@@ -41,7 +41,9 @@ module.exports = {
           600: '#475569',
           700: '#334155',
           800: '#1e293b',
-          900: '#0f172a',
+          850: '#1a2332', // Mix of white and RGB(18, 41, 65)
+          900: '#122941', // RGB(18, 41, 65)
+          950: '#0f1f35', // Darker variant
         }
       },
       fontFamily: {
@@ -67,4 +69,3 @@ module.exports = {
   },
   plugins: [],
 }
-

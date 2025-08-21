@@ -1,12 +1,15 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
-import { toursAPI } from '../utils/api';
 import { Icon, Icons } from '../components/common/Icons';
-import { Tour } from '../types';
+import BookingModal from '../components/common/BookingModal';
+import { getFeaturedTours } from '../data/mockTours';
 
 const Home: React.FC = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
+  const [bookingModal, setBookingModal] = useState<{
+    isOpen: boolean;
+    item: { id: string; title: string; price: number; type: 'tour' | 'service' } | null;
+  }>({ isOpen: false, item: null });
   const carRentalsRef = useRef<HTMLDivElement>(null);
   const galleryRef = useRef<HTMLDivElement>(null);
   const coreServicesRef = useRef<HTMLDivElement>(null);
@@ -24,11 +27,26 @@ const Home: React.FC = () => {
     }
   };
 
-  // Fetch featured tours
-  const { data: featuredTours, isLoading: toursLoading } = useQuery({
-    queryKey: ['featuredTours'],
-    queryFn: () => toursAPI.getFeaturedTours(),
-  });
+  // Use mock data for featured tours
+  const featuredTours = getFeaturedTours();
+  const toursLoading = false;
+
+  // Handle booking modal
+  const handleBooking = (tour: any) => {
+    setBookingModal({
+      isOpen: true,
+      item: {
+        id: tour.id,
+        title: tour.title,
+        price: tour.price,
+        type: 'tour',
+      },
+    });
+  };
+
+  const closeBookingModal = () => {
+    setBookingModal({ isOpen: false, item: null });
+  };
 
   // Hero slides data with video support
   const heroSlides = [
@@ -152,14 +170,14 @@ const Home: React.FC = () => {
               <div
                 className="relative h-96 rounded-2xl overflow-hidden bg-cover bg-center"
                 style={{
-                  backgroundImage: `url('https://images.unsplash.com/photo-1441974231531-c6227db76b6e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80')`,
+                  backgroundImage: `url('https://static.wixstatic.com/media/8fa70e_ca95c635557f41c7b98ac645bb27d085~mv2.jpg/v1/fill/w_675,h_312,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/This%20was%20indeed%20one-of-a-kind%20experience.jpg%201x,%20https://static.wixstatic.com/media/8fa70e_ca95c635557f41c7b98ac645bb27d085~mv2.jpg/v1/fill/w_1350,h_624,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/This%20was%20indeed%20one-of-a-kind%20experience.jpg%202x')`,
                 }}
               >
                 <div className="absolute inset-0 bg-black/40"></div>
                 <div className="relative z-10 h-full flex items-center justify-center p-8">
                   <div className="text-center text-white">
                     <blockquote className="text-2xl md:text-3xl font-serif italic leading-relaxed mb-6">
-                      "We believe travel is not just about destinations, but about transforming perspectives and creating lifelong memories."
+                      "For over 15 years, Trang Thanh Travel has been a trusted companion, helping customers have smooth and memorable trips. From organizing tours, events, to renting private cars, making visas, or booking airline tickets, cruises, trains, hotels, we can take care of everything so that you have the most perfect experience."
                     </blockquote>
                     <div className="flex items-center justify-center">
                       <div className="w-12 h-px bg-white/60 mr-4"></div>
@@ -184,7 +202,7 @@ const Home: React.FC = () => {
               <div className="relative w-full h-64 md:h-80 rounded-xl overflow-hidden shadow-lg">
                 <iframe
                   className="w-full h-full"
-                  src="https://www.youtube.com/embed/dQw4w9WgXcQ?controls=1&modestbranding=1&rel=0"
+                  src="https://www.youtube.com/embed/8VJpaYXrPPQ?controls=1&modestbranding=1&rel=0"
                   title="About Our Travel Company"
                   frameBorder="0"
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
@@ -359,22 +377,27 @@ const Home: React.FC = () => {
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {featuredTours?.data?.data?.slice(0, 3).map((tour: Tour) => (
-                <div key={tour._id} className="bg-white dark:bg-dark-700 rounded-xl shadow-lg overflow-hidden group hover:shadow-2xl transition-all duration-300 border dark:border-dark-600">
+              {featuredTours?.slice(0, 3).map((tour) => (
+                <div key={tour.id} className="bg-white dark:bg-dark-850 rounded-xl shadow-lg overflow-hidden group hover:shadow-2xl transition-all duration-300 border dark:border-dark-600">
                   <div className="relative h-48 overflow-hidden">
                     <img
-                      src={tour.images?.[0]?.url || `https://images.unsplash.com/photo-1469474968028-56623f02e42e?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80`}
+                      src={tour.image_url || tour.images?.[0] || `https://images.unsplash.com/photo-1469474968028-56623f02e42e?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80`}
                       alt={tour.title}
                       className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
                     />
                     <div className="absolute top-4 right-4 bg-white dark:bg-dark-800 rounded-full px-3 py-1 text-sm font-medium text-primary-600 dark:text-primary-400">
-                      ${tour.pricing?.basePrice || 'N/A'}
+                      ${tour.price}
                     </div>
+                    {tour.featured && (
+                      <div className="absolute top-4 left-4 bg-yellow-500 text-white px-2 py-1 rounded text-xs font-medium">
+                        Featured
+                      </div>
+                    )}
                   </div>
                   <div className="p-6">
                     <div className="flex items-center text-sm text-gray-500 dark:text-gray-400 mb-2">
                       <Icon icon={Icons.FiMapPin} className="w-4 h-4 mr-1" />
-                      <span>{tour.destination}</span>
+                      <span>{tour.location}</span>
                     </div>
                     <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors duration-200">
                       {tour.title}
@@ -382,22 +405,22 @@ const Home: React.FC = () => {
                     <p className="text-gray-600 dark:text-gray-300 text-sm mb-4 line-clamp-2">
                       {tour.description}
                     </p>
-                    <div className="flex items-center justify-between">
+                    <div className="flex items-center justify-between mb-4">
                       <div className="flex items-center text-sm text-gray-500 dark:text-gray-400">
                         <Icon icon={Icons.FiClock} className="w-4 h-4 mr-1" />
-                        <span>{tour.duration.days}D/{tour.duration.nights}N</span>
+                        <span>{tour.duration}</span>
                       </div>
-                      <div className="flex items-center text-sm text-yellow-500">
-                        <Icon icon={Icons.FiStar} className="w-4 h-4 mr-1 fill-current" />
-                        <span>{tour.ratings.average.toFixed(1)} ({tour.ratings.count})</span>
+                      <div className="flex items-center text-sm text-gray-500 dark:text-gray-400">
+                        <Icon icon={Icons.FiUsers} className="w-4 h-4 mr-1" />
+                        <span>Max {tour.max_participants}</span>
                       </div>
                     </div>
-                    <Link
-                      to={`/tours/${tour.slug}`}
-                      className="mt-4 block w-full bg-primary-600 hover:bg-primary-700 text-white text-center py-2 rounded-lg font-medium transition-colors duration-200"
+                    <button
+                      onClick={() => handleBooking(tour)}
+                      className="w-full bg-primary-600 hover:bg-primary-700 text-white py-2 rounded-lg font-medium transition-colors duration-200"
                     >
-                      View Details
-                    </Link>
+                      Book Now
+                    </button>
                   </div>
                 </div>
               ))}
@@ -735,6 +758,13 @@ const Home: React.FC = () => {
           </div>
         </div>
       </section>
+
+      {/* Booking Modal */}
+      <BookingModal
+        isOpen={bookingModal.isOpen}
+        onClose={closeBookingModal}
+        item={bookingModal.item}
+      />
     </div>
   );
 };

@@ -49,7 +49,7 @@ const AdminLogin: React.FC = () => {
         <div className="flex justify-end">
           <button
             onClick={toggleTheme}
-            className="p-2 rounded-lg bg-white dark:bg-dark-800 border border-gray-300 dark:border-dark-600 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-dark-700 transition-colors duration-200"
+            className="p-2 rounded-lg bg-white dark:bg-dark-850 border border-gray-300 dark:border-dark-700 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-dark-800 transition-colors duration-200"
             aria-label="Toggle theme"
           >
             <Icon icon={isDarkMode ? Icons.FiSun : Icons.FiMoon} className="w-5 h-5" />
@@ -65,7 +65,7 @@ const AdminLogin: React.FC = () => {
           </p>
         </div>
 
-        <div className="bg-white dark:bg-dark-800 p-8 rounded-lg shadow-lg border dark:border-dark-700">
+        <div className="bg-white dark:bg-dark-850 p-8 rounded-lg shadow-lg border dark:border-dark-700">
           <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
             <div className="space-y-4">
               <div>
@@ -76,7 +76,7 @@ const AdminLogin: React.FC = () => {
                   {...register('email')}
                   type="email"
                   autoComplete="email"
-                  className="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 dark:border-dark-600 placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-white bg-white dark:bg-dark-700 rounded-md focus:outline-none focus:ring-primary-500 focus:border-primary-500 focus:z-10 sm:text-sm transition-colors duration-200"
+                  className="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 dark:border-dark-700 placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-white bg-white dark:bg-dark-800 rounded-md focus:outline-none focus:ring-primary-500 focus:border-primary-500 focus:z-10 sm:text-sm transition-colors duration-200"
                   placeholder="admin@example.com"
                 />
                 {errors.email && (
@@ -93,7 +93,7 @@ const AdminLogin: React.FC = () => {
                     {...register('password')}
                     type={showPassword ? 'text' : 'password'}
                     autoComplete="current-password"
-                    className="appearance-none relative block w-full px-3 py-2 pr-10 border border-gray-300 dark:border-dark-600 placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-white bg-white dark:bg-dark-700 rounded-md focus:outline-none focus:ring-primary-500 focus:border-primary-500 focus:z-10 sm:text-sm transition-colors duration-200"
+                    className="appearance-none relative block w-full px-3 py-2 pr-10 border border-gray-300 dark:border-dark-700 placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-white bg-white dark:bg-dark-800 rounded-md focus:outline-none focus:ring-primary-500 focus:border-primary-500 focus:z-10 sm:text-sm transition-colors duration-200"
                     placeholder="Password"
                   />
                   <button
@@ -114,7 +114,7 @@ const AdminLogin: React.FC = () => {
               <button
                 type="submit"
                 disabled={isSubmitting || state.isLoading}
-                className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 dark:focus:ring-offset-dark-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
+                className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 dark:focus:ring-offset-dark-850 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
               >
                 {isSubmitting || state.isLoading ? (
                   <Icon icon={Icons.FiLoader} className="animate-spin h-5 w-5" />

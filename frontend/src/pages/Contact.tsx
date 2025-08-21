@@ -52,116 +52,96 @@ const Contact: React.FC = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="text-center mb-16">
-          <h1 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-6">
+          <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
             Contact Us
           </h1>
-          <p className="text-xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto">
-            Have questions about our tours or services? We'd love to hear from you.
-            Send us a message and we'll respond as soon as possible.
+          <p className="text-lg text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
+            We'd love to hear from you. Send us a message and we'll respond as soon as possible.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
           {/* Contact Information */}
           <div className="space-y-8">
-            <div>
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-8">
+            <div className="bg-white dark:bg-dark-850 rounded-2xl shadow-xl p-8 border dark:border-dark-700">
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
                 Get in Touch
               </h2>
 
               <div className="space-y-6">
-                {/* Address */}
                 <div className="flex items-start space-x-4">
                   <div className="w-12 h-12 bg-primary-100 dark:bg-primary-900/20 rounded-lg flex items-center justify-center flex-shrink-0">
                     <Icon icon={Icons.FiMapPin} className="w-6 h-6 text-primary-600 dark:text-primary-400" />
                   </div>
                   <div>
-                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">
-                      Our Office
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                      Visit Our Office
                     </h3>
-                    <p className="text-gray-600 dark:text-gray-400">
+                    <p className="text-gray-600 dark:text-gray-300 mt-1">
                       123 Travel Street<br />
-                      Adventure City, AC 12345<br />
-                      United States
+                      Ho Chi Minh City, Vietnam<br />
+                      70000
                     </p>
                   </div>
                 </div>
 
-                {/* Phone */}
                 <div className="flex items-start space-x-4">
                   <div className="w-12 h-12 bg-primary-100 dark:bg-primary-900/20 rounded-lg flex items-center justify-center flex-shrink-0">
                     <Icon icon={Icons.FiPhone} className="w-6 h-6 text-primary-600 dark:text-primary-400" />
                   </div>
                   <div>
-                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">
-                      Phone
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                      Call Us
                     </h3>
-                    <p className="text-gray-600 dark:text-gray-400">
-                      +1 (555) 123-4567
+                    <p className="text-gray-600 dark:text-gray-300 mt-1">
+                      +84 123 456 789<br />
+                      Mon-Fri 9AM-6PM
                     </p>
                   </div>
                 </div>
 
-                {/* Email */}
                 <div className="flex items-start space-x-4">
                   <div className="w-12 h-12 bg-primary-100 dark:bg-primary-900/20 rounded-lg flex items-center justify-center flex-shrink-0">
                     <Icon icon={Icons.FiMail} className="w-6 h-6 text-primary-600 dark:text-primary-400" />
                   </div>
                   <div>
-                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">
-                      Email
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                      Email Us
                     </h3>
-                    <p className="text-gray-600 dark:text-gray-400">
-                      info@travelcompany.com
-                    </p>
-                  </div>
-                </div>
-
-                {/* Hours */}
-                <div className="flex items-start space-x-4">
-                  <div className="w-12 h-12 bg-primary-100 dark:bg-primary-900/20 rounded-lg flex items-center justify-center flex-shrink-0">
-                    <Icon icon={Icons.FiClock} className="w-6 h-6 text-primary-600 dark:text-primary-400" />
-                  </div>
-                  <div>
-                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">
-                      Business Hours
-                    </h3>
-                    <p className="text-gray-600 dark:text-gray-400">
-                      Monday - Friday: 9:00 AM - 6:00 PM<br />
-                      Saturday: 10:00 AM - 4:00 PM<br />
-                      Sunday: Closed
+                    <p className="text-gray-600 dark:text-gray-300 mt-1">
+                      info@travelcompany.com<br />
+                      support@travelcompany.com
                     </p>
                   </div>
                 </div>
               </div>
-            </div>
 
-            {/* Social Media */}
-            <div>
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-                Follow Us
-              </h3>
-              <div className="flex space-x-4">
-                <a
-                  href="mailto:info@travelcompany.com"
-                  className="w-10 h-10 bg-primary-600 hover:bg-primary-700 rounded-lg flex items-center justify-center text-white transition-colors duration-200"
-                  aria-label="Send us an email"
-                >
-                  <Icon icon={Icons.FiMail} className="w-5 h-5" />
-                </a>
-                <a
-                  href="tel:+15551234567"
-                  className="w-10 h-10 bg-primary-600 hover:bg-primary-700 rounded-lg flex items-center justify-center text-white transition-colors duration-200"
-                  aria-label="Call us"
-                >
-                  <Icon icon={Icons.FiPhone} className="w-5 h-5" />
-                </a>
+              <div className="mt-8 pt-8 border-t border-gray-200 dark:border-dark-600">
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+                  Follow Us
+                </h3>
+                <div className="flex space-x-4">
+                  <a
+                    href="mailto:info@travelcompany.com"
+                    className="w-10 h-10 bg-primary-600 hover:bg-primary-700 rounded-lg flex items-center justify-center text-white transition-colors duration-200"
+                    aria-label="Send us an email"
+                  >
+                    <Icon icon={Icons.FiMail} className="w-5 h-5" />
+                  </a>
+                  <a
+                    href="tel:+84123456789"
+                    className="w-10 h-10 bg-primary-600 hover:bg-primary-700 rounded-lg flex items-center justify-center text-white transition-colors duration-200"
+                    aria-label="Call us"
+                  >
+                    <Icon icon={Icons.FiPhone} className="w-5 h-5" />
+                  </a>
+                </div>
               </div>
             </div>
           </div>
 
           {/* Contact Form */}
-          <div className="bg-white dark:bg-dark-800 rounded-2xl shadow-xl p-8 border dark:border-dark-700">
+          <div className="bg-white dark:bg-dark-850 rounded-2xl shadow-xl p-8 border dark:border-dark-700">
             <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
               Send us a Message
             </h2>
@@ -170,12 +150,13 @@ const Contact: React.FC = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                   <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Name *
+                    Full Name
                   </label>
                   <input
                     {...register('name')}
                     type="text"
-                    className="w-full px-4 py-3 border border-gray-300 dark:border-dark-600 rounded-lg bg-white dark:bg-dark-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-colors duration-200"
+                    id="name"
+                    className="w-full px-4 py-3 border border-gray-300 dark:border-dark-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-dark-800 dark:text-white transition-colors duration-200"
                     placeholder="Your full name"
                   />
                   {errors.name && (
@@ -185,13 +166,14 @@ const Contact: React.FC = () => {
 
                 <div>
                   <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Email *
+                    Email Address
                   </label>
                   <input
                     {...register('email')}
                     type="email"
-                    className="w-full px-4 py-3 border border-gray-300 dark:border-dark-600 rounded-lg bg-white dark:bg-dark-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-colors duration-200"
-                    placeholder="your@email.com"
+                    id="email"
+                    className="w-full px-4 py-3 border border-gray-300 dark:border-dark-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-dark-800 dark:text-white transition-colors duration-200"
+                    placeholder="your.email@example.com"
                   />
                   {errors.email && (
                     <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.email.message}</p>
@@ -201,13 +183,14 @@ const Contact: React.FC = () => {
 
               <div>
                 <label htmlFor="subject" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Subject *
+                  Subject
                 </label>
                 <input
                   {...register('subject')}
                   type="text"
-                  className="w-full px-4 py-3 border border-gray-300 dark:border-dark-600 rounded-lg bg-white dark:bg-dark-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-colors duration-200"
-                  placeholder="What's this about?"
+                  id="subject"
+                  className="w-full px-4 py-3 border border-gray-300 dark:border-dark-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-dark-800 dark:text-white transition-colors duration-200"
+                  placeholder="What is your message about?"
                 />
                 {errors.subject && (
                   <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.subject.message}</p>
@@ -216,12 +199,13 @@ const Contact: React.FC = () => {
 
               <div>
                 <label htmlFor="message" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Message *
+                  Message
                 </label>
                 <textarea
                   {...register('message')}
+                  id="message"
                   rows={6}
-                  className="w-full px-4 py-3 border border-gray-300 dark:border-dark-600 rounded-lg bg-white dark:bg-dark-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-colors duration-200"
+                  className="w-full px-4 py-3 border border-gray-300 dark:border-dark-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-dark-800 dark:text-white resize-none transition-colors duration-200"
                   placeholder="Tell us more about your inquiry..."
                 />
                 {errors.message && (
@@ -232,17 +216,17 @@ const Contact: React.FC = () => {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full bg-primary-600 hover:bg-primary-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+                className="w-full bg-primary-600 hover:bg-primary-700 disabled:bg-primary-400 text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-200 flex items-center justify-center space-x-2"
               >
                 {isSubmitting ? (
                   <>
-                    <Icon icon={Icons.FiLoader} className="animate-spin w-5 h-5 mr-2" />
-                    Sending...
+                    <Icon icon={Icons.FiLoader} className="w-5 h-5 animate-spin" />
+                    <span>Sending...</span>
                   </>
                 ) : (
                   <>
-                    <Icon icon={Icons.FiSend} className="w-5 h-5 mr-2" />
-                    Send Message
+                    <Icon icon={Icons.FiSend} className="w-5 h-5" />
+                    <span>Send Message</span>
                   </>
                 )}
               </button>
