@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Icon, Icons } from '../components/common/Icons';
-import { carRentals, CarRental } from '../data/carRentals';
+import { carRentals } from '../data/carRentals';
 
 // Types for services
 interface ServiceItem {

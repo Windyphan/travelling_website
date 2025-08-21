@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
@@ -111,7 +111,7 @@ const ServiceBookingModal: React.FC<ServiceBookingModalProps> = ({ isOpen, onClo
   };
 
   // Get default values based on service type
-  const getDefaultValues = (): any => {
+  const getDefaultValues = useCallback((): any => {
     const baseDefaults = {
       name: '',
       email: '',
@@ -154,7 +154,7 @@ const ServiceBookingModal: React.FC<ServiceBookingModalProps> = ({ isOpen, onClo
       default:
         return baseDefaults;
     }
-  };
+  }, [serviceType, item?.id]);
 
   const form = useForm<ServiceBookingFormData>({
     resolver: yupResolver(getSchema() as any),
@@ -173,7 +173,7 @@ const ServiceBookingModal: React.FC<ServiceBookingModalProps> = ({ isOpen, onClo
   // Reset form when service type changes
   useEffect(() => {
     reset(getDefaultValues());
-  }, [serviceType, reset]);
+  }, [serviceType, reset, getDefaultValues]);
 
   const watchedPassengers = watch('passengers');
   const watchedReturnTrip = watch('returnTrip');
