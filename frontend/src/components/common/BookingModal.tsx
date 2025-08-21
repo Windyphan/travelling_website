@@ -1,27 +1,27 @@
-import React, { useState } from 'react';
-import { useForm } from 'react-hook-form';
+import React, { useState, useEffect } from 'react';
+import { useForm, SubmitHandler } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
-import { Icon, Icons } from '../common/Icons';
+import { Icon, Icons } from './Icons';
+import { TourBookingForm } from '../../types';
 import toast from 'react-hot-toast';
 
-const schema = yup.object({
+// Create a schema that matches TourBookingForm exactly
+const bookingSchema = yup.object({
   name: yup.string().required('Name is required'),
   email: yup.string().email('Invalid email').required('Email is required'),
   phone: yup.string().required('Phone number is required'),
-  participants: yup.number().min(1, 'At least 1 participant').required('Number of participants is required'),
-  preferredDate: yup.string().required('Preferred date is required'),
-  specialRequests: yup.string(),
-});
-
-interface BookingFormData {
-  name: string;
-  email: string;
-  phone: string;
-  participants: number;
-  preferredDate: string;
-  specialRequests?: string;
-}
+  gender: yup.mixed<'male' | 'female' | 'other'>().oneOf(['male', 'female', 'other'], 'Please select a gender').required('Gender is required'),
+  dateOfBirth: yup.string().optional(),
+  address: yup.string().optional(),
+  serviceId: yup.string().required('Service ID is required'),
+  serviceType: yup.mixed<'tours'>().oneOf(['tours']).required(),
+  passengers: yup.object({
+    adults: yup.number().required('Adults is required').min(1, 'At least 1 adult is required'),
+    children: yup.number().required('Children is required').min(0),
+  }).required(),
+  departureDate: yup.string().required('Departure date is required'),
+}) as yup.ObjectSchema<TourBookingForm>;
 
 interface BookingModalProps {
   isOpen: boolean;
@@ -37,20 +37,41 @@ interface BookingModalProps {
 const BookingModal: React.FC<BookingModalProps> = ({ isOpen, onClose, item }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-    reset,
-  } = useForm<BookingFormData>({
-    resolver: yupResolver(schema),
+  const form = useForm<TourBookingForm>({
+    resolver: yupResolver(bookingSchema),
+    defaultValues: {
+      name: '',
+      email: '',
+      phone: '',
+      gender: 'male',
+      dateOfBirth: '',
+      address: '',
+      serviceId: item?.id || '',
+      serviceType: 'tours',
+      passengers: {
+        adults: 1,
+        children: 0,
+      },
+      departureDate: '',
+    },
   });
 
-  const onSubmit = async (data: BookingFormData) => {
+  const { register, handleSubmit, formState: { errors }, reset, watch, setValue } = form;
+
+  // Update serviceId when item changes
+  useEffect(() => {
+    if (item?.id) {
+      setValue('serviceId', item.id);
+    }
+  }, [item?.id, setValue]);
+
+  const watchedPassengers = watch('passengers');
+  const totalPassengers = (watchedPassengers?.adults || 1) + (watchedPassengers?.children || 0);
+
+  const handleFormSubmit: SubmitHandler<TourBookingForm> = async (data: TourBookingForm) => {
     setIsSubmitting(true);
     try {
-      // Here you would typically send the booking data to your backend
-      // For now, we'll just simulate a successful booking
+      console.log('Booking data:', data);
       await new Promise(resolve => setTimeout(resolve, 1500));
 
       toast.success('Booking request submitted successfully! We\'ll contact you soon to confirm.');
@@ -65,7 +86,7 @@ const BookingModal: React.FC<BookingModalProps> = ({ isOpen, onClose, item }) =>
 
   if (!isOpen || !item) return null;
 
-  const totalPrice = item.price * (1); // You can multiply by participants if needed
+  const totalPrice = item.price * totalPassengers;
 
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto">
@@ -77,7 +98,7 @@ const BookingModal: React.FC<BookingModalProps> = ({ isOpen, onClose, item }) =>
         ></div>
 
         {/* Modal */}
-        <div className="inline-block w-full max-w-2xl my-8 overflow-hidden text-left align-middle transition-all transform bg-white dark:bg-dark-850 shadow-xl rounded-2xl">
+        <div className="inline-block w-full max-w-3xl my-8 overflow-hidden text-left align-middle transition-all transform bg-white dark:bg-dark-850 shadow-xl rounded-2xl">
           {/* Header */}
           <div className="flex items-center justify-between p-6 border-b dark:border-dark-700">
             <div>
@@ -97,106 +118,171 @@ const BookingModal: React.FC<BookingModalProps> = ({ isOpen, onClose, item }) =>
           </div>
 
           {/* Form */}
-          <form onSubmit={handleSubmit(onSubmit)} className="p-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Full Name *
-                </label>
-                <input
-                  {...register('name')}
-                  type="text"
-                  id="name"
-                  className="w-full px-4 py-3 border border-gray-300 dark:border-dark-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-dark-800 dark:text-white transition-colors duration-200"
-                  placeholder="Your full name"
-                />
-                {errors.name && (
-                  <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.name.message}</p>
-                )}
-              </div>
+          <form onSubmit={handleSubmit(handleFormSubmit)} className="p-6">
+            {/* Hidden fields */}
+            <input type="hidden" {...register('serviceId')} />
+            <input type="hidden" {...register('serviceType')} />
 
-              <div>
-                <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Email Address *
-                </label>
-                <input
-                  {...register('email')}
-                  type="email"
-                  id="email"
-                  className="w-full px-4 py-3 border border-gray-300 dark:border-dark-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-dark-800 dark:text-white transition-colors duration-200"
-                  placeholder="your.email@example.com"
-                />
-                {errors.email && (
-                  <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.email.message}</p>
-                )}
-              </div>
+            {/* Personal Information */}
+            <div className="mb-8">
+              <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Personal Information</h4>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Full Name *
+                  </label>
+                  <input
+                    {...register('name')}
+                    type="text"
+                    id="name"
+                    className="w-full px-4 py-3 border border-gray-300 dark:border-dark-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-dark-800 dark:text-white transition-colors duration-200"
+                    placeholder="Your full name"
+                  />
+                  {errors.name && (
+                    <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.name.message}</p>
+                  )}
+                </div>
 
-              <div>
-                <label htmlFor="phone" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Phone Number *
-                </label>
-                <input
-                  {...register('phone')}
-                  type="tel"
-                  id="phone"
-                  className="w-full px-4 py-3 border border-gray-300 dark:border-dark-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-dark-800 dark:text-white transition-colors duration-200"
-                  placeholder="+84 123 456 789"
-                />
-                {errors.phone && (
-                  <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.phone.message}</p>
-                )}
-              </div>
+                <div>
+                  <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Email Address *
+                  </label>
+                  <input
+                    {...register('email')}
+                    type="email"
+                    id="email"
+                    className="w-full px-4 py-3 border border-gray-300 dark:border-dark-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-dark-800 dark:text-white transition-colors duration-200"
+                    placeholder="your.email@example.com"
+                  />
+                  {errors.email && (
+                    <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.email.message}</p>
+                  )}
+                </div>
 
-              <div>
-                <label htmlFor="participants" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Number of Participants *
-                </label>
-                <input
-                  {...register('participants')}
-                  type="number"
-                  id="participants"
-                  min="1"
-                  className="w-full px-4 py-3 border border-gray-300 dark:border-dark-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-dark-800 dark:text-white transition-colors duration-200"
-                  placeholder="1"
-                />
-                {errors.participants && (
-                  <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.participants.message}</p>
-                )}
-              </div>
+                <div>
+                  <label htmlFor="phone" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Phone Number *
+                  </label>
+                  <input
+                    {...register('phone')}
+                    type="tel"
+                    id="phone"
+                    className="w-full px-4 py-3 border border-gray-300 dark:border-dark-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-dark-800 dark:text-white transition-colors duration-200"
+                    placeholder="+84 123 456 789"
+                  />
+                  {errors.phone && (
+                    <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.phone.message}</p>
+                  )}
+                </div>
 
-              <div className="md:col-span-2">
-                <label htmlFor="preferredDate" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Preferred Date *
-                </label>
-                <input
-                  {...register('preferredDate')}
-                  type="date"
-                  id="preferredDate"
-                  min={new Date().toISOString().split('T')[0]}
-                  className="w-full px-4 py-3 border border-gray-300 dark:border-dark-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-dark-800 dark:text-white transition-colors duration-200"
-                />
-                {errors.preferredDate && (
-                  <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.preferredDate.message}</p>
-                )}
-              </div>
+                <div>
+                  <label htmlFor="gender" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Gender *
+                  </label>
+                  <select
+                    {...register('gender')}
+                    id="gender"
+                    className="w-full px-4 py-3 border border-gray-300 dark:border-dark-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-dark-800 dark:text-white transition-colors duration-200"
+                  >
+                    <option value="">Select Gender</option>
+                    <option value="male">Male</option>
+                    <option value="female">Female</option>
+                    <option value="other">Other</option>
+                  </select>
+                  {errors.gender && (
+                    <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.gender.message}</p>
+                  )}
+                </div>
 
-              <div className="md:col-span-2">
-                <label htmlFor="specialRequests" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Special Requests
-                </label>
-                <textarea
-                  {...register('specialRequests')}
-                  id="specialRequests"
-                  rows={4}
-                  className="w-full px-4 py-3 border border-gray-300 dark:border-dark-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-dark-800 dark:text-white resize-none transition-colors duration-200"
-                  placeholder="Any special requirements or requests..."
-                />
+                <div>
+                  <label htmlFor="dateOfBirth" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Date of Birth
+                  </label>
+                  <input
+                    {...register('dateOfBirth')}
+                    type="date"
+                    id="dateOfBirth"
+                    className="w-full px-4 py-3 border border-gray-300 dark:border-dark-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-dark-800 dark:text-white transition-colors duration-200"
+                  />
+                </div>
+
+                <div>
+                  <label htmlFor="address" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Address
+                  </label>
+                  <input
+                    {...register('address')}
+                    type="text"
+                    id="address"
+                    className="w-full px-4 py-3 border border-gray-300 dark:border-dark-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-dark-800 dark:text-white transition-colors duration-200"
+                    placeholder="Your address"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Booking Details */}
+            <div className="mb-8">
+              <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Booking Details</h4>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div>
+                  <label htmlFor="adults" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Adults *
+                  </label>
+                  <input
+                    {...register('passengers.adults')}
+                    type="number"
+                    id="adults"
+                    min="1"
+                    className="w-full px-4 py-3 border border-gray-300 dark:border-dark-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-dark-800 dark:text-white transition-colors duration-200"
+                  />
+                  {errors.passengers?.adults && (
+                    <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.passengers.adults.message}</p>
+                  )}
+                </div>
+
+                <div>
+                  <label htmlFor="children" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Children
+                  </label>
+                  <input
+                    {...register('passengers.children')}
+                    type="number"
+                    id="children"
+                    min="0"
+                    className="w-full px-4 py-3 border border-gray-300 dark:border-dark-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-dark-800 dark:text-white transition-colors duration-200"
+                  />
+                </div>
+
+                <div>
+                  <label htmlFor="departureDate" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Departure Date *
+                  </label>
+                  <input
+                    {...register('departureDate')}
+                    type="date"
+                    id="departureDate"
+                    min={new Date().toISOString().split('T')[0]}
+                    className="w-full px-4 py-3 border border-gray-300 dark:border-dark-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-dark-800 dark:text-white transition-colors duration-200"
+                  />
+                  {errors.departureDate && (
+                    <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.departureDate.message}</p>
+                  )}
+                </div>
               </div>
             </div>
 
             {/* Price Summary */}
             <div className="mt-6 p-4 bg-gray-50 dark:bg-dark-800 rounded-lg">
-              <div className="flex justify-between items-center">
+              <div className="flex justify-between items-center mb-2">
+                <span className="text-sm text-gray-600 dark:text-gray-400">
+                  Base Price (${item.price} × {totalPassengers} passengers)
+                </span>
+                <span className="text-sm text-gray-900 dark:text-white">
+                  ${item.price * totalPassengers}
+                </span>
+              </div>
+              <div className="flex justify-between items-center pt-2 border-t border-gray-200 dark:border-dark-600">
                 <span className="text-lg font-medium text-gray-900 dark:text-white">
                   Total Price:
                 </span>
