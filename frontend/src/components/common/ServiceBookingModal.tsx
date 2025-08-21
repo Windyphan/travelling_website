@@ -209,20 +209,20 @@ const ServiceBookingModal: React.FC<ServiceBookingModalProps> = ({ isOpen, onClo
         ></div>
 
         {/* Modal */}
-        <div className="inline-block w-full max-w-4xl my-8 overflow-hidden text-left align-middle transition-all transform bg-white dark:bg-dark-850 shadow-xl rounded-2xl">
+        <div className="inline-block w-full max-w-4xl my-8 overflow-hidden text-left align-middle transition-all transform bg-white dark:bg-dark-850 shadow-xl rounded-2xl border border-gray-200 dark:border-dark-white-800/20">
           {/* Header */}
-          <div className="flex items-center justify-between p-6 border-b dark:border-dark-700">
+          <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-dark-white-800/20 bg-gray-50 dark:bg-dark-825">
             <div>
-              <h3 className="text-2xl font-bold text-gray-900 dark:text-white">
+              <h3 className="text-2xl font-bold text-gray-900 dark:text-dark-white-100 mb-1">
                 Book {serviceType === 'tours' ? 'Tour' : serviceType === 'car-rental' ? 'Car Rental' : 'Service'}
               </h3>
-              <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+              <p className="text-sm text-gray-600 dark:text-dark-white-400">
                 {item.title}
               </p>
             </div>
             <button
               onClick={onClose}
-              className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+              className="p-2 text-gray-400 hover:text-gray-600 dark:text-dark-white-500 dark:hover:text-dark-white-300 transition-colors rounded-lg hover:bg-gray-100 dark:hover:bg-dark-750"
             >
               <Icon icon={Icons.FiX} className="w-6 h-6" />
             </button>

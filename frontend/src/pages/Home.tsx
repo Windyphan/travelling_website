@@ -176,26 +176,26 @@ const Home: React.FC = () => {
       </section>
 
       {/* About Us Section */}
-      <section className="py-20 bg-white dark:bg-dark-800 transition-colors duration-200">
+      <section className="py-20 bg-white dark:bg-dark-825 transition-colors duration-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             {/* Left side - Company Quote with Nature Background */}
             <div className="relative">
               <div
-                className="relative h-96 rounded-2xl overflow-hidden bg-cover bg-center"
+                className="relative h-96 rounded-2xl overflow-hidden bg-cover bg-center shadow-2xl"
                 style={{
                   backgroundImage: `url('https://static.wixstatic.com/media/8fa70e_ca95c635557f41c7b98ac645bb27d085~mv2.jpg/v1/fill/w_675,h_312,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/This%20was%20indeed%20one-of-a-kind%20experience.jpg%201x,%20https://static.wixstatic.com/media/8fa70e_ca95c635557f41c7b98ac645bb27d085~mv2.jpg/v1/fill/w_1350,h_624,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/This%20was%20indeed%20one-of-a-kind%20experience.jpg%202x')`,
                 }}
               >
-                <div className="absolute inset-0 bg-black/40"></div>
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-black/40"></div>
                 <div className="relative z-10 h-full flex items-center justify-center p-8">
                   <div className="text-center text-white">
-                    <blockquote className="text-2xl md:text-3xl font-serif italic leading-relaxed mb-6">
+                    <blockquote className="text-2xl md:text-3xl font-serif italic leading-relaxed mb-6 drop-shadow-lg">
                       "For over 15 years, Trang Thanh Travel has been a trusted companion, helping customers have smooth and memorable trips. From organizing tours, events, to renting private cars, making visas, or booking airline tickets, cruises, trains, hotels, we can take care of everything so that you have the most perfect experience."
                     </blockquote>
                     <div className="flex items-center justify-center">
                       <div className="w-12 h-px bg-white/60 mr-4"></div>
-                      <p className="text-lg font-medium">Travel Beyond Boundaries</p>
+                      <p className="text-lg font-medium drop-shadow-md">Travel Beyond Boundaries</p>
                       <div className="w-12 h-px bg-white/60 ml-4"></div>
                     </div>
                   </div>

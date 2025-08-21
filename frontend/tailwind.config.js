@@ -40,10 +40,29 @@ module.exports = {
           500: '#64748b',
           600: '#475569',
           700: '#334155',
+          750: '#2a3441', // New: Lighter mix with more white
           800: '#1e293b',
+          825: '#1c2530', // New: White-mixed variant
           850: '#1a2332', // Mix of white and RGB(18, 41, 65)
+          875: '#162028', // New: Subtle white mixing
           900: '#122941', // RGB(18, 41, 65)
+          925: '#0f1c2e', // New: Deeper with white hints
           950: '#0f1f35', // Darker variant
+        },
+        // Add new white-mixed variants for better contrast
+        'dark-white': {
+          50: '#fefefe',
+          100: '#fdfdfd',
+          200: '#fbfbfb',
+          300: '#f8f9fa',
+          400: '#f1f3f4',
+          500: '#e8eaed',
+          600: '#dadce0',
+          700: '#bdc1c6',
+          800: '#9aa0a6',
+          850: '#80868b',
+          900: '#5f6368',
+          950: '#3c4043',
         }
       },
       fontFamily: {
